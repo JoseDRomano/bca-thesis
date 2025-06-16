@@ -95,7 +95,8 @@ processes, including various human diseases \cite{mirna_as_biomarkers_Ho2022} (H
 
 Given their regulatory nature, several studies have demonstrated a significant association between \gls{miRNAs} expression 
 profiles and relevant clinical characteristics in the context of \gls{BC}, including processes such as tumor 
-progression and metastasis development \cite{mirna_as_biomarkers_Ho2022} \cite{mirnas_in_bc_Muñoz2023} (Muñoz \textit{et al.}, 2023) \cite{mirna_as_bio_for_sub_Blenkiron2007MicroRNA} (Blenkiron \textit{et al.}, 2007). 
+progression and metastasis development \cite{mirna_as_biomarkers_Ho2022} \cite{mirnas_in_bc_Muñoz2023} (Muñoz \textit{et al.}, 2023) 
+\cite{mirna_as_bio_for_sub_Blenkiron2007MicroRNA} (Blenkiron \textit{et al.}, 2007). 
 In addition to these aspects, a seminal 
 study by Blenkiron \textit{et al.} (2007) demonstrated that \gls{miRNAs} expression profiles can effectively distinguish between 
 different molecular subtypes of \gls{BC}, highlighting their potential as a precise subtyping tool. This ability to 
@@ -120,3 +121,165 @@ identification of reliable biomarkers for this disease.
 This reality reinforces the urgency of developing advanced computational tools that can enable more precise molecular 
 characterization and guide personalized therapeutic decisions, ultimately improving clinical outcomes for patients with 
 aggressive and hard-to-treat \gls{BC} subtypes.
+
+\section{Background}
+\label{sec:background}
+\subsection{Biology}
+
+The modern understanding of how genetic information is stored, interpreted, and regulated in cells is based on a fundamental 
+principle known as the Central Dogma of Molecular Biology. This concept, first formulated by Francis Crick in $1958$, describes 
+the unidirectional flow of genetic information in cells: from deoxyribonucleic acid (DNA) to ribonucleic acid (RNA), and from there 
+to protein synthesis. According to this model, genes encoded in DNA are transcribed into messenger RNA (mRNA), which in turn is 
+translated into proteins—the functional molecules responsible for most essential biological processes. This dogma has served as 
+the basis for much of the research in molecular biology and biotechnology.
+
+However, in recent decades, it has become clear that this flow of information is regulated in a much more complex way than initially 
+thought. In particular, it has been discovered that a substantial part of the genome is transcribed into non-coding RNA, i.e., RNA 
+that does not give rise to proteins but plays fundamental regulatory roles. It is in this context that microRNAs (miRNAs) emerge, 
+small RNA molecules with central functions in the regulation of gene expression. Their discovery has broadened the classical view 
+of the central dogma, introducing new layers of post-transcriptional control that decisively influence normal and pathological biological phenomena.
+
+\subsubsection*{DNA \& RNA - the Genetic Code}
+
+At the molecular level, the genetic information of all living organisms is encoded in a molecule called deoxyribonucleic acid (DNA). 
+DNA consists of two complementary strands arranged in a double helix structure, with each strand consisting of a sequence of nucleotides. 
+These nucleotides are composed of a sugar-phosphate structure and one of four nitrogenous bases: adenine (A), cytosine (C), guanine (G), 
+and thymine (T) \cite{ConceptsBiology_DNA}. When in the helix structure, these bases can only be linked to their corresponding base: 
+adenine can only be linked to thymine and cytosine to guanine, and it is in the sequence of bases that the instructions necessary for the 
+synthesis of all the proteins that govern cell structure and function are encoded.
+ 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{dna.jpg}
+\caption{Structure of the DNA double helix}
+\label{fig:dna}
+\end{figure}
+
+The functional units of DNA are called genes, which are discrete sequences that contain the instructions for producing proteins. However, 
+DNA itself cannot participate directly in protein synthesis. Instead, a process called transcription is used to copy the information 
+from a gene to a ribonucleic acid (RNA) molecule \cite{basic_biology_NCBI2002}. Unlike DNA, RNA is single-stranded and uses uracil (U) 
+instead of thymine as one of its bases.
+
+Among the various types of RNA, the best known is messenger RNA (mRNA), which serves as an intermediary between genes and proteins. 
+During transcription, an mRNA molecule is synthesized as a complementary copy of a gene, and this mRNA carries the genetic message 
+from the DNA in the nucleus to the ribosomes in the cytoplasm, where protein synthesis occurs. This process, known as translation, 
+is where the mRNA sequence is read in triplets (called codons), each of which corresponds to a specific amino acid \cite{central_dogma_molecular}.
+
+%melhorar estrutura da imagem para ser como no paper
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{transcription1.png}
+\includegraphics[width=0.3\textwidth]{transcription2.png}
+\includegraphics[width=0.3\textwidth]{transcription3.png}
+\caption{Illustration of the transcription mechanism: (a) initiation, (b) elongation, and (c) termination}
+\label{fig:transcription}
+\end{figure}
+
+The set of rules by which the nucleotide sequence in messenger RNA is translated into a sequence of amino acids is known as 
+the genetic code. This code is composed of triplets of nucleotides, called codons, where each codon specifies one of the twenty 
+standard amino acids used in protein synthesis \cite{genetic_codeNovozhilov2008O}.
+
+The genetic code is described as redundant but unambiguous. Redundancy means that most amino acids are encoded by more than 
+one codon—for example, leucine is specified by six different codons—which provides a certain degree of robustness to the system. 
+At the same time, the code is unambiguous because each codon corresponds to only one amino acid; that is, a given codon does not 
+encode multiple amino acids \cite{ConceptsBiology_DNA}.
+
+Another fundamental characteristic of the genetic code is its universality. With very few exceptions, the same codons specify the 
+same amino acids in virtually all living organisms, from bacteria to humans. This evolutionary conservation has been fundamental in 
+enabling the development of many molecular biology tools and biotechnological applications \cite{genetic_codeKoonin2017}.
+
+Although the focus of molecular biology for decades has been on the coding sequence of the genome—that is, the genes that give rise 
+to proteins—it is now known that a large part of the human genome is transcribed into RNA that does not code for proteins. 
+These non-coding RNA (ncRNA) molecules play crucial regulatory roles in controlling gene expression. One of the most studied groups 
+within this class are microRNAs (miRNAs), which appear to be central elements in the fine-tuning of the genetic regulation process.
+
+\subsubsection*{MicroRNAs - The Regulators of Gene Expression}
+MicroRNAs (miRNAs) are small non-coding RNA molecules, approximately $20$ to $25$ nucleotides in length, that play a key 
+role in regulating gene expression at the post-transcriptional level \cite{regulatory_mecha_mirnaGulyaeva2016, first_mirna_Ambros1993,post_transcript_wightman1993}. 
+Instead of encoding proteins, miRNAs act by controlling the production of proteins from genes.
+
+In simple terms, miRNAs function as molecular switches that bind to messenger RNA (mRNA) molecules, blocking their 
+translation into protein or promoting their degradation. This mechanism depends on the degree of complementarity 
+between the miRNA sequence and that of the target mRNA:
+\begin{itemize}
+    \item When there is high complementarity, the mRNA tends to be degraded.
+    \item When complementarity is partial, the miRNA generally acts by inhibiting translation without destroying the mRNA \cite{role_mirna_Calaf2023}.
+\end{itemize}
+
+The action of miRNAs occurs mainly in the untranslated 3' region (3'UTR) of mRNA and is mediated by protein complexes 
+such as RISC (RNA-induced silencing complex), which facilitates this interaction \cite{regulatory_mecha_mirnaGulyaeva2016}. This regulation 
+is highly efficient: a single miRNA can control dozens to hundreds of different genes, and it is estimated that more 
+than $60\%$ of human coding genes are targeted for regulation by miRNAs \cite{role_mirna_Calaf2023}.
+
+Due to this broad regulatory capacity, miRNAs play a central role in multiple cellular processes such as proliferation, 
+differentiation, apoptosis, and stress response. Consequently, changes in miRNA expression profiles are associated with 
+several diseases, including cancer, neurodegenerative and cardiovascular diseases. In an oncological context, miRNAs can 
+act as oncogenes (promoting tumor growth) or as tumor suppressors, depending on the biological context and cell type \cite{regulatory_mecha_mirnaGulyaeva2016}.
+
+Due to their specificity, stability, and direct involvement in relevant molecular mechanisms, miRNAs have been extensively 
+investigated as promising biomarkers for diagnosis, prognosis, and subtype stratification in various diseases—including cancer.
+
+\subsubsection*{Cancer - A Complex Disease}
+Cancer is a disease characterized by the uncontrolled proliferation of transformed cells, which can invade neighboring 
+tissues and spread to other parts of the body through processes such as metastasis. This definition, based on that of the 
+NCI, has recently been expanded to recognize the role of natural selection in the evolution of cancer: it is a cellular 
+system that continuously evolves, adapting to internal and external pressures to ensure its survival \cite{def_of_cancer_Brown2023,NCI2021}.
+
+Under normal conditions, the body's cells divide only when necessary, die when damaged or obsolete, and are replaced by 
+new ones. However, in cancer, this biological balance is disrupted: abnormal cells gain the ability to multiply 
+independently of the body's signals and to resist programmed cell death (apoptosis). These transformed cells become 
+autonomous units that not only ignore normal growth controls but also interact with the tumor microenvironment to 
+promote their own survival, using angiogenesis, immune evasion, and other adaptive mechanisms \cite{def_of_cancer_Brown2023,NCI2021}.
+
+The result is a heterogeneous cell population, subject to natural selection within the human body. Cells that acquire 
+adaptive advantages (e.g., higher proliferation rate, drug resistance, or migration ability) tend to prevail, making 
+cancer a constantly evolving disease \cite{def_of_cancer_Brown2023}.
+
+Although cancer can arise in virtually any tissue, not all cellular changes are malignant. There are precancerous 
+conditions, such as hyperplasia or dysplasia, which represent an increase in the number of cells or changes in their 
+morphology, but which do not yet invade surrounding tissues.
+
+Progression to true cancer involves the acquisition of invasive and metastatic capacity—properties that distinguish 
+malignant tumors from benign ones. This process can be silent for years, until more severe symptoms arise, often related 
+to the invasion of vital organs.
+
+\subsubsection*{Breast Cancer \& its Subtypes}
+
+Breast cancer is the most commonly diagnosed cancer in women worldwide and is one of the leading causes of cancer death 
+in developed and developing countries \cite{BreastEpidemiology_Romanowicz2022, updatedbca_Hong2022Breast}. It is estimated that one in eight women 
+will be diagnosed with this disease during their lifetime, although it can also affect men—albeit with a much lower 
+incidence \cite{BreastEpidemiology_Romanowicz2022}.
+
+Most breast tumors originate in the epithelial cells of the ducts or lobules of the breast, which acquire malignant 
+properties after the accumulation of genetic and epigenetic changes. These events alter the normal control of cell 
+proliferation, differentiation, and apoptosis, allowing for unregulated tumor growth \cite{origins_and_evolution_bca_Polyak2007}.
+
+The development of the disease is associated with a set of well-established risk factors, which include:
+\begin{itemize}
+    \item Age and family history of the disease;
+    \item Hereditary genetic mutations, especially in the \textit{BRCA1} and \textit{BRCA2} genes;
+    \item Prolonged exposure to endogenous or exogenous hormones (e.g., early menarche, late menopause, hormone therapy);
+    \item Environmental and behavioral factors, such as obesity, physical inactivity, alcohol consumption, and a diet rich 
+    in saturated fats \cite{BreastEpidemiology_Romanowicz2022,clinical_implication_bca_Adamo2015}.
+\end{itemize}
+
+From a molecular and clinical point of view, breast cancer is highly heterogeneous. Each tumor may have unique 
+combinations of genetic alterations, signaling pathways, and gene expression profiles, which are reflected in different 
+clinical behaviors, degrees of aggressiveness, and response to treatment \cite{origins_and_evolution_bca_Polyak2007,diff_bca_usa_Howlader2018}.
+
+Early detection is crucial for prognosis. When diagnosed in its early stages, breast cancer has survival rates of over 
+$90\%$. However, in more advanced stages, especially when metastases appear, controlling the disease becomes substantially 
+more difficult and the therapeutic goal shifts from curative to palliative \cite{updatedbca_Hong2022Breast,clinical_implication_bca_Adamo2015}.
+
+The therapeutic approach is typically multimodal, combining surgery, radiotherapy, chemotherapy, hormone therapy, and 
+targeted or biological therapies, depending on the characteristics of the tumor and the patient's general condition. 
+The most significant advance in the last decade has been the transition from a uniform model to a personalized treatment 
+approach, tailored to the molecular subtype and individual risk \cite{BreastEpidemiology_Romanowicz2022}.
+
+In addition, it has been recognized that breast tumors are not static entities. Due to phenomena of intra-tumor heterogeneity 
+and clonal evolution, tumors adapt to the selective pressure of treatments, often leading to the development of therapeutic 
+resistance and disease progression \cite{origins_and_evolution_bca_Polyak2007}.
+
+
+
+\subsection{Artificial Intelligence}
