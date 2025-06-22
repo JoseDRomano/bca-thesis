@@ -14,15 +14,42 @@
 \section{Motivation \& Problem Statement}
 \label{sec:motivation+problem-statement}
 \subsection{Breast Cancer - A Global Health Challenge}
-\gls{BC} is currently one of the biggest public health challenges worldwide. In 2022,
-more than $2.3$ million new cases of \gls{BC} were diagnosed, resulting in around $665,\!000$ global deaths
-\textcite{bcaData2024_bray}. Other studies estimate that \gls{BC} will continue to not only be
-the most commonly diagnosed cancer but also to increase in incidence, with projections indicating that by 2040, the number
-of deaths will almost double and the number of new cases will be around $3.2$ million \textcite{bca_data_Arnold2022Current}.
-These figures underline the high incidence and mortality associated with the disease, highlighting the ongoing need to
-develop more effective strategies for its diagnosis and treatment.
 
-%% Incidencia de cancro -> converter imagem em código LaTeX https://gco.iarc.who.int/media/globocan/factsheets/populations/900-world-fact-sheet.pdf
+\gls{BC} is currently one of the biggest public health challenges worldwide. In 
+2022, more than $2.3$ million new cases of \gls{BC} were diagnosed, resulting in
+around $665,\!000$ global deaths \textcite{bcaData2024_bray}. Other studies 
+estimate that \gls{BC} will continue to not only bethe most commonly diagnosed 
+cancer but also to increase in incidence, with projections indicating that by 
+2040, the number of deaths will almost double and the number of new cases will 
+be around $3.2$ million \textcite{bca_data_Arnold2022Current}. These figures 
+underline the high incidence and mortality associated with the disease, 
+highlighting the ongoing need to develop more effective strategies for 
+its diagnosis and treatment.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.0\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/graphic_incidencies_world.png}
+  \caption{Age-standardized incidence rate (ASR, per 100,000 inhabitants) of breast cancer in both sexes in 2022. The data represent global estimates based on \textcite{GLOBOCAN2022}, highlighting significant geographical variations in disease burden.}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.8\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/new_cases_2020_2040.png}
+    \caption{NEW CASES}
+    \label{fig:imagem1}
+  \end{subfigure}
+  \vspace{0.5cm}
+  \begin{subfigure}[b]{0.8\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/deaths_2020_2040.png}
+    \caption{MORTES}
+    \label{fig:imagem2}
+  \end{subfigure}
+  \caption{Comparação visual entre dois cenários de interesse.}
+  \label{fig:duas-imagens-empilhadas}
+\end{figure}
 
 BC is characterized by marked biological heterogeneity, manifested in multiple
 molecular subtypes that exhibit distinct clinical behaviors
@@ -146,7 +173,7 @@ implementation of a control group would not only broaden the scope of the
 model's task (e.g., distinguishing between the presence and absence of cancer
 before predicting the subtype), but also optimize the robustness of biomarker
 identification. An illustrative example of this phenomenon is presented in the
-study \textcite{ml_gastric_Azari2023} where the implementation of a control set 
+study \textcite{ml_gastric_Azari2023} where the implementation of a control set
 was fundamental to the identification of discriminative markers.
 
 The data for this study were previously selected by Dr. Bárbara Mendes and her
@@ -166,11 +193,11 @@ of algorithms and attention to the pipeline that is set up to ensure that the
 results obtained are robust and relevant.
 
 Furthermore, this problem cannot be addressed with data augmentation techniques
-used in the field of \glossary{ML}, such as \textit{SMOTE} (Synthetic
-Minority Over-sampling Technique) \textcite{SMOTE_Blagus2013SMOTE}. As
-discussed earlier in the topic \ref{sec:biological-heterogeneity}, the nature
-of this data makes reliable synthetic generation unfeasible, which can lead to
-artificially inconsistent samples ("Extra-terrestial beings", in other words).
+used in the field of \glossary{ML}, such as \textit{SMOTE} (Synthetic Minority
+Over-sampling Technique) \textcite{SMOTE_Blagus2013SMOTE}. As discussed earlier
+in the topic \ref{sec:biological-heterogeneity}, the nature of this data makes
+reliable synthetic generation unfeasible, which can lead to artificially
+inconsistent samples ("Extra-terrestial beings", in other words).
 
 Having a control set would be an important step toward increasing the
 generalizability of our model. This data set would not only allow us to expand
