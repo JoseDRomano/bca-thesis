@@ -15,15 +15,15 @@
 \label{sec:motivation+problem-statement}
 \subsection{Breast Cancer - A Global Health Challenge}
 
-\gls{BC} is currently one of the biggest public health challenges worldwide. In 
+\gls{BC} is currently one of the biggest public health challenges worldwide. In
 2022, more than $2.3$ million new cases of \gls{BC} were diagnosed, resulting in
-around $665,\!000$ global deaths \textcite{bcaData2024_bray}. Other studies 
-estimate that \gls{BC} will continue to not only bethe most commonly diagnosed 
-cancer but also to increase in incidence, with projections indicating that by 
-2040, the number of deaths will almost double and the number of new cases will 
-be around $3.2$ million \textcite{bca_data_Arnold2022Current}. These figures 
-underline the high incidence and mortality associated with the disease, 
-highlighting the ongoing need to develop more effective strategies for 
+around $665,\!000$ global deaths \textcite{bcaData2024_bray}. Other studies
+estimate that \gls{BC} will continue to not only bethe most commonly diagnosed
+cancer but also to increase in incidence, with projections indicating that by
+2040, the number of deaths will almost double and the number of new cases will
+be around $3.2$ million \textcite{bca_data_Arnold2022Current}. These figures
+underline the high incidence and mortality associated with the disease,
+highlighting the ongoing need to develop more effective strategies for
 its diagnosis and treatment.
 
 \begin{figure}[h!]
@@ -73,13 +73,12 @@ Given their regulatory nature, several studies have demonstrated a significant
 association between \gls{miRNAs} expression profiles and relevant clinical
 characteristics in the context of \gls{BC}, including processes such as tumor
 progression and metastasis development \textcite{mirna_as_biomarkers_Ho2022}
-\textcite{mirnas_in_bc_Muñoz2023}
-\textcite{mirna_as_bio_for_sub_Blenkiron2007MicroRNA}. In addition to these
-aspects, a seminal study by Blenkiron \textit{et al.} (2007) demonstrated that
-\gls{miRNAs} expression profiles can effectively distinguish between different
-molecular subtypes of \gls{BC}, highlighting their potential as a precise
-subtyping tool. This ability to discriminate between subtypes reinforces the
-value of \gls{miRNAs} as promising clinical biomarkers.
+\textcite{mirnas_in_bc_Muñoz2023}. In addition to these aspects, a seminal
+study by \textcite{mirna_as_bio_for_sub_Blenkiron2007MicroRNA} demonstrated
+that \gls{miRNAs} expression profiles can effectively distinguish between
+different molecular subtypes of \gls{BC}, highlighting their potential as a
+precise subtyping tool. This ability to discriminate between subtypes
+reinforces the value of \gls{miRNAs} as promising clinical biomarkers.
 
 \subsection{How to identify the most relevant miRNAs?}
 
@@ -98,10 +97,10 @@ In this context, \gls{ML} and \gls{DL} models are particularly well suited for
 the task of robustly characterizing and explaining the profiles of
 \gls{miRNAs}-based biomarkers — should such biomarkers exist — with the
 potential to effectively discriminate between different \gls{BC} subtypes, as
-already seen in a study done by \textcite{ml_gastric_Azari2023} Azari
-\textit{et al.} 2023 where \gls{ML} algorithms identified potential diagnostic
-and prognostic \glossary{miRNAs} in gastric cancer, showing high accuracy in
-the identification of reliable biomarkers for this disease.
+already seen in a study done by \textcite{ml_gastric_Azari2023} 2023 where
+\gls{ML} algorithms identified potential diagnostic and prognostic
+\glossary{miRNAs} in gastric cancer, showing high accuracy in the
+identification of reliable biomarkers for this disease.
 
 This reality reinforces the urgency of developing advanced computational tools
 that can enable more precise molecular characterization and guide personalized
@@ -206,6 +205,28 @@ but also improve the identification of discriminative biomarkers. The latter
 has already been successfully tested in other types of cancer, and a key step
 in the pipeline used is precisely the comparison with a control set
 (\textcite{ml_gastric_Azari2023}) to isolate clinically relevant markers.
+
+\section{Expected Contributions}
+\label{sec:expected-contributions}
+The main contribution of this dissertation is the development of a computational
+framework for the classification of \glossary{BC} subtypes based on \glossary{microRNA}
+expression and patient clinical data. This framework will integrate
+and compare different \glossary{ML} and \glossary{DL} approaches (still underexplored for this decease)
+applied to a problem of high biological and statistical complexity.
+
+In addition to the classification process, this framework will include a
+statistical analysis component aimed at validating the predictions made in
+order to give robustness to the decision made by the model. This robustness is
+particularly relevant in a clinical setting, where transparency and reliability
+of predictions are essential for possible future translation into medical
+practice.
+
+Throughout the work, a critical and comparative analysis of the approaches
+explored will be promoted, focusing on their applicability to complex and
+heterogeneous biomedical data. It is thus hoped to contribute to the
+development of more robust, explainable computational solutions adapted to the
+reality of biological systems, reinforcing the potential of \glossary{miRNAs}
+as relevant molecular markers in the stratification of \glossary{BC} patients.
 
 \section{Document Organization}
 \label{sec:document-organization}
