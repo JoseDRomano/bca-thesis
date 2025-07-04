@@ -15,10 +15,10 @@ context related to this work, as well as the work that has been already made in
 the field of microRNA reaserch and its applications in breast cancer as a
 biomarker and a subtype classifier. The chapter is divided into two main
 sections: the first one will present the biological background, including the
-central dogma of molecular biology, the role of microRNAs in gene expression
+central dogma of molecular biology, the role of \gls{mirna} in gene expression
 regulation, and the characteristics of breast cancer and its subtypes. The
 second section will review the related work in the field of microRNA research,
-focusing on the use of microRNAs as biomarkers and subtype classifiers in
+focusing on the use of \gls{mirna} as biomarkers and subtype classifiers in
 breast cancer, as well as the challenges and limitations of current approaches.
 
 \section{Biological Context}
@@ -116,55 +116,55 @@ sequence of the genome—that is, the genes that give rise to proteins—it is n
 known that a large part of the human genome is transcribed into \gls{rna} that
 does not code for proteins. These non-coding \gls{rna} (ncRNA) molecules play
 crucial regulatory roles in controlling gene expression. One of the most
-studied groups within this class are microRNAs (miRNAs), which appear to be
-central elements in the fine-tuning of the genetic regulation process.
+studied groups within this class are \gls{mirna}, which appear to be central
+elements in the fine-tuning of the genetic regulation process.
 
 \subsection{MicroRNAs - The Regulators of Gene Expression}
-MicroRNAs (miRNAs) are small non-coding \gls{rna} molecules, approximately $20$
+\gls{mirna} are small non-coding \gls{rna} molecules, approximately $20$
 to $25$ nucleotides in length, that play a key role in regulating gene
 expression at the post-transcriptional level
 \cite{regulatory_mecha_mirnaGulyaeva2016,
   first_mirna_Ambros1993,post_transcript_wightman1993}. Instead of encoding
-proteins, miRNAs act by controlling the production of proteins from genes.
+proteins, \gls{mirna} act by controlling the production of proteins from genes.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{mirna_process.png}
   \caption{The figure shows the process of gene expression: DNA is transcribed
-    into mRNA, which is then translated into protein by the ribosome. microRNAs
+    into mRNA, which is then translated into protein by the ribosome. \gls{mirna}
     are shown as regulators acting on the mRNA before translation.}
   \label{fig:mirna_mechanism}
 \end{figure}
 
-In simple terms, \textbf{miRNAs function as molecular switches that bind to
-  messenger \gls{rna} (mRNA) molecules}, blocking their translation into protein
-or promoting their degradation. This mechanism depends on the degree of
-complementarity between the miRNA sequence and that of the target mRNA:
+In simple terms, \textbf{\gls{mirna} function as molecular switches that bind
+  to messenger \gls{rna} (mRNA) molecules}, blocking their translation into
+protein or promoting their degradation. This mechanism depends on the degree of
+complementarity between the \gls{mirna} sequence and that of the target mRNA:
 
 \begin{itemize}
   \item When there is high complementarity, the mRNA tends to be degraded;
-  \item When complementarity is partial, the miRNA generally acts by inhibiting
+  \item When complementarity is partial, the \gls{mirna} generally acts by inhibiting
         translation without destroying the mRNA.
 \end{itemize}
 
 A study made by \textcite{role_mirna_Calaf2023} demonstrates the high
-effienciency of this mechanism of regulation: a \textbf{single miRNA can
+effienciency of this mechanism of regulation: a \textbf{single \gls{mirna} can
   control dozens to hundreds of different genes}, and it is estimated that more
-than $60\%$ of human coding genes are targeted for regulation by miRNAs.
+than $60\%$ of human coding genes are targeted for regulation by \gls{mirna}.
 
-Due to this broad regulatory capacity, miRNAs play a central role in multiple
-cellular processes such as proliferation, differentiation, apoptosis, and
-stress response. Consequently, changes in miRNA expression profiles are
-associated with several diseases, including cancer, neurodegenerative and
-cardiovascular diseases. In an oncological context, miRNAs can act as oncogenes
-(promoting tumor growth) or as tumor suppressors, depending on the biological
-context and cell type as shown by
+Due to this broad regulatory capacity, \gls{mirna} play a central role in
+multiple cellular processes such as proliferation, differentiation, apoptosis,
+and stress response. Consequently, changes in \gls{mirna} expression profiles
+are associated with several diseases, including cancer, neurodegenerative and
+cardiovascular diseases. In an oncological context, \gls{mirna} can act as
+oncogenes (promoting tumor growth) or as tumor suppressors, depending on the
+biological context and cell type as shown by
 \textcite{regulatory_mecha_mirnaGulyaeva2016}.
 
 Due to their specificity, stability, and direct involvement in relevant
-molecular mechanisms, miRNAs have been extensively investigated as promising
-biomarkers for diagnosis, prognosis, and subtype stratification in various
-diseases—including cancer.
+molecular mechanisms, \gls{mirna} have been extensively investigated as
+promising biomarkers for diagnosis, prognosis, and subtype stratification in
+various diseases—including cancer.
 
 \subsection{Cancer - A Complex Disease}
 Cancer is a disease characterized by the uncontrolled proliferation of
@@ -371,7 +371,7 @@ these contributions inform and substantiate the methodological choices made in
 the present work, justifying, whenever possible, the algorithmic and
 experimental choices based on the available scientific evidence.
 
-\subsection{Leveraging \gls{ai} models for \gls{bc} subtype classification}
+\subsection{Leveraging \gls{ai} models for cancer classification}
 % HERE: começar com cancer classification em geral -> depois falar de 
 % Papers a usar: 4, 10 , 11, 12 ( estes dois últimos são com imagens, mas podemos abordar)
 
@@ -386,7 +386,7 @@ human experts in the diagnosis of malignant skin lesions.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.7\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/NN.png}
-  \caption{Structure of an deep neural network (DNNs). It shows the input, hidden, and output layers, with connections between neurons responsible for processing information.}
+  \caption{Structure of an deep neural network (DNNs). It shows the input, hidden, and output layers, with connections between neurons responsible for processing information \cite{analyticsvidhya_image}.}
   \label{fig:DNN}
 \end{figure}
 
@@ -395,7 +395,8 @@ convolutional neural networks (CNNs) - a type of DNN that is particularly
 effective in image processing (Figure \ref{fig:CNN_derma}). CNNs work by
 applying convolutional filters that extract visual patterns at different levels
 of complexity, allowing the model to identify relevant features directly from
-the image pixels, without the need for specialized preprocessing.
+the image pixels, without the need for specialized preprocessing
+\cite{CNN_Albawi2017}.
 
 \begin{figure}[htbp]
   \centering
@@ -481,14 +482,233 @@ images, ignoring irrelevant regions such as background or healthy skin -
 promising evidence of \textit{automated clinical focus} with real practical
 utility.
 
-\begin{figure}
+\begin{figure} [h]
   \centering
-  \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/t_sne_derma.png}
+  \includegraphics[width=0.5\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/t_sne_derma.png}
   \caption{t-SNE projection of the internal representations of the last hidden layer of the CNN \cite{ai_in_dermacancer_esteva2017}. The different classes of lesions are grouped into distinct clouds, revealing the model's ability to extract relevant discriminative features.}
   \label{fig:tsne_derma}
 \end{figure}
 
-\subsection{\gls{ml} unravelling microRNAs as biomarkers}
+\noindent\rule{\linewidth}{0.4pt}
+
+The effectiveness demonstrated in the previous project shows the magnitude of
+the benefits that \gls{ai} can bring to the world of medicine, helping doctors
+diagnose and stratify diseases with an accuracy that, in some cases, surpasses
+that of human specialists. This capability is not limited to imaging data: it
+also extends to the field of molecular data and dermatology, as demonstrated by
+the study by \textcite{bca_subtypes_with_ml_Wu_2021}, which applies machine
+learning algorithms to the task of classifying breast cancer subtypes (in this
+case, the goal was to distinguish between Triple Negative, or basal-like, and
+non-Triple Negative tumors, since TNBC is the most deadly cancer with the most
+difficult prognosis, as we saw in the table).
+
+In the study by \textcite{bca_subtypes_with_ml_Wu_2021}, when working with gene
+expression data from thousands of patients, additional challenges arise related
+to the high dimensionality of the data, requiring robust feature selection
+methods and predictive models capable of dealing with complex and often
+non-linear correlations. This type of study brings us closer not only to the
+context of this thesis, but also to the type of challenges we will encounter
+and how we can take advantage of the methodologies used in this paper to
+achieve good results.
+
+In this work, the Support Vector Machine (\textit{SVM}) algorithm stood out for
+its performance. This approach allowed us to achieve high levels of accuracy,
+sensitivity, and specificity, demonstrating the potential of \gls{ai} in
+classifying breast cancer subtypes based on genomic information.
+
+In this case, the source of information is the RNA-Sequence (RNA-Seq) profiles
+made available by The Cancer Genome Atlas (TCGA), a public database containing
+thousands of tumor samples characterized at the genomic level. After a rigorous
+quality control, noise removal, and normalization step, the final dataset
+included 934 tumor samples and more than 57{,}000 genes expressed per sample -
+a typical high-dimensionality scenario, where the number of variables far
+exceeds the number of observations.
+
+To address this challenge, differential expression analysis was applied - a
+bioinformatics technique used to detect which genes are significantly more or
+less expressed between different conditions - resulting in the selection of
+5{,}502 differentially expressed genes, which served as input for the
+predictive models (a large reduction of over 50{,}000 genes). This step
+corresponds to feature selection, which is essential in problems where there is
+a high risk of \textit{overfitting} - that is, when the model memorizes the
+training data but fails to generalize to new examples.
+
+\begin{figure} [h]
+  \centering
+  \includegraphics[width=1.0\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/overfit.png}
+  \caption{Examples of underfitting, proper fitting, and overfitting.
+    From left to right: the model underfits the data, fits it appropriately, and overfits by capturing noise instead of the underlying pattern \cite{overfiting_ailab_mti_image}.}
+  \label{fig:overfitting}
+\end{figure}
+
+Now that the dataset had been reduced to a more informative and manageable
+subset of features, the authors moved on to the predictive modeling phase. This
+is a crucial moment in the \gls{ml} pipeline, where the ability of different
+algorithms to learn discriminative patterns present in the data is tested—in
+this case, distinguishing between TNBC and non-TNBC tumors based on the
+expression levels of selected genes. Several classic supervised learning
+algorithms were then evaluated, representing different approaches to the
+classification task:
+
+\begin{itemize}
+  \item \textbf{K-nearest Neighbors (\textit{kNN})}: classifies new data based on the K nearest neighbors in the feature space \cite{knn_article}.
+        \begin{figure} [h]
+          \centering
+          \includegraphics[width=0.45\linewidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/knn-example.jpg}
+          \caption{Illustration of the k-Nearest Neighbors (k-NN) classification process. The top-left panel shows the initial labeled data (Class A in yellow, Class B in purple) and a new unlabeled sample (?). The top-right panel demonstrates the calculation of distances from the new sample to all existing points. The bottom panel shows the selection of the k=3 nearest neighbors and class assignment based on majority voting, resulting in the classification of the new sample.}
+        \end{figure}
+
+  \item \textbf{Naïve Bayes (\textit{NB})}: uses Bayes' Theorem to estimate the most likely class of a sample, assuming that the input variables are independent of each other (\cite{naivebayes_Watson2001}).
+        \[
+          P(C_k \mid \mathbf{x}) = \frac{P(C_k) \prod_{i=1}^n P(x_i \mid C_k)}{P(\mathbf{x})}
+        \]
+
+  \item \textbf{Decision Tree (\textit{DT})}: a model that makes decisions through a hierarchical tree-shaped structure, where each internal node represents a condition on a variable, and each branch represents a possible outcome of that condition. The process continues until it reaches a leaf node, which indicates the final class or value \cite{decision_trees_Jijo2021}.
+        \begin{figure} [h]
+          \centering
+          \includegraphics[width=0.45\linewidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/dt-example.png}
+          \caption{Example of a Decision Tree for Classification Based on Attributes: Income, Age, Student Status, and Credit Rating (CR). The tree predicts a binary decision outcome (Yes/No) using hierarchical decision rules \cite{decision_trees_Jijo2021Classification}.}
+        \end{figure}
+
+  \item \textbf{Support Vector Machine (\textit{SVM})}: This algorithm constructs an optimal hyperplane that best separates samples from different classes. The goal of SVM is to maximize the margin between the two classes for better generalization. Support vectors are the data points that lie closest to the hyperplane and define its position.
+        \begin{figure} [h]
+          \centering
+          \includegraphics[width=0.45\linewidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/SVM.png}
+          \caption{Visualization of a Support Vector Machine (SVM) classifier. The red line represents the optimal hyperplane that separates two classes (blue and green points), while the dashed lines indicate the margins.}
+        \end{figure}
+\end{itemize}
+
+In order to evaluate a model, performance metrics are used to assess how well
+it performs across different dimensions, such as accuracy, relevance, and
+sensitivity to different classes. These metrics provide quantitative insight
+into the strengths and limitations of a classification algorithm, allowing
+researchers and practitioners to make informed decisions when comparing models
+or tuning parameters. Evaluating models using multiple metrics is especially
+important in scenarios involving imbalanced datasets, where a single metric
+(such as accuracy) may not provide a complete picture. The most commonly used
+evaluation metrics in classification tasks, according to
+\textcite{metrics_models_yaseen2021}, are:
+
+\begin{enumerate}
+  \item \textbf{Accuracy} \\
+        Accuracy is the ratio of correctly predicted instances to the total number of instances. It measures the overall effectiveness of a classification model.
+        \[
+          \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+        \]
+        where:
+        \begin{itemize}
+          \item TP = True Positives
+          \item TN = True Negatives
+          \item FP = False Positives
+          \item FN = False Negatives
+        \end{itemize}
+
+  \item \textbf{Precision} \\
+        Precision measures the proportion of correctly predicted positive observations to the total predicted positive observations. It reflects the model’s ability to return only relevant results.
+        \[
+          \text{Precision} = \frac{TP}{TP + FP}
+        \]
+
+  \item \textbf{Recall (Sensitivity or True Positive Rate)} \\
+        Recall is the ratio of correctly predicted positive observations to all actual positives. It indicates the model’s ability to identify all relevant cases.
+        \[
+          \text{Recall} = \frac{TP}{TP + FN}
+        \]
+
+  \item \textbf{F1-Score} \\
+        The F1-Score is the harmonic mean of Precision and Recall, providing a balance between the two. It is particularly useful when the class distribution is imbalanced.
+        \[
+          \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+        \]
+
+  \item \textbf{Support} \\
+        Support refers to the number of actual occurrences of each class in the dataset. While not a performance metric per se, it helps in understanding how many examples a classifier is making predictions on for each class.
+\end{enumerate}
+
+Now that we are familiar with the main concepts of classification models and
+the metrics used to evaluate them, let us return to the study by Wu and Hicks
+(2021) in light of these indicators. The analysis of the results, presented in
+the following table, allows us to see more clearly how each algorithm performed
+in the task of distinguishing between TNBC and non-TNBC, highlighting the
+performance of SVM in virtually all scenarios evaluated.
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{|l|c|c|c|c|c|}
+    \hline
+    \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1-score} & \textbf{Specificity} \\
+    \hline
+    kNN            & 0.81              & 0.76            & 0.80               & 0.78              & 0.86                 \\
+    Naïve Bayes    & 0.84              & 0.81            & 0.83               & 0.82              & 0.88                 \\
+    Decision Tree  & 0.88              & 0.86            & 0.87               & 0.86              & 0.89                 \\
+    \textbf{SVM}   & \textbf{0.90}     & \textbf{0.87}   & \textbf{0.90}      & \textbf{0.88}     & \textbf{0.90}        \\
+    \hline
+  \end{tabular}
+  \caption{Performance of models in classifying breast cancer subtypes (TNBC vs non-TNBC) based on differential gene expression.}
+  \label{tab:model-performance}
+\end{table}
+
+In the complete gene set, SVM achieved 90\% accuracy, 87\% recall, and 90\%
+specificity—metrics that indicate, respectively, the proportion of correct
+classifications, the ability to correctly identify TNBC cases, and the ability
+to avoid false positives. The analysis of these metrics is essential to
+correctly interpret the results in a clinical context, where the consequences
+of classification errors can be significant.
+
+To validate the robustness of the differentially expressed gene selection
+approach, the authors compared it with other classic feature selection methods,
+such as \textit{SVM-RFE} (an iterative technique that removes the least
+relevant features based on \textit{SVM} weights), \textit{Relief} (which
+weights features based on their correlation with the class), \textit{ARCO}, and
+\textit{mRMR} (which maximizes relevance and minimizes redundancy between
+variables). Even so, the model based on differential expression and
+\textit{SVM} demonstrated better performance in most cases, confirming the
+soundness of the strategy adopted.
+
+The study further deepened the analysis of feature importance by evaluating the
+performance of models with different sizes of gene subsets, from the initial
+5,502 to only 16 genes. Interestingly, \textit{SVM} performance remained high
+even with reduced sets, achieving the best results with 256 genes. This
+stability suggests that discriminative information is concentrated in a small
+subset of features, which is relevant for scenarios with a low number of
+samples and a large number of features, as we have in this dissertation, and
+quite positive because:
+
+\begin{itemize}
+  \item it allows molecular tests to be cheaper and faster since fewer genes are
+        needed;
+  \item it makes models easier to validate in a clinical setting since it is simpler to
+        obtain quality samples with few targets;
+  \item greater interpretability for physicians.
+\end{itemize}
+
+The analysis of the two studies presented here allows us to consolidate a
+fundamental idea for this dissertation: \gls{ml} and \gls{dl} algorithms
+demonstrate a remarkable ability to \textbf{classify different types of cancer
+  based on complex data}, whether imaging or molecular. From deep neural networks
+applied to dermatological imaging to discriminative algorithms used to analyze
+gene expression, these models have proven to be effective tools for supporting
+clinical decisions, sometimes proving superior to human experts.
+
+More than just efficient classifiers, these systems have also proven to be
+interpretable, robust, and applicable in real clinical scenarios. Both the
+image-based approach (\cite{ai_in_dermacancer_esteva2017}) and the gene
+expression-based approach (\cite{bca_subtypes_with_ml_Wu_2021}) have faced and
+overcome challenges typical of medical practice and biomedical research: sample
+scarcity, high dimensionality, and the need for models with good overall
+performance, but also \textbf{confidence in the prediction of clinically
+  critical cases}.
+
+These findings provide the \textbf{conceptual support needed to explore a more
+  specific direction}: the use of \gls{ml} models to discover and validate
+\textbf{\gls{mirna} as biomarkers} in oncology. Like coding genes, \gls{mirna}
+carry rich and discriminative information about the biological state of cells
+and have shown promise in the stratification of tumor subtypes. The next
+section addresses precisely this line of research, focusing on how ML has been
+used to reveal \gls{mirna} signatures with diagnostic and prognostic value - a
+foundation point for the objectives of this dissertation.
+
+\subsection{\gls{ml} unravelling \gls{mirna} as biomarkers}
 % Papers a usar: 1, 2 e 3
 
 \subsection{Comparison with thesis approach}
