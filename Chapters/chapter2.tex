@@ -120,6 +120,7 @@ studied groups within this class are \gls{mirna}, which appear to be central
 elements in the fine-tuning of the genetic regulation process.
 
 \subsection{MicroRNAs - The Regulators of Gene Expression}
+\label{sec:microRNA}
 \gls{mirna} are small non-coding \gls{rna} molecules, approximately $20$
 to $25$ nucleotides in length, that play a key role in regulating gene
 expression at the post-transcriptional level
@@ -509,29 +510,25 @@ methods and predictive models capable of dealing with complex and often
 non-linear correlations. This type of study brings us closer not only to the
 context of this thesis, but also to the type of challenges we will encounter
 and how we can take advantage of the methodologies used in this paper to
-achieve good results.
-
-In this work, the Support Vector Machine (\textit{SVM}) algorithm stood out for
-its performance. This approach allowed us to achieve high levels of accuracy,
-sensitivity, and specificity, demonstrating the potential of \gls{ai} in
-classifying breast cancer subtypes based on genomic information.
-
-In this case, the source of information is the RNA-Sequence (RNA-Seq) profiles
-made available by The Cancer Genome Atlas (TCGA), a public database containing
-thousands of tumor samples characterized at the genomic level. After a rigorous
-quality control, noise removal, and normalization step, the final dataset
-included 934 tumor samples and more than 57{,}000 genes expressed per sample -
-a typical high-dimensionality scenario, where the number of variables far
-exceeds the number of observations.
-
-To address this challenge, differential expression analysis was applied - a
-bioinformatics technique used to detect which genes are significantly more or
-less expressed between different conditions - resulting in the selection of
-5{,}502 differentially expressed genes, which served as input for the
-predictive models (a large reduction of over 50{,}000 genes). This step
-corresponds to feature selection, which is essential in problems where there is
-a high risk of \textit{overfitting} - that is, when the model memorizes the
-training data but fails to generalize to new examples.
+achieve good results. From all the algorithms that were tested, Support Vector
+Machine (\textit{SVM}) stood out for its performance. This approach allowed the
+authors to achieve high levels of accuracy, sensitivity, and specificity,
+demonstrating the potential of \gls{ai} in classifying breast cancer subtypes
+based on genomic information. The type of information for this study was the
+RNA-Sequence (RNA-Seq) profiles made available by The Cancer Genome Atlas
+(TCGA), a public database containing thousands of tumor samples characterized
+at the genomic level. This dataset, after pre processing, had 934 tumor samples
+and over 57{,}000 genes per sample, a typical high-dimensionality scenario
+where the number of variables far exceeds the number of observations, and
+considering that not all of them are necessary or have a great impact,
+\textbf{differential expression analysis was applied} - a bioinformatics
+technique used to detect which genes are significantly more or less expressed
+between different conditions - resulting in the selection of 5{,}502
+differentially expressed genes, which served as input for the predictive models
+(a large reduction of over 50{,}000 genes). This step corresponds to feature
+selection, which is essential in problems where there is a high risk of
+\textit{overfitting} - that is, when the model memorizes the training data but
+fails to generalize to new examples.
 
 \begin{figure} [h]
   \centering
@@ -558,7 +555,7 @@ classification task:
           \caption{Illustration of the k-Nearest Neighbors (k-NN) classification process. The top-left panel shows the initial labeled data (Class A in yellow, Class B in purple) and a new unlabeled sample (?). The top-right panel demonstrates the calculation of distances from the new sample to all existing points. The bottom panel shows the selection of the k=3 nearest neighbors and class assignment based on majority voting, resulting in the classification of the new sample.}
         \end{figure}
 
-  \item \textbf{Naïve Bayes (\textit{NB})}: uses Bayes' Theorem to estimate the most likely class of a sample, assuming that the input variables are independent of each other (\cite{naivebayes_Watson2001}).
+  \item \textbf{Naïve Bayes (\textit{NB})}: uses Bayes' Theorem to estimate the most likely class of a sample, assuming that the input variables are independent of each other \cite{naivebayes_Watson2001}.
         \[
           P(C_k \mid \mathbf{x}) = \frac{P(C_k) \prod_{i=1}^n P(x_i \mid C_k)}{P(\mathbf{x})}
         \]
@@ -688,16 +685,14 @@ demonstrate a remarkable ability to \textbf{classify different types of cancer
   based on complex data}, whether imaging or molecular. From deep neural networks
 applied to dermatological imaging to discriminative algorithms used to analyze
 gene expression, these models have proven to be effective tools for supporting
-clinical decisions, sometimes proving superior to human experts.
-
-More than just efficient classifiers, these systems have also proven to be
-interpretable, robust, and applicable in real clinical scenarios. Both the
-image-based approach (\cite{ai_in_dermacancer_esteva2017}) and the gene
-expression-based approach (\cite{bca_subtypes_with_ml_Wu_2021}) have faced and
-overcome challenges typical of medical practice and biomedical research: sample
-scarcity, high dimensionality, and the need for models with good overall
-performance, but also \textbf{confidence in the prediction of clinically
-  critical cases}.
+clinical decisions, sometimes proving superior to human experts. More than just
+efficient classifiers, these systems have also proven to be interpretable,
+robust, and applicable in real clinical scenarios. Both the image-based
+approach \cite{ai_in_dermacancer_esteva2017} and the gene expression-based
+approach \cite{bca_subtypes_with_ml_Wu_2021} have faced and overcome challenges
+typical of medical practice and biomedical research: sample scarcity, high
+dimensionality, and the need for models with good overall performance, but also
+\textbf{confidence in the prediction of clinically critical cases}.
 
 These findings provide the \textbf{conceptual support needed to explore a more
   specific direction}: the use of \gls{ml} models to discover and validate
@@ -710,6 +705,37 @@ foundation point for the objectives of this dissertation.
 
 \subsection{\gls{ml} unravelling \gls{mirna} as biomarkers}
 % Papers a usar: 1, 2 e 3
+
+As previously discussed, artificial intelligence models have demonstrated
+proficiency in the task of classificating tumor type, or subtype, by either
+analysing clinical images, high-dimensional genomic data and other forms of
+data. In this thesis, our focus is into a more specific and pertinent domain:
+the identification of \gls{mirna} as biomarkers in oncological contexts through
+\gls{ml} techniques. We know for a fact that \gls{mirna} are a class of small
+molecules that have been demonstrated to possess a substantial regulatory
+capacity over gene expression \ref{sec:microRNA}, but even though this capacity
+distinguishes them as optimal candidates for utilization as molecular
+biomarkers, the number of \glossary{mirna} expressed in human tissues, in
+conjunction with their variability across individuals, demands the
+implementation of robust computational methodologies.
+
+In this context, \gls{ml} models have gained prominence as powerful tools for
+revealing latent patterns in \gls{mirna} expression data, allowing the
+identification of subsets with diagnostic, prognostic, or tumor subtype
+stratification value. This research trajectory is particularly auspicious, as
+it proffers more readily implementable, non-invasive methodologies that can be
+substantiated within a clinical environment. That's what we are going to
+explore in this section, where we we will present three papers that illustrate
+different stages of this scientific effort: the first being a general reference
+of the type of work that we will be analyzing giving us a glampse of how
+\gls{ml} can work in this context; the second one being a more detailed
+\gls{ml} pipeline applied to the identification of \gls{mirna} as biomarkers
+for gastric cancer, and lastly, the intersection of this kind of approach with
+\glossary{bc}, which is the central carcinoma focus of this thesis.
+
+\noindent\rule{\linewidth}{0.4pt}
+
+
 
 \subsection{Comparison with thesis approach}
 % Papers a usar: 2, 4 e 10
