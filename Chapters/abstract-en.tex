@@ -8,16 +8,38 @@
 
 \typeout{NT FILE abstract-en.tex}%
 
-Regardless of the language in which the dissertation is written, usually there are at least two abstracts: one abstract in the same language as the main text, and another abstract in some other language.
+Accurate classification of breast cancer subtypes is essential for a
+personalized and effective clinical approach. In recent years, microRNAs
+(miRNAs) have emerged as potent biomarkers due to their role in
+post-transcriptional regulation and their specific expression pattern in tumor
+tissues. This dissertation explores the use of Machine Learning and Deep
+Learning techniques to map miRNA expression signatures to molecular subtypes of
+breast cancer, namely: Luminal A, Luminal B, HER2-enriched, and Basal-like (or
+Triple-Negative).
+
+The work developed includes a comparative analysis between discriminative
+models (Logistic Regression, XGBoost) and methods based on latent spaces
+(DIABLO, for example). The experimental pipeline considers multi-omnics data
+composed by 244 patient data with 462 features (miRNAs and clinical data),
+previously pre-processed and normalized.
+
+Preliminary results demonstrate that it is possible to train classification
+models that identify miRNA expression patterns with robust results in the
+evaluation metrics, except for the HER2-enriched and Luminal-B subtypes, which
+appear to be more difficult to separate. These findings support the feasibility
+of integrating miRNA profiles and clinical data into medical decision support
+systems and are in line with the vision of this dissertation: to contribute to
+more accurate, interpretable, and clinically relevant methods for breast cancer
+stratification in order to personalize treatment according to subtype.
 
 % Palavras-chave do resumo em Inglês
 % \begin{keywords}
 % Keyword 1, Keyword 2, Keyword 3, Keyword 4, Keyword 5, Keyword 6, Keyword 7, Keyword 8, Keyword 9
 % \end{keywords}
 \keywords{
-  One keyword \and
-  Another keyword \and
-  Yet another keyword \and
-  One keyword more \and
-  The last keyword
+  microRNAs \and
+  breast cancer \and
+  biomarkers \and
+  machine learning applied to Medicine \and
+  multi-omics data
 }

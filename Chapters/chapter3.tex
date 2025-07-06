@@ -8,3 +8,27 @@
 
 \typeout{NT FILE chapter3.tex}%
 \chapter{Preliminary Work}
+
+This chapter presents the initial experiments using machine learning for breast
+cancer molecular subtype classification based on the patients’ microRNAs
+expression levels. Early work focused on testing baseline \gls{ml} models
+(Logistic Regression, SVM, Random Forest) to assess their classification
+performance using datasets such as TCGA-BRCA. These initial experiments laid
+the foundation for the extensive work that followed and ultimately led to the
+publication of a scientific paper [\ref{ann:EPIA_paper}] at the EPIA 2025
+Conference under the category of "AI in Medicine" by our thesis group. The
+experiments will be divided into two main sections: the first covers the steps
+using an early dataset version, which raised concerns due to unclear
+normalization procedures — potentially leading to data leakage. In the second
+section, the same dataset is used, but I re-processed it from scratch to ensure
+a clean and leakage-free setup.
+
+\section{Possible Data Leakage Dataset}
+
+The first dataset used was the TCGA-BRCA dataset, which contains microRNA
+expression levels for breast cancer patients. The dataset was obtained from the
+TCGA database and pre-processed. The table asda portraits the number of samples
+and features in the dataset (including some clinical features), as well as the
+distribution of molecular subtypes in the graphic
+\ref{fig:subtype_distribution}.
+

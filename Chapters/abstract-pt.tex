@@ -8,16 +8,39 @@
 
 \typeout{NT FILE abstract-pt.tex}%
 
-Independentemente da língua em que a dissertação está escrita, geralmente esta contém pelo menos dois resumos: um resumo na mesma língua do texto principal e outro resumo numa outra língua.
+A classificação precisa dos subtipos de cancro da mama é essencial para uma
+abordagem clínica personalizada e eficaz. Nos últimos anos, os microRNAs
+(miRNAs) emergiram como potentes biomarcadores devido ao seu papel na regulação
+pós-transcricional e ao seu padrão de expressão específico em tecidos tumorais.
+Esta dissertação explora a utilização de técnicas de Aprendizagem Automática e
+Aprendizagem Profunda para mapear assinaturas de expressão de miRNAs a subtipos
+moleculares de cancro da mama, nomeadamente: Luminal A, Luminal B,
+HER2-enriched e Basal-like (ou Triple-Negative).
+
+O trabalho desenvolvido inclui uma análise comparativa entre modelos
+discriminativos (Logistic Regression, XGBoost) e métodos baseados em espaços
+latentes (DIABLO, por exemplo). A pipeline experimental considera dados
+multi-omnicos compostos por com 244 biópsias com 462 features (miRNAs e dados
+clínicos), previamente pré-processadas e normalizadas.
+
+Os resultados preliminares demonstram que é possível treinar modelos de
+classificação que identifiquem padrões de expressão de miRNAs com resultados
+robustos nas métricas de avaliação, salvo os subtipos HER2-enriched e Luminal-B
+que aparentam ser mais difíceis de serparar. Estes achados sustentam a
+viabilidade de integrar perfis de miRNAs e dados clínicos em sistemas de
+suporte à decisão médica, e alinham-se com a visão desta dissertação:
+contribuir para métodos mais precisos, interpretáveis e clinicamente relevantes
+na estratificação do cancro da mama de modo a personalizar o tratmento de
+acordo com o subtipo.
 
 % Palavras-chave do resumo em Português
 % \begin{keywords}
 % Palavra-chave 1, Palavra-chave 2, Palavra-chave 3, Palavra-chave 4
 % \end{keywords}
 \keywords{
-  Primeira palavra-chave \and
-  Outra palavra-chave \and
-  Mais uma palavra-chave \and
-  A última palavra-chave
+  microRNAs \and
+  cancro da mama \and
+  biomarcadores \and
+  aprendizagem automática aplicado à Medicina \and
+  dados multi-ômics
 }
-% to add an extra black line
