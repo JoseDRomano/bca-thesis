@@ -8,29 +8,34 @@
 
 \typeout{NT FILE abstract-en.tex}%
 
-Accurate classification of breast cancer subtypes is essential for a
-personalized and effective clinical approach. In recent years, microRNAs
-(miRNAs) have emerged as potent biomarkers due to their role in
-post-transcriptional regulation and their specific expression pattern in tumor
-tissues. This dissertation explores the use of Machine Learning and Deep
-Learning techniques to map miRNA expression signatures to molecular subtypes of
-breast cancer, namely: Luminal A, Luminal B, HER2-enriched, and Basal-like (or
-Triple-Negative).
+Accurate classification of breast cancer subtypes is essential for enabling
+personalized and effective treatment strategies. However, the manual
+stratification of patients based solely on clinical and pathological criteria
+presents significant challenges, due to the molecular complexity and
+heterogeneity of breast cancer. In this context, the integration of molecular
+biomarkers such as microRNAs (miRNAs), small non-coding RNAs with key roles in
+post-transcriptional regulation, offers a promising avenue for improving
+diagnostic precision and the possibility for personalized treatments.
 
-The work developed includes a comparative analysis between discriminative
-models (Logistic Regression, XGBoost) and methods based on latent spaces
-(DIABLO, for example). The experimental pipeline considers multi-omnics data
-composed by 244 patient data with 462 features (miRNAs and clinical data),
-previously pre-processed and normalized.
+This dissertation investigates how Machine Learning and Deep Learning
+techniques can be used to map miRNA expression profiles to the intrinsic
+molecular subtypes of breast cancer: Luminal A, Luminal B, HER2-enriched, and
+Basal-like (Triple-Negative). The main research direction is centred on
+evaluating the effectiveness of combining miRNA data with clinical variables to
+develop robust and interpretable subtype classifiers. Particular attention is
+given to comparing discriminative approaches (e.g., Logistic Regression,
+XGBoost) with correlation-based or latent space methods (e.g., DIABLO), in
+order to identify the most appropriate modelling strategies for multi-omics
+integration and evaluate the impact of incorporating data form different
+natures.
 
-Preliminary results demonstrate that it is possible to train classification
-models that identify miRNA expression patterns with robust results in the
-evaluation metrics, except for the HER2-enriched and Luminal-B subtypes, which
-appear to be more difficult to separate. These findings support the feasibility
-of integrating miRNA profiles and clinical data into medical decision support
-systems and are in line with the vision of this dissertation: to contribute to
-more accurate, interpretable, and clinically relevant methods for breast cancer
-stratification in order to personalize treatment according to subtype.
+Preliminary results suggest that ML models can successfully capture miRNA
+expression signatures associated with certain subtypes, although Luminal B and
+HER2-enriched remain challenging to distinguish. These findings represent an
+initial step toward the broader goal of this work: to contribute to the
+development of reliable, subtype-specific decision support tools that
+incorporate molecular and clinical data for more precise breast cancer
+stratification and personalised treatment planning.
 
 % Palavras-chave do resumo em Inglês
 % \begin{keywords}
