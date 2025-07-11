@@ -592,34 +592,34 @@ evaluation metrics in classification tasks, according to
 \begin{enumerate}
   \item \textbf{Accuracy} \\
         Accuracy is the ratio of correctly predicted instances to the total number of instances. It measures the overall effectiveness of a classification model.
-        \[
-          \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-        \]
-        where:
-        \begin{itemize}
-          \item TP = True Positives
-          \item TN = True Negatives
-          \item FP = False Positives
-          \item FN = False Negatives
-        \end{itemize}
+        % \[
+        %   \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+        % \]
+        % where:
+        % \begin{itemize}
+        %   \item TP = True Positives
+        %   \item TN = True Negatives
+        %   \item FP = False Positives
+        %   \item FN = False Negatives
+        % \end{itemize}
 
   \item \textbf{Precision} \\
         Precision measures the proportion of correctly predicted positive observations to the total predicted positive observations. It reflects the model’s ability to return only relevant results.
-        \[
-          \text{Precision} = \frac{TP}{TP + FP}
-        \]
+        % \[
+        %   \text{Precision} = \frac{TP}{TP + FP}
+        % \]
 
   \item \textbf{Recall (Sensitivity or True Positive Rate)} \\
         Recall is the ratio of correctly predicted positive observations to all actual positives. It indicates the model’s ability to identify all relevant cases.
-        \[
-          \text{Recall} = \frac{TP}{TP + FN}
-        \]
+        % \[
+        %   \text{Recall} = \frac{TP}{TP + FN}
+        % \]
 
   \item \textbf{F1-Score} \\
         The F1-Score is the harmonic mean of Precision and Recall, providing a balance between the two. It is particularly useful when the class distribution is imbalanced.
-        \[
-          \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
-        \]
+        % \[
+        %   \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+        % \]
 
   \item \textbf{Support} \\
         Support refers to the number of actual occurrences of each class in the dataset. While not a performance metric per se, it helps in understanding how many examples a classifier is making predictions on for each class.
@@ -632,21 +632,21 @@ the following table, allows us to see more clearly how each algorithm performed
 in the task of distinguishing between TNBC and non-TNBC, highlighting the
 performance of SVM in virtually all scenarios evaluated.
 
-\begin{table}[h!]
-  \centering
-  \begin{tabular}{|l|c|c|c|c|c|}
-    \hline
-    \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1-score} & \textbf{Specificity} \\
-    \hline
-    kNN            & 0.81              & 0.76            & 0.80               & 0.78              & 0.86                 \\
-    Naïve Bayes    & 0.84              & 0.81            & 0.83               & 0.82              & 0.88                 \\
-    Decision Tree  & 0.88              & 0.86            & 0.87               & 0.86              & 0.89                 \\
-    \textbf{SVM}   & \textbf{0.90}     & \textbf{0.87}   & \textbf{0.90}      & \textbf{0.88}     & \textbf{0.90}        \\
-    \hline
-  \end{tabular}
-  \caption{Performance of models in classifying \gls{bc} subtypes (TNBC vs non-TNBC) based on differential gene expression.}
-  \label{tab:model-performance}
-\end{table}
+% \begin{table}[h!]
+%   \centering
+%   \begin{tabular}{|l|c|c|c|c|c|}
+%     \hline
+%     \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1-score} & \textbf{Specificity} \\
+%     \hline
+%     kNN            & 0.81              & 0.76            & 0.80               & 0.78              & 0.86                 \\
+%     Naïve Bayes    & 0.84              & 0.81            & 0.83               & 0.82              & 0.88                 \\
+%     Decision Tree  & 0.88              & 0.86            & 0.87               & 0.86              & 0.89                 \\
+%     \textbf{SVM}   & \textbf{0.90}     & \textbf{0.87}   & \textbf{0.90}      & \textbf{0.88}     & \textbf{0.90}        \\
+%     \hline
+%   \end{tabular}
+%   \caption{Performance of models in classifying \gls{bc} subtypes (TNBC vs non-TNBC) based on differential gene expression.}
+%   \label{tab:model-performance}
+% \end{table}
 
 In the complete gene set, SVM achieved 90\% accuracy, 87\% recall, and 90\%
 specificity - metrics that indicate, respectively, the proportion of correct
