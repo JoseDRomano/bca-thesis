@@ -317,8 +317,8 @@ biological context and cell type as shown by
 Due to their specificity, stability, and direct involvement in relevant
 molecular mechanisms, \gls{mirna} have been extensively investigated as
 promising biomarkers for diagnosis, prognosis, and classification in various
-diseases - including cancer - because if we understand how these regulators
-are present in our body, we can ease the clinical decision-making process and 
+diseases - including cancer - because if we understand how these regulators are
+present in our body, we can ease the clinical decision-making process and
 improve the treatment of patients.
 
 % Fazer isto depois da preparação
@@ -441,24 +441,24 @@ was able to classify two critical clinical cases with high accuracy:
 keratinocytic carcinomas versus benign seborrheic keratoses, and malignant
 melanomas versus benign nevi. In these binary scenarios, it obtained areas
 under the curve (\textit{AUC}) of 0.96 and 0.94, respectively (Figure
-\ref{fig:AUC_derma_total_dnn_model}) - values higher than those obtained by
-dermatologists in the same tasks. \textit{AUC} is a metric that quantifies a
-model's ability to distinguish between classes, with values close to 1
-indicating excellent performance.
+\ref{fig:AUC_dnn_model}) - values higher than those obtained by dermatologists
+in the same tasks. \textit{AUC} is a metric that quantifies a model's ability
+to distinguish between classes, with values close to 1 indicating excellent
+performance.
 
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.50\textwidth}
     \centering
     \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/conf-matrix-docs.png}
-    %\caption{(a)}
+    \caption{(Confusion matrices comparison)}
     \label{fig:conf-matrix-docs}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.50\textwidth}
     \centering
     \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/AUC_derma_2.png}
-    %\caption{(b)}
+    \caption{AUC curves analysis}
     \label{fig:AUC_dnn_model}
   \end{subfigure}
   \caption{Performance evaluation of the convolutional neural network (CNN) in skin lesion classification. (a) Confusion matrices of CNN and two dermatologists. The concentration on the diagonal indicates correct classifications; CNN shows less dispersion and better overall performance \cite{ai_in_dermacancer_esteva2017}. (b) Reliability of the CNN demonstrated by \textit{AUC} curves on a larger, independent dataset \cite{ai_in_dermacancer_esteva2017}.}
@@ -466,15 +466,17 @@ indicating excellent performance.
 \end{figure}
 
 Furthermore, in more complex scenarios with multiple classes (three and nine
-disease categories), the model maintained \textbf{remarkable levels of
-  accuracy} (72.1\% and 55.4\%), surpassing or equaling human experts. The
-robustness of the methodology, that is, its ability to maintain performance
-under different conditions or test data, was also confirmed in larger test
-sets, where the network's performance remained stable, with \textbf{minimal
-  variations in evaluation metrics}. From a technical standpoint, it was an
-efficient, scalable system with \textbf{potential for application in mobile
-  devices}, which gives it relevant clinical applicability, especially in
-contexts with limited access to specialists.
+disease categories), the model maintained its\textbf{remarkable levels of
+  accuracy} (72.1\% and 55.4\%), surpassing or equaling human experts (the levels
+itself are not extraordinary, but considering that surpases the group of
+experts, it becomes a great achievement). The robustness of the methodology,
+that is, its ability to maintain performance under different conditions or test
+data, was also confirmed in larger test sets, where the network's performance
+remained stable, with \textbf{minimal variations in evaluation metrics}. From a
+technical standpoint, it was an efficient, scalable system with
+\textbf{potential for application in mobile devices}, which gives it relevant
+clinical applicability, especially in contexts with limited access to
+specialists.
 
 Internal analyses further reinforced confidence in the model, showing that it
 learned consistent clinical representations: the network tended to
