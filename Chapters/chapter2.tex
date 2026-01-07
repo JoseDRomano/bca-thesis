@@ -1,10 +1,8 @@
-%!TEX root = ../template.tex
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% chapter2.tex
-%% NOVA thesis document file
-%%
-%% Chapter with the template manual
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chapters/chapter2.tex
+% Neste capitulo falamos sobre o background do lado de biologia e damos o contexto
+% biologico do cancro da mama e dos microRNAs. Depois fazemos um review de trabalhos
+% relacionados com o uso de microRNAs como biomarcadores e classificadores de
+% subtipos de cancro da mama.
 
 \typeout{NT FILE chapter2.tex}%
 
@@ -21,7 +19,7 @@ section will review the related work in the field of \gls{mirna} research,
 focusing on the use of \gls{mirna} as biomarkers and subtype classifiers in
 \gls{bc}, as well as the challenges and limitations of current approaches.
 
-\section{Biological Context}
+\section{Biological Background}
 The modern understanding of how genetic information is stored, interpreted, and
 regulated in cells is based on a fundamenta principle known as the Central
 Dogma of Molecular Biology. This concept, first formulated in
@@ -43,233 +41,81 @@ the regulation of gene expression. Their discovery has broadened the classical
 view of the central dogma, introducing new layers of post-transcriptional
 control that decisively influence normal and pathological biological phenomena.
 
-% \subsection{DNA \& RNA - The Genetic Code}
+\subsection{DNA \& RNA - The Genetic Code}
 
-% At the molecular level, the genetic information of all living organisms is
-% encoded in a molecule called deoxyribonucleic acid (\gls{dna}). \gls{dna}
-% consists of two complementary strands arranged in a double helix structure,
-% with each strand consisting of a sequence of nucleotides. These nucleotides are
-% composed of a sugar-phosphate structure and one of four nitrogenous bases:
-% adenine (A), cytosine (C), guanine (G), and thymine (T)
-% \cite{ConceptsBiology_DNA}. When in the helix structure, these bases can only
-% be linked to their corresponding base: adenine can only be linked to thymine
-% and cytosine to guanine, and it is in the sequence of bases that the
-% instructions necessary for the synthesis of all the proteins that govern cell
-% structure and function are encoded.
+At the molecular level, the genetic information of all living organisms is
+encoded in a molecule called deoxyribonucleic acid (\gls{dna}). \gls{dna}
+consists of two complementary strands arranged in a double helix structure,
+with each strand consisting of a sequence of nucleotides. These nucleotides are
+composed of a sugar-phosphate structure and one of four nitrogenous bases:
+adenine (A), cytosine (C), guanine (G), and thymine (T)
+\cite{ConceptsBiology_DNA}. When in the helix structure, these bases can only
+be linked to their corresponding base: adenine can only be linked to thymine
+and cytosine to guanine, and it is in the sequence of bases that the
+instructions necessary for the synthesis of all the proteins that govern cell
+structure and function are encoded.
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=0.6\textwidth]{dna.jpg}
-%   \caption{Structure of the \gls{dna} double helix}
-%   \label{fig:dna}
-% \end{figure}
-
-% The functional units of \gls{dna} are called genes, which are discrete
-% sequences that contain the instructions for producing proteins. However,
-% \gls{dna} itself cannot participate directly in protein synthesis. Instead, a
-% process called transcription is used to copy the information from a gene to a
-% \gls{rna} molecule as seen in \textcite{basic_biology_NCBI2002}. Unlike
-% \gls{dna}, \gls{rna} is single-stranded and uses uracil (U) instead of thymine
-% as one of its bases.
-
-% Among the various types of \gls{rna}, the best known is messenger \gls{rna}
-% (mRNA), which serves as an intermediary between genes and proteins. During
-% transcription, an mRNA molecule is synthesized as a complementary copy of a
-% gene, and this mRNA carries the genetic message from the \gls{dna} in the
-% nucleus to the ribosomes in the cytoplasm, where protein synthesis occurs. This
-% process, known as translation, is where the mRNA sequence is read in triplets
-% (called codons), each of which corresponds to a specific amino acid
-% \cite{central_dogma_molecular}.
-
-% %melhorar estrutura da imagem para ser como no paper
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=0.3\textwidth]{transcription1.png}
-%   \includegraphics[width=0.3\textwidth]{transcription2.png}
-%   \includegraphics[width=0.3\textwidth]{transcription3.png}
-%   \caption{Illustration of the transcription mechanism: (a) initiation, (b) elongation, and (c) termination}
-%   \label{fig:transcription}
-% \end{figure}
-
-% The set of rules by which the nucleotide sequence in messenger \gls{rna} is
-% translated into a sequence of amino acids is known as the genetic code. This
-% code is composed of triplets of nucleotides, called codons, where each codon
-% specifies one of the twenty standard amino acids used in protein synthesis seen
-% in \textcite{genetic_codeNovozhilov2008O} study.
-
-% The genetic code is described as redundant but unambiguous. Redundancy means
-% that most amino acids are encoded by more than one codon - for example, leucine
-% is specified by six different codons - which provides a certain degree of
-% robustness to the system. At the same time, the code is unambiguous because
-% each codon corresponds to only one amino acid; that is, a given codon does not
-% encode multiple amino acids \cite{ConceptsBiology_DNA}.
-
-% Another fundamental characteristic of the genetic code is its universality.
-% With very few exceptions, the same codons specify the same amino acids in
-% virtually all living organisms, from bacteria to humans. This evolutionary
-% conservation has been fundamental in enabling the development of many molecular
-% biology tools and biotechnological applications prooved by
-% \textcite{genetic_codeKoonin2017}.
-
-% Although the focus of molecular biology for decades has been on the coding
-% sequence of the genome - that is, the genes that give rise to proteins - it is
-% now known that a large part of the human genome is transcribed into \gls{rna}
-% that does not code for proteins. These non-coding \gls{rna} (ncRNA) molecules
-% play crucial regulatory roles in controlling gene expression. One of the most
-% studied groups within this class are \gls{mirna}, which appear to be central
-% elements in the fine-tuning of the genetic regulation process.
-
-\subsection{Cancer - A Complex Disease}
-Cancer is a disease characterized by the uncontrolled proliferation of
-transformed cells, which can invade neighboring tissues and spread to other
-parts of the body through processes such as metastasis. This definition, based
-on \textcite{NCI2021,def_of_cancer_Brown2023}, has recently been expanded to
-recognize the role of natural selection in the evolution of cancer: it is a
-cellular system that continuously evolves, adapting to internal and external
-pressures to ensure its survival.
-
-Under normal conditions, the body's cells divide only when necessary, die when
-damaged or obsolete, and are replaced by new ones. However, in cancer, this
-biological balance is disrupted: abnormal cells gain the ability to multiply
-independently of the body's signals and to resist programmed cell death
-(apoptosis). These transformed cells become autonomous units that not only
-ignore normal growth controls but also interact with the tumor microenvironment
-to promote their own survival, using angiogenesis, immune evasion, and other
-adaptive mechanisms \cite{def_of_cancer_Brown2023,NCI2021}.
-
-The result is a heterogeneous cell population, subject to natural selection
-within the human body. Cells that acquire adaptive advantages (e.g., higher
-proliferation rate, drug resistance, or migration ability) tend to prevail,
-making cancer a constantly evolving disease \cite{def_of_cancer_Brown2023}.
-
-Although cancer can arise in virtually any tissue, not all cellular changes are
-malignant. There are precancerous conditions, such as \textit{hyperplasia or
-  dysplasia}, which represent an increase in the number of cells or changes in
-their morphology, but which do not yet invade surrounding tissues.
-
-The advance of cancer stages is a complex process that involves the
-\textbf{acquisition of invasive and metastatic capacity - properties that
-  distinguish malignant tumors from benign ones}. This process can be silent for
-years, until more severe symptoms arise, often related to the invasion of vital
-organs.
-
-\subsection{Breast Cancer \& its Subtypes}
-
-Breast cancer is the most commonly diagnosed cancer in women worldwide and is
-one of the leading causes of cancer death in developed and developing countries
-as seen in \textcite{BreastEpidemiology_Romanowicz2022,
-  updatedbca_Hong2022Breast}. It is estimated that \textbf{one in eight women}
-will be diagnosed with this disease during their lifetime, although it can also
-affect men - albeit with a much lower incidence.
-
-Most breast tumors are originated in the epithelial cells of the ducts or
-lobules of the breast, which acquire malignant properties after the
-accumulation of genetic and epigenetic changes. These events alter the normal
-control of cell proliferation, differentiation, and apoptosis, allowing for
-unregulated tumor growth \cite{origins_and_evolution_bca_Polyak2007}.
-
-\begin{figure}
+\begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\textwidth]{bca_anatomy.png}
-  \caption{In (A) we have a normal breast tissue, while in (B) we can see
-    the presence of a malignant tumor \cite{bca_anatomy_figure_Muthu2020}.}
-  \label{fig:breast_cancer_anatomy}
+  \includegraphics[width=0.6\textwidth]{dna.jpg}
+  \caption{Structure of the \gls{dna} double helix}
+  \label{fig:dna}
 \end{figure}
 
-The development of the disease is associated with a set of well-established
-risk factors, which include:
-\begin{itemize}
-  \item Age and family history of the disease;
-  \item Hereditary genetic mutations, especially in the \textit{BRCA1} and
-        \textit{BRCA2} genes;
-  \item Prolonged exposure to endogenous or exogenous hormones (e.g., early menarche,
-        late menopause, hormone therapy);
-  \item Environmental and behavioral factors, such as obesity, physical inactivity,
-        alcohol consumption, and a diet rich in saturated fats
-        \cite{BreastEpidemiology_Romanowicz2022,clinical_implication_bca_Adamo2015}.
-\end{itemize}
+The functional units of \gls{dna} are called genes, which are discrete
+sequences that contain the instructions for producing proteins. However,
+\gls{dna} itself cannot participate directly in protein synthesis. Instead, a
+process called transcription is used to copy the information from a gene to a
+\gls{rna} molecule as seen in \textcite{basic_biology_NCBI2002}. Unlike
+\gls{dna}, \gls{rna} is single-stranded and uses uracil (U) instead of thymine
+as one of its bases.
 
-From a molecular and clinical point of view, \textbf{\gls{bc} is highly
-  heterogeneous}. Each tumor may have unique combinations of genetic alterations,
-signaling pathways, and gene expression profiles, which are reflected in
-different clinical behaviors, degrees of aggressiveness, and response to
-treatment
-\cite{origins_and_evolution_bca_Polyak2007,diff_bca_usa_Howlader2018}. Given
-this, early detection is crucial for prognosis. When diagnosed in its early
-stages, \gls{bc} has survival rates of over $90\%$. However, in more advanced
-stages, especially when metastases appear, controlling the disease becomes
-substantially more difficult and the therapeutic goal shifts from curative to
-palliative \cite{updatedbca_Hong2022Breast,clinical_implication_bca_Adamo2015}.
+Among the various types of \gls{rna}, the best known is messenger \gls{rna}
+(mRNA), which serves as an intermediary between genes and proteins. During
+transcription, an mRNA molecule is synthesized as a complementary copy of a
+gene, and this mRNA carries the genetic message from the \gls{dna} in the
+nucleus to the ribosomes in the cytoplasm, where protein synthesis occurs. This
+process, known as translation, is where the mRNA sequence is read in triplets
+(called codons), each of which corresponds to a specific amino acid
+\cite{central_dogma_molecular}.
 
-The therapeutic approach is typically multimodal, combining surgery,
-radiotherapy, chemotherapy, hormone therapy, and targeted or biological
-therapies, depending on the characteristics of the tumor and the patient's
-general condition. The most significant advance in the last decade has been the
-transition from a uniform model to a personalized treatment approach, tailored
-to the molecular subtype and individual risk as studied by
-\textcite{BreastEpidemiology_Romanowicz2022}.
-
-In addition, a study made by \textcite{origins_and_evolution_bca_Polyak2007}
-recognized that breast tumors are not static entities. Due to phenomena of
-intra-tumor heterogeneity and clonal evolution, tumors adapt to the selective
-pressure of treatments, often leading to the development of therapeutic
-resistance and disease progression.
-
-Given the molecular complexity and clinical diversity of breast tumors, it was
-established in the papers
-\textcite{clinical_implication_bca_Adamo2015,bc_subtypes_Prat2015Clinical} that
-\gls{bc} is not a single disease but rather a collection of biologically
-distinct entities that arise from a common anatomical site. This heterogeneity
-is reflected in major differences in tumor progression, metastatic behavior,
-response to therapy, and long-term prognosis.
-
-To better capture this complexity and inform clinical decision-making,
-researchers from various studies, such as
-\textcite{bc_molecular_Perou2000,bc_subtypes_Prat2015Clinical}, have developed
-a molecular classification system that subdivides breast tumors into intrinsic
-subtypes which are: \textit{Luminal-A}, \textit{Luminal-B}, \textit{Basal-like}
-(or Triple-negative) and \textit{HER2-enriched} . These subtypes are defined
-based on the expression status of three key hormonal biomarkers:
-\textbf{estrogen receptor (ER)}, \textbf{progesterone receptor (PR)}, and
-\textbf{human epidermal growth factor receptor 2 (HER2)} as well as other
-proliferation indices (e.g., Ki-67) and gene expression patterns. The
-relationship between \gls{bc} subtypes and these hormone receptors can be seen
-in Table \ref{tab:bc_subtypes_summary}. This classification underpins modern
-precision oncology approaches and has profound implications for therapy and
-prognosis.
-
-\renewcommand{\arraystretch}{1.3}
-\begin{table}
+%melhorar estrutura da imagem para ser como no paper
+\begin{figure}[h]
   \centering
-  \small
-  \caption{Summary of intrinsic \gls{bc} subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{bc_subtypes_Prat2015Clinical}, \cite{updatedbca_Hong2022Breast}, \cite{tnbc_therapies_Mahalingam2020The}.}
-  \label{tab:bc_subtypes_summary}
-  \begin{tabularx}{\textwidth}{l l l l X}
-    \toprule
-    \textbf{Subtype}  & \textbf{Receptors / HER2} & \textbf{Prolif.} & \textbf{Prognosis} & \textbf{Treatment}          \\
-    \midrule
-    Luminal A         & ER+/PR+, HER2−            & Low              & Favorable          & Endocrine only              \\
-    \midrule
-    Luminal B         & ER+, PR↓, HER2±           & High             & Intermediate       & Hormone ± Chemo ± Anti-HER2 \\
-    \midrule
-    HER2-enriched     & HER2+, ER−, PR−           & High             & Improved           & Anti-HER2 + Chemo           \\
-    \midrule
-    Basal-like / TNBC & ER−, PR−, HER2−           & High             & Poor               & Chemo; ± PARP/IO (selected) \\
+  \includegraphics[width=0.3\textwidth]{transcription1.png}
+  \includegraphics[width=0.3\textwidth]{transcription2.png}
+  \includegraphics[width=0.3\textwidth]{transcription3.png}
+  \caption{Illustration of the transcription mechanism: (a) initiation, (b) elongation, and (c) termination}
+  \label{fig:transcription}
+\end{figure}
 
-    \bottomrule
-  \end{tabularx}
+The set of rules by which the nucleotide sequence in messenger \gls{rna} is
+translated into a sequence of amino acids is known as the genetic code. This
+code is composed of triplets of nucleotides, called codons, where each codon
+specifies one of the twenty standard amino acids used in protein synthesis seen
+in \textcite{genetic_codeNovozhilov2008O} study.
 
-  \vspace{1ex}
-  \raggedright
-  \footnotesize
-  \textit{Acronyms:} Chemo = Chemotherapy , IO = Immunotherapy .
-\end{table}
+The genetic code is described as redundant but unambiguous. Redundancy means
+that most amino acids are encoded by more than one codon - for example, leucine
+is specified by six different codons - which provides a certain degree of
+robustness to the system. At the same time, the code is unambiguous because
+each codon corresponds to only one amino acid; that is, a given codon does not
+encode multiple amino acids \cite{ConceptsBiology_DNA}.
 
-Recent evidence by
-\textcite{intratumor_heterogeneity_Yeo2017,origins_and_evolution_bca_Polyak2007}
-suggests that multiple subtypes can coexist within the same tumor (a phenomenon
-called intra-tumor heterogeneity). This complexity contributes to therapeutic
-resistance and disease progression.
+Another fundamental characteristic of the genetic code is its universality.
+With very few exceptions, the same codons specify the same amino acids in
+virtually all living organisms, from bacteria to humans. This evolutionary
+conservation has been fundamental in enabling the development of many molecular
+biology tools and biotechnological applications prooved by
+\textcite{genetic_codeKoonin2017}.
+
+Although the focus of molecular biology for decades has been on the coding
+sequence of the genome (that is, the genes that give rise to proteins) it is
+now known that a large part of the human genome is transcribed into \gls{rna}
+that does not code for proteins. These non-coding \gls{rna} (ncRNA) molecules
+play crucial regulatory roles in controlling gene expression. One of the most
+studied groups within this class are \gls{mirna}, which appear to be central
+elements in the fine-tuning of the genetic regulation process.
 
 \subsection{MicroRNAs - The Regulators of Gene Expression}
 \label{sec:microRNA}
@@ -321,17 +167,373 @@ diseases - including cancer - because if we understand how these regulators are
 present in our body, we can ease the clinical decision-making process and
 improve the treatment of patients.
 
-% Fazer isto depois da preparação
-% \subsection{Nucleic acids as gene therapies}
-% \label{sec:nucleic_acids_gene_therapies}
-% Now that we have a better understanding of limitations that most of cancer treatments 
-% have, \gls{mirna} have emerged as a promising tool in the field of cancer
-% research and treatment. 
+\subsection{Cancer - A Complex Disease}
+Cancer is a disease characterized by the uncontrolled proliferation of
+transformed cells, which can invade neighboring tissues and spread to other
+parts of the body through processes such as metastasis. This definition, based
+on \textcite{NCI2021,def_of_cancer_Brown2023}, has recently been expanded to
+recognize the role of natural selection in the evolution of cancer: it is a
+cellular system that continuously evolves, adapting to internal and external
+pressures to ensure its survival.
 
-% Considering them as the "natural regulators" of the human body, we can leverage 
-% that regulating mechanism and use it to 
+Under normal conditions, the body's cells divide only when necessary, die when
+damaged or obsolete, and are replaced by new ones. However, in cancer, this
+biological balance is disrupted: abnormal cells gain the ability to multiply
+independently of the body's signals and to resist programmed cell death
+(apoptosis). These transformed cells become autonomous units that not only
+ignore normal growth controls but also interact with the tumor microenvironment
+to promote their own survival, using angiogenesis, immune evasion, and other
+adaptive mechanisms \cite{def_of_cancer_Brown2023,NCI2021}.
 
-\newpage
+The result is a heterogeneous cell population, subject to natural selection
+within the human body. Cells that acquire adaptive advantages (e.g., higher
+proliferation rate, drug resistance, or migration ability) tend to prevail,
+making cancer a constantly evolving disease \cite{def_of_cancer_Brown2023}.
+
+Although cancer can arise in virtually any tissue, not all cellular changes are
+malignant. There are precancerous conditions, such as \textit{hyperplasia or
+  dysplasia}, which represent an increase in the number of cells or changes in
+their morphology, but which do not yet invade surrounding tissues.
+
+The advance of cancer stages is a complex process that involves the
+\textbf{acquisition of invasive and metastatic capacity - properties that
+  distinguish malignant tumors from benign ones}. This process can be silent for
+years, until more severe symptoms arise, often related to the invasion of vital
+organs.
+
+\section{Biological Context}
+Breast cancer represents both one of the greatest challenges in modern medicine
+and one of the most dynamic areas of biomedical research. Its relevance stems
+not only from its high incidence and mortality rates, but above all from its
+biological complexity, which distinguishes it from many other neoplasms. This
+type of tumour is not uniform, resulting from the accumulation of multiple
+genetic and epigenetic alterations in breast epithelial cells that deregulate
+fundamental processes such as proliferation, differentiation, and apoptosis.
+This molecular instability translates into significant clinical and biological
+heterogeneity, in which different tumours can have profoundly different gene
+expression profiles, progression patterns, and metastatic behaviours. This
+diversity, both intertumoral and intratumoral, constitutes a significant
+obstacle to the accurate stratification of the disease and the definition of
+universal therapeutic strategies, given that even patients diagnosed with the
+same clinical subtype may respond differently to the same treatments.
+
+Although therapeutic advances in recent decades have transformed the prognosis
+for many patients, with the introduction of more effective surgical therapies,
+combined drug regimens, hormone blockade, and therapies targeting specific
+molecular targets, substantial limitations remain, particularly related to
+phenomena such as acquired resistance, clonal adaptation, and tumour
+recurrence. In this context, there is a clear need to explore new therapeutic
+avenues capable of overcoming these limitations. Among the emerging strategies,
+nucleic acid-based therapies stand out, which aim to directly modulate the gene
+expression involved in tumour progression, constituting a paradigm shift in the
+treatment of breast cancer.
+
+\subsection{Breast Cancer \& its Subtypes}
+Breast cancer is the most commonly diagnosed cancer in women worldwide and is
+one of the leading causes of cancer death in developed and developing countries
+as seen in \textcite{BreastEpidemiology_Romanowicz2022,
+  updatedbca_Hong2022Breast}. It is estimated that \textbf{one in eight women}
+will be diagnosed with this disease during their lifetime, although it can also
+affect men - albeit with a much lower incidence.
+
+Most breast tumors are originated in the epithelial cells of the ducts or
+lobules of the breast, which acquire malignant properties after the
+accumulation of genetic and epigenetic changes. These events alter the normal
+control of cell proliferation, differentiation, and apoptosis, allowing for
+unregulated tumor growth \cite{origins_and_evolution_bca_Polyak2007}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{bca_anatomy.png}
+  \caption{In (A) we have a normal breast tissue, while in (B) we can see
+    the presence of a malignant tumor \cite{bca_anatomy_figure_Muthu2020}.}
+  \label{fig:breast_cancer_anatomy}
+\end{figure}
+
+The development of the disease is associated with a set of well-established
+risk factors, which include:
+\begin{itemize}
+  \item Age and family history of the disease;
+  \item Hereditary genetic mutations, especially in the \textit{BRCA1} and
+        \textit{BRCA2} genes;
+  \item Prolonged exposure to endogenous or exogenous hormones (e.g., early menarche,
+        late menopause, hormone therapy);
+  \item Environmental and behavioral factors, such as obesity, physical inactivity,
+        alcohol consumption, and a diet rich in saturated fats
+        \cite{BreastEpidemiology_Romanowicz2022,clinical_implication_bca_Adamo2015}.
+\end{itemize}
+
+% From a molecular and clinical point of view, \textbf{\gls{bc} is highly
+%   heterogeneous}. Each tumor may have unique combinations of genetic alterations,
+% signaling pathways, and gene expression profiles, which are reflected in
+% different clinical behaviors, degrees of aggressiveness, and response to
+% treatment
+% \cite{origins_and_evolution_bca_Polyak2007,diff_bca_usa_Howlader2018}. Given
+% this, early detection is crucial for prognosis. When diagnosed in its early
+% stages, \gls{bc} has survival rates of over $90\%$. However, in more advanced
+% stages, especially when metastases appear, controlling the disease becomes
+% substantially more difficult and the therapeutic goal shifts from curative to
+% palliative \cite{updatedbca_Hong2022Breast,clinical_implication_bca_Adamo2015}.
+
+% The therapeutic approach is typically multimodal, combining surgery,
+% radiotherapy, chemotherapy, hormone therapy, and targeted or biological
+% therapies, depending on the characteristics of the tumor and the patient's
+% general condition. The most significant advance in the last decade has been the
+% transition from a uniform model to a personalized treatment approach, tailored
+% to the molecular subtype and individual risk as studied by
+% \textcite{BreastEpidemiology_Romanowicz2022}.
+
+% In addition, a study made by \textcite{origins_and_evolution_bca_Polyak2007}
+% recognized that breast tumors are not static entities. Due to phenomena of
+% intra-tumor heterogeneity and clonal evolution, tumors adapt to the selective
+% pressure of treatments, often leading to the development of therapeutic
+% resistance and disease progression.
+
+% Given the molecular complexity and clinical diversity of breast tumors, it was
+% established in the papers
+% \textcite{clinical_implication_bca_Adamo2015,bc_subtypes_Prat2015Clinical} that
+% \gls{bc} is not a single disease but rather a collection of biologically
+% distinct entities that arise from a common anatomical site. This heterogeneity
+% is reflected in major differences in tumor progression, metastatic behavior,
+% response to therapy, and long-term prognosis.
+
+% To better capture this complexity and inform clinical decision-making,
+% researchers from various studies, such as
+% \textcite{bc_molecular_Perou2000,bc_subtypes_Prat2015Clinical}, have developed
+% a molecular classification system that subdivides breast tumors into intrinsic
+% subtypes which are: \textit{Luminal-A}, \textit{Luminal-B}, \textit{Basal-like}
+% (or Triple-negative) and \textit{HER2-enriched} . These subtypes are defined
+% based on the expression status of three key hormonal biomarkers:
+% \textbf{estrogen receptor (ER)}, \textbf{progesterone receptor (PR)}, and
+% \textbf{human epidermal growth factor receptor 2 (HER2)} as well as other
+% proliferation indices (e.g., Ki-67) and gene expression patterns. The
+% relationship between \gls{bc} subtypes and these hormone receptors can be seen
+% in Table \ref{tab:bc_subtypes_summary}. This classification underpins modern
+% precision oncology approaches and has profound implications for therapy and
+% prognosis.
+
+From a molecular and clinical point of view, \textbf{\gls{bc} is highly
+  heterogeneous}. Each tumor may have unique combinations of genetic alterations,
+signaling pathways, and gene expression profiles, which are reflected in
+different clinical behaviors, degrees of aggressiveness, and response to
+treatment
+\cite{origins_and_evolution_bca_Polyak2007,diff_bca_usa_Howlader2018}. This
+diversity explains why early detection remains crucial for prognosis: when
+diagnosed in its early stages, \gls{bc} has survival rates of over $90\%$.
+However, in more advanced stages, especially when metastases appear,
+controlling the disease becomes substantially more difficult and the
+therapeutic goal shifts from curative to palliative
+\cite{updatedbca_Hong2022Breast,clinical_implication_bca_Adamo2015}. The
+therapeutic approach is therefore typically multimodal, combining surgery,
+radiotherapy, chemotherapy, hormone therapy, and targeted or biological
+therapies, depending on the characteristics of the tumor and the patient’s
+general condition. The most significant advance in the last decade has been the
+transition from a uniform model to a personalized treatment approach, tailored
+to the molecular subtype and individual risk as studied by
+\textcite{BreastEpidemiology_Romanowicz2022}.
+
+It is also important to note that breast tumors are not static entities. As
+recognized by \textcite{origins_and_evolution_bca_Polyak2007}, phenomena such
+as intra-tumor heterogeneity and clonal evolution enable tumors to adapt to the
+selective pressure of treatments, frequently leading to therapeutic resistance
+and disease progression. This dynamic nature of the disease further complicates
+clinical management and reinforces the need for accurate molecular
+characterization. Indeed, given the molecular complexity and clinical diversity
+of breast tumors, several studies have established that \gls{bc} is not a
+single disease but rather a collection of biologically distinct entities that
+arise from a common anatomical site
+\cite{clinical_implication_bca_Adamo2015,bc_subtypes_Prat2015Clinical}. This
+heterogeneity is reflected in major differences in tumor progression,
+metastatic behavior, response to therapy, and long-term prognosis.
+
+To better capture this complexity and inform clinical decision-making,
+researchers have proposed molecular classification systems that subdivide
+breast tumors into intrinsic subtypes
+\cite{bc_molecular_Perou2000,bc_subtypes_Prat2015Clinical}. These are typically
+defined as \textit{Luminal-A}, \textit{Luminal-B}, \textit{Basal-like} (or
+Triple-negative) and \textit{HER2-enriched}, and rely on the expression status
+of three key hormonal biomarkers: \textbf{estrogen receptor (ER)},
+\textbf{progesterone receptor (PR)}, and \textbf{human epidermal growth factor
+  receptor 2 (HER2)}, in combination with proliferation indices (e.g., Ki-67) and
+gene expression patterns. The relationship between \gls{bc} subtypes and these
+hormone receptors is summarized in Table \ref{tab:bc_subtypes_summary}. This
+classification underpins modern precision oncology approaches and has profound
+implications for both therapy and prognosis.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{table}
+  \centering
+  \small
+  \caption{Summary of intrinsic \gls{bc} subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{bc_subtypes_Prat2015Clinical}, \cite{updatedbca_Hong2022Breast}, \cite{tnbc_therapies_Mahalingam2020The}.}
+  \label{tab:bc_subtypes_summary}
+  \begin{tabularx}{\textwidth}{l l l l X}
+    \toprule
+    \textbf{Subtype}  & \textbf{Receptors / HER2} & \textbf{Prolif.} & \textbf{Prognosis} & \textbf{Treatment}          \\
+    \midrule
+    Luminal A         & ER+/PR+, HER2−            & Low              & Favorable          & Endocrine only              \\
+    \midrule
+    Luminal B         & ER+, PR↓, HER2±           & High             & Intermediate       & Hormone ± Chemo ± Anti-HER2 \\
+    \midrule
+    HER2-enriched     & HER2+, ER−, PR−           & High             & Improved           & Anti-HER2 + Chemo           \\
+    \midrule
+    Basal-like / TNBC & ER−, PR−, HER2−           & High             & Poor               & Chemo; ± PARP/IO (selected) \\
+
+    \bottomrule
+  \end{tabularx}
+
+  \vspace{1ex}
+  \raggedright
+  \footnotesize
+  \textit{Acronyms:} Chemo = Chemotherapy , IO = Immunotherapy .
+\end{table}
+
+Recent evidence by
+\textcite{intratumor_heterogeneity_Yeo2017,origins_and_evolution_bca_Polyak2007}
+suggests that multiple subtypes can coexist within the same tumor (a phenomenon
+called intra-tumor heterogeneity). This complexity contributes to therapeutic
+resistance and disease progression.
+
+\subsection{Treatment limitations}
+
+Despite remarkable progress in recent decades, breast cancer treatment
+continues to face significant limitations that compromise both clinical
+efficacy and patients' quality of life \cite{Loibl2021Breast}. The development
+of new therapies and molecular stratification of the disease have substantially
+improved prognosis in several contexts, but significant obstacles remain. Among
+the most critical are the lack of effective therapeutic options for
+particularly aggressive subtypes, such as triple-negative breast cancer,
+acquired resistance to different treatment modalities, the toxicity associated
+with existing regimens, and difficulties in personalizing therapy for specific
+patient groups. These factors, analyzed below, reveal the complexity of the
+disease and the continuing need for more effective and safer solutions
+\cite{bc_molecular_Perou2000, bc_subtypes_Prat2015Clinical}.
+
+One of the most striking limitations when it comes to breast cancer treatment
+is undoubtedly the triple-negative subtype, recognized for its aggressiveness
+in the patient's body and poor prognosis, as seen in the study by
+\textcite{diff_bca_usa_Howlader2018} and \textcite{Loibl2021Breast}. The
+absence of estrogen, progesterone, and HER2 receptors (hence the term triple
+negative) immediately eliminates the possibility of using hormonal or targeted
+therapies, leaving chemotherapy as the main treatment option. Although many
+patients respond positively in the initial period, relapses are frequent and,
+in most cases, there are no effective options to counteract the gradual
+weakening of the body given the aggressiveness of the treatments
+\cite{Eroles2012Molecular}. Trials with anti-angiogenic agents, such as
+bevacizumab, have shown only marginal benefits and no consistent impact on
+overall patient survival. Epidemiological studies find that TNBC has the lowest
+specific survival rate among the subtypes, reflecting the lack of a therapy
+with clear and targeted targets.
+
+Therapeutic resistance is another cross-cutting challenge. In the study by
+\textcite{Sun2017Risk}, hormone-sensitive tumors, acquired resistance to
+endocrine therapies (therapies that aim to block the production of hormones
+that lead to tumor growth or prevent those that are produced from acting on
+tumor receptors) such as aromatase inhibitors and selective estrogen receptor
+modulators, often mediated by alternative signaling pathways such as
+PI3K/AKT/mTOR. In the HER2-positive subtype, despite the success of
+trastuzumab, resistance often emerges in a metastatic context, associated with
+mutations in HER2 or activation of parallel pathways such as MEK/ERK
+\cite{Loibl2021Breast, Eroles2012Molecular}. Trials such as HERA have
+demonstrated clear gains in disease-free survival with the addition of
+trastuzumab, but have also confirmed that the benefit is not uniform across all
+patients. In cases of TNBC, resistance to chemotherapy is even more
+problematic: patients who do not achieve a complete pathological response have
+very high relapse rates, and lifestyle factors such as obesity or smoking have
+been associated with lower therapeutic efficacy.
+
+The toxicity associated with treatments remains a central limitation in breast
+cancer. Despite advances in therapeutic efficacy, many regimens have adverse
+effects that significantly affect patients' quality of life and, in some cases,
+can even be severe \cite{Loibl2021Breast}. Chemotherapy, for example, is
+associated with severe toxic reactions in some patients. Hormone therapy,
+evaluated in the study by \textcite{Sun2017Risk}, used in hormone
+receptor-positive tumors, may increase the risk of cardiovascular complications
+and other systemic effects, while hormone inhibitors are linked to bone health
+problems. Even targeted therapies, considered more selective, are not risk-free
+and can cause long-term complications. This delicate balance between clinical
+efficacy and toxic impact represents a constant dilemma, underscoring the need
+to develop safer and more personalized approaches.
+
+Finally, important limitations remain in terms of treatment individualization.
+The ideal approach for certain patient groups, such as those with low hormone
+receptor expression, remains unclear, as these cases do not easily fit into
+traditional clinical categories or available trials. Metastatic disease remains
+one of the greatest challenges, remaining essentially incurable and associated
+with reduced median survival, regardless of subtype
+\cite{diff_bca_usa_Howlader2018}. Furthermore, there is still no consensus on
+the best sequence of therapies for some patient profiles, and clinical practice
+often faces the dilemma between undertreatment and overtreatment: in many
+contexts, more intensive regimens are chosen to reduce the risk of failure, but
+this results in adverse effects that significantly impact quality of life
+\cite{bc_subtypes_Prat2015Clinical}.
+
+In summary, the current limitations of breast cancer treatment reflect the
+interaction of multiple factors: subtypes with poor prognosis (such as TNBC),
+resistance phenomena that reduce therapeutic efficacy, toxicities that
+compromise quality of life, and the absence of clear consensus on the
+individualization of care. These challenges explain why, despite advances,
+metastatic disease remains incurable and why many patients are still subjected
+to therapeutic regimens that do not offer the ideal balance between efficacy
+and safety. Overcoming these barriers will depend on the ability to integrate
+new biomarkers, innovative treatment strategies, and truly personalized
+approaches—points that also form the basis for research into computational
+methods and artificial intelligence applied to oncology.
+
+\subsection{Nucleic acids as gene therapies}
+\label{sec:nucleic_acids_gene_therapies}
+The use of nucleic acids as therapeutic agents has emerged as one of the most promising approaches in contemporary biomedicine, based on their unique ability to directly modulate gene expression. Molecules such as plasmid DNA (pDNA), messenger RNA (mRNA), small interfering RNAs (siRNAs), antisense oligonucleotides (ASOs), and microRNAs (miRNAs) allow precise intervention in the molecular pathways responsible for the origin and progression of multiple diseases \cite{_Mendes2022Nanodelivery}. Unlike conventional drugs, which act mainly at the protein or metabolic level, these molecules act upstream, on the regulation of gene expression. This feature makes it possible to correct mutations, restore the function of tumor suppressor genes, silence unwanted transcripts, or reintroduce lost cellular functions. Thus, nucleic acid-based therapeutics offer the potential to treat diseases previously considered untreatable, including monogenic genetic disorders, persistent viral infections, and various types of cancer.
+
+Therapeutic strategies based on nucleic acids can be organized into three broad
+categories: \textbf{gene editing}, which uses systems such as CRISPR-Cas to
+correct or inactivate mutated genes; \textbf{gene addition}, which involves
+introducing functional copies of missing genes; and \textbf{gene silencing},
+which uses small \gls{rna} molecules to block the translation of pathogenic
+transcripts. Despite their enormous potential, the clinical application of
+these technologies faces significant obstacles related to biological stability
+and the effective delivery of molecules to target cells. Nucleic acids are
+structurally fragile, as seen in \textcite{_Mendes2022Nanodelivery} and
+\textcite{Mendes2024Nanoparticles}, degrade rapidly by the action of nucleases,
+and, due to their negative charge and high molecular weight, have low diffusion
+through the plasma membrane. To overcome these limitations, nanotransport
+systems - such as lipid, polymeric, and inorganic nanoparticles - have been
+developed that not only protect these molecules from degradation but also
+facilitate their entry into cells and release at the site of action.
+
+The development of these delivery systems has been instrumental in the clinical
+translation of gene therapies. A prime example is the central role of lipid
+nanoparticles (LNPs) in the success of mRNA vaccines against SARS-CoV-2, which
+has consolidated the viability and global acceptance of this technology.
+Although they face challenges related to safety, toxicity, and low accumulation
+in tumor tissues, other platforms, such as polymeric and inorganic
+nanoparticles, offer additional advantages, namely greater structural
+versatility and unique physicochemical properties. Thanks to their ability to
+selectively and sustainably modulate biological processes, nucleic acids now
+play a central role in the development of precision cancer therapies. This is
+particularly relevant in breast cancer, one of the most prevalent neoplasms
+worldwide and marked by profound molecular heterogeneity. Subtypes such as
+luminal, HER2-positive, or triple-negative tumors have distinct genetic and
+epigenetic profiles, which determine not only the progression of the disease
+but also the response to conventional therapies
+\textcite{Mendes2024Nanoparticles}. In this scenario, nucleic acid-based
+therapies offer a unique opportunity: instead of resorting to nonspecific
+chemotherapeutic agents, highly selective interventions can be designed to
+correct specific alterations in each tumor subtype - from restoring inactivated
+suppressor genes to blocking active oncogenes or regulating key elements of the
+tumor microenvironment.
+
+Breast cancer is thus a privileged model for preclinical research on nucleic
+acid delivery. Recent trials highlight the use of lipid and inorganic
+nanoparticles in breast tumor models, precisely because of their ability to
+transport mRNA, siRNA, or miRNA to tumor cells and, in some cases, to the
+surrounding stroma. Although tumor accumulation efficiency remains low - often
+less than 5\% of the administered dose - results in animal models show
+significant reductions in tumor growth, reinforcing the translational potential
+of this approach. In this context, breast cancer emerges not only as one of the
+most urgent targets due to its high incidence, but also as a paradigmatic case
+for the therapeutic exploration of nucleic acids, where the need for
+personalized solutions is coupled with the challenge of resistance and clinical
+variability associated with currently available therapies.
+
 \section{Related work}
 
 This section will present a critical review of computational approaches
@@ -594,34 +796,34 @@ evaluation metrics in classification tasks, according to
 \begin{enumerate}
   \item \textbf{Accuracy} \\
         Accuracy is the ratio of correctly predicted instances to the total number of instances. It measures the overall effectiveness of a classification model.
-        % \[
-        %   \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-        % \]
-        % where:
-        % \begin{itemize}
-        %   \item TP = True Positives
-        %   \item TN = True Negatives
-        %   \item FP = False Positives
-        %   \item FN = False Negatives
-        % \end{itemize}
+        \[
+          \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+        \]
+        where:
+        \begin{itemize}
+          \item TP = True Positives
+          \item TN = True Negatives
+          \item FP = False Positives
+          \item FN = False Negatives
+        \end{itemize}
 
   \item \textbf{Precision} \\
         Precision measures the proportion of correctly predicted positive observations to the total predicted positive observations. It reflects the model’s ability to return only relevant results.
-        % \[
-        %   \text{Precision} = \frac{TP}{TP + FP}
-        % \]
+        \[
+          \text{Precision} = \frac{TP}{TP + FP}
+        \]
 
   \item \textbf{Recall (Sensitivity or True Positive Rate)} \\
         Recall is the ratio of correctly predicted positive observations to all actual positives. It indicates the model’s ability to identify all relevant cases.
-        % \[
-        %   \text{Recall} = \frac{TP}{TP + FN}
-        % \]
+        \[
+          \text{Recall} = \frac{TP}{TP + FN}
+        \]
 
   \item \textbf{F1-Score} \\
         The F1-Score is the harmonic mean of Precision and Recall, providing a balance between the two. It is particularly useful when the class distribution is imbalanced.
-        % \[
-        %   \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
-        % \]
+        \[
+          \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+        \]
 
   \item \textbf{Support} \\
         Support refers to the number of actual occurrences of each class in the dataset. While not a performance metric per se, it helps in understanding how many examples a classifier is making predictions on for each class.
@@ -971,8 +1173,8 @@ comprises 1207 breast cancer samples with 1881 \gls{mirna} expression profiles
 from the TCGA-BRCA repository, already normalized and labeled. Notably, the
 class distribution is balanced, reducing bias in classification and
 strengthening the reliability of evaluation metrics. Given the high
-dimensionality, an initial feature cleaning step — including removal of null
-values — was performed, reducing the set to 1626 features. Based on prior
+dimensionality, an initial feature cleaning step (including removal of null
+values) was performed, reducing the set to 1626 features. Based on prior
 studies, the authors manually selected the 36 most promising \gls{mirna} for
 classification. Three complementary feature selection methods were then
 applied:

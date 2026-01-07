@@ -28,6 +28,22 @@
 \newcommand{\MikTeX}{Mik\TeX}
 \newcommand{\TeXLive}{\TeX Live}
 \newcommand{\pdfLaTeX}{pdf\LaTeX}
+
+% Comando para a diferença colorida
+% Uso: \diff{valor_atual}{valor_antigo}
+\newcommand{\diff}[2]{%
+    \pgfmathsetmacro{\res}{#1-#2}% Calcula a diferença
+    \ifdim \res pt > 0pt
+        {\scriptsize\color{posgreen} (+\pgfmathprintnumber[fixed, precision=2]{\res})}%
+    \else
+        \ifdim \res pt < 0pt
+            {\scriptsize\color{negred} (\pgfmathprintnumber[fixed, precision=2]{\res})}%
+        \else
+            {\scriptsize\color{gray} (0.00)}%
+        \fi
+    \fi
+}
+
 \definecolor{Schlgray}{gray}{0.95}
 
 %%============================================================
@@ -44,7 +60,7 @@
 \usepackage{makecell}      % Multiline table cells and control vertical and horizontal alignment
 
 \usepackage{tcolorbox}    % pretty print color boxes
-
+\usepackage{pgf}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.17}
 \usepackage{pgfplotstable}
@@ -58,6 +74,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{multirow}
+\usepackage{pgf-pie} % Requires pgf-pie package
+\usepackage{threeparttable}
+\usepackage{xcolor}
 
 
 % \usepackage{indentfirst}       % Indent first list after a (sub)section title

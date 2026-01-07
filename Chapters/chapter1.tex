@@ -142,47 +142,59 @@ possible relationships between these features and \gls{bc} subtypes.
 If substantial results are obtained by any of the models, we will be able to
 conduct a more extensive study on our main point: whether or not there are
 \gls{mirna} that are potential biomarkers for \gls{bc} subtypes. In a more
-advanced approach, I will be able to explore the applicability of
-\textit{Conformal Prediction} \cite{conformal_prediction_Angelopoulos2023},
-which provides statistically based confidence intervals for each prediction
-(which is widely used in areas where risk must be justified and well-founded,
-such as finance and healthcare). The latter is an approach that is still
-gaining ground in healthcare and, considering our problem, it makes sense to be
-able to give a prediction based on a confidence interval, giving our model
-greater transparency and reliability, something particularly relevant in
-clinical contexts where error must be minimized and uncertainty well
-characterized.
+advanced approach, we will be able to explore the applicability of methods in
+the realm of unsupervised learning, such as clustering techniques, to identify
+potentially novel subgroups within \gls{bc} that may not align with the
+currently established subtypes. This exploration could reveal new insights into
+the heterogeneity of the disease and potentially identify new therapeutic
+targets.
+
+%NO CASO DE FAZER CONFORMAL PREDICTION, TÁ AQUI UM TEXTO ***********************
+% In a more
+% advanced approach, I will be able to explore the applicability of
+% \textit{Conformal Prediction} \cite{conformal_prediction_Angelopoulos2023},
+% which provides statistically based confidence intervals for each prediction
+% (which is widely used in areas where risk must be justified and well-founded,
+% such as finance and healthcare). The latter is an approach that is still
+% gaining ground in healthcare and, considering our problem, it makes sense to be
+% able to give a prediction based on a confidence interval, giving our model
+% greater transparency and reliability, something particularly relevant in
+% clinical contexts where error must be minimized and uncertainty well
+% characterized.
 
 Even though the base seems promising, there are several challenges to overcome
-in order to achieve the desired results such as: \\ \textbf{1. Biological
-  heterogeneity:} \label{sec:biological-heterogeneity} Biological heterogeneity
-is characterized by the diversity of living organisms, including species,
-genotypes, and populations, which exhibit a variety of biological
-characteristics, such as morphology, physiology, genetics, and biogeography.
-The human body is a highly complex system in which the behavior of each
-component depends on its interaction with countless other parts. Exposure to
-the same treatment by two bodies can result in completely different reactions.
-\\ \textbf{2. Functional complexity of microRNAs:} \label{sec:mirna_complexity}
-\\ The role of \gls{mirna} in biological regulation and cancer progression is
-extremely complex and still relatively new from a scientific point of view. The
-action of a single microRNA is not isolated, but rather part of a network of
-interactions with dozens (or hundreds) of other \gls{mirna} and contextual
-factors. This highly interdependent behavior raises questions about the
-effectiveness of overly simplistic or linear models. The application of
-nonlinear models allows for the discovery of complex relationships and
-cross-interactions between different \gls{mirna} or between them and clinical
-variables. These relationships and interactions would be invisible to more
-traditional approaches. \\ \textbf{3. No control set:} Another relevant
-challenge is the absence of a control set that includes data from healthy
-individuals. Since this type of analysis (\gls{mirna} expression profiling) is
-not routinely performed in individuals without cancer, it is difficult to
-define what would be a “normal level” of expression. The implementation of a
-control group would not only broaden the scope of the model's task (e.g.,
-distinguishing between the presence and absence of cancer before predicting the
-subtype), but also optimize the robustness of biomarker identification. An
-illustrative example of this phenomenon is presented in the study
-\textcite{ml_gastric_Azari2023} where the implementation of a control set was
-fundamental to the identification of discriminative markers.
+in order to achieve the desired results such as: \\ \textbf{1. Inter-Tumor
+  Heterogeneity:} \\ One of the main challenges in studying breast cancer is the
+significant biological variation between tumours classified within the same
+subtype, known as \textit{intertumoral heterogeneity}. This diversity can
+manifest at various levels (genomic, transcriptomic, epigenetic and
+phenotypic), reflecting microRNA expression profiles that vary among patients.
+Consequently, defining consistent molecular signatures is difficult, as
+apparently similar tumours may exhibit distinct biological behaviours and
+respond differently to therapies. This variability makes it difficult to
+generalise biomarkers and hinders the identification of stable patterns that
+can be reliably used in a clinical context. \\ \textbf{2. Functional complexity
+  of microRNAs:} \label{sec:mirna_complexity} \\ The role of \gls{mirna} in
+biological regulation and cancer progression is extremely complex and still
+relatively new from a scientific point of view. The action of a single microRNA
+is not isolated, but rather part of a network of interactions with dozens (or
+hundreds) of other \gls{mirna} and contextual factors. This highly
+interdependent behavior raises questions about the effectiveness of overly
+simplistic or linear models. The application of nonlinear models allows for the
+discovery of complex relationships and cross-interactions between different
+\gls{mirna} or between them and clinical variables. These relationships and
+interactions would be invisible to more traditional approaches. \\ \textbf{3.
+  No control set:} Another relevant challenge is the absence of a control set
+that includes data from healthy individuals. Since this type of analysis
+(\gls{mirna} expression profiling) is not routinely performed in individuals
+without cancer, it is difficult to define what would be a “normal level” of
+expression. The implementation of a control group would not only broaden the
+scope of the model's task (e.g., distinguishing between the presence and
+absence of cancer before predicting the subtype), but also optimize the
+robustness of biomarker identification. An illustrative example of this
+phenomenon is presented in the study \textcite{ml_gastric_Azari2023} where the
+implementation of a control set was fundamental to the identification of
+discriminative markers.
 
 The morphology of this dataset limits the choice of approaches to be used and
 requires extra caution in how we work with certain models, such as nonlinear
@@ -191,10 +203,10 @@ limited data, can easily lead to overfitting. This requires careful selection
 of algorithms and attention to the pipeline that is set up to ensure that the
 results obtained are robust and relevant.
 
-We will eventually find a control set because it would be an important step
-toward increasing the generalizability of our model. This data set would not
-only allow us to expand the problem to include the distinction between healthy
-and sick individuals, but also improve the identification of discriminative
+Having a control would be an important step toward increasing the
+generalizability of our model. Using a negative sampling, it would not only
+allow us to expand the problem to include the distinction between healthy and
+sick individuals, but also improve the identification of discriminative
 biomarkers. The latter has already been successfully tested in other types of
 cancer, and a key step in the pipeline used is precisely the comparison with a
 control set \cite{ml_gastric_Azari2023} to isolate clinically relevant markers.
@@ -229,29 +241,30 @@ relevant molecular markers in the stratification of \gls{bc} patients.
 
 \section{Document Organization}
 \label{sec:document-organization}
-This dissertation is organized into four main chapters, structured to guide the
-reader from the conceptual framework to the definition of the work plan. Each
-chapter contributes to building a foundation for the topic addressed in this
-thesis: the classification of breast cancer subtypes using miRNA expression
-profiles and machine learning techniques.
-\begin{itemize}
-  \item Chapter 1 – Introduction: Presents the motivation for this work, the main
-        objectives of the research, and the context of the problem in the context of
-        precision medicine assisted by computational algorithms.
+TO-DO
+% This dissertation is organized into four main chapters, structured to guide the
+% reader from the conceptual framework to the definition of the work plan. Each
+% chapter contributes to building a foundation for the topic addressed in this
+% thesis: the classification of breast cancer subtypes using miRNA expression
+% profiles and machine learning techniques.
+% \begin{itemize}
+%   \item Chapter 1 – Introduction: Presents the motivation for this work, the main
+%         objectives of the research, and the context of the problem in the context of
+%         precision medicine assisted by computational algorithms.
 
-  \item Chapter 2 – Background and State of the Art: Begins with an exposition of the
-        fundamental concepts of molecular biology and genomics necessary for
-        understanding the topic addressed. This is followed by a critical analysis of
-        the relevant literature, highlighting the main works that apply machine
-        learning models to the identification of biomarkers and the classification of
-        cancer subtypes. This analysis provides a \textbf{methodological basis for the
-          work developed}.
+%   \item Chapter 2 – Background and State of the Art: Begins with an exposition of the
+%         fundamental concepts of molecular biology and genomics necessary for
+%         understanding the topic addressed. This is followed by a critical analysis of
+%         the relevant literature, highlighting the main works that apply machine
+%         learning models to the identification of biomarkers and the classification of
+%         cancer subtypes. This analysis provides a \textbf{methodological basis for the
+%           work developed}.
 
-  \item Chapter 3 – Experiments and Preliminary Results: This chapter presents the
-        first practical phase of the work and the preliminary results obtained.
+%   \item Chapter 3 – Experiments and Preliminary Results: This chapter presents the
+%         first practical phase of the work and the preliminary results obtained.
 
-  \item Chapter 4 – Work Planning: Proposes a detailed schedule of future stages of the
-        research, using a Gantt chart to establish time goals and organize the
-        activities planned.
-\end{itemize}
+%   \item Chapter 4 – Work Planning: Proposes a detailed schedule of future stages of the
+%         research, using a Gantt chart to establish time goals and organize the
+%         activities planned.
+% \end{itemize}
 

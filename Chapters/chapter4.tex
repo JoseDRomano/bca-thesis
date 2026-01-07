@@ -1,36 +1,217 @@
-%!TEX root = ../template.tex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% chapter4.tex
-%% NOVA thesis document file
-%%
-%% Chapter with lots of dummy text
+% Neste capítulo vamos falar sobre os resultados finais obtidos.
+% Para isto, vamos explicar que obtivamos mais dados na fase final da tese e então, por isso
+% repetimos as implementações que fizemos na primeira fase da tese.
+%
+% É com estes resultados que nós vamos depois fazer a análise final no capítulo 6.
+% Caso haja alguma correlação com os findings que tivemos na primeira parte, ótimo.
+% Caso contrário, também não há problema.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Definição de cores
+\definecolor{oldgray}{gray}{0.6} % Cinza claro para o dataset antigo
+\definecolor{posgreen}{HTML}{008000} % Verde para melhorias
+\definecolor{negred}{HTML}{CC0000}  % Vermelho para piorias
 
 \typeout{NT FILE chapter4.tex}%
+\chapter{Scalling the Analysis: the Expanded Cohort}
+\label{ch:expanded}
 
-\chapter{Work Plan}
-\label{cha:work_plan}
+\section{Transition to the Larger Dataset}
+4.1.1 Identification and Alignment: Merging the 256-subset with the 700-entry master set.
+- Why do we say that our original dataset is actually a subset of this master set? (optional)
+- What are the key differences between the subset and this master set?
 
-Figure presents a Gantt chart to illustrate an outline of the timeline and key
-milestones from this point foward. The chart is divided into several phases,
-each with specific tasks and deadlines.
+4.1.2 Comparative Analysis: Does the larger dataset change the data distribution?
 
-\begin{figure}[htbp]
+\section{Applying the Refined Pipeline}
+4.2.1 Re-training the Supervised Models.
+\subsection{Model Evaluation}
+
+% \begin{table}[!t]
+%   \centering
+%   \begin{threeparttable}
+%     \renewcommand{\arraystretch}{1.5} % Aumenta o espaço entre linhas para não amontoar os valores
+%     \caption{Heterogeneous models (\underline{miRNAs} + \underline{Clinical Data}). Results are shown in percentage.}
+%     \label{tab:heterogeneous_comparison}
+
+%     \begin{tabular}{lcccccccc}
+%         \toprule
+%                         & \multicolumn{4}{c}{\textbf{Overall}} & \multicolumn{4}{c}{\textbf{F1-Score per subtype}}                                            \\
+%         \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+%         \textbf{Model}  & P                                    & R                                                 & F1 & Acc & Basal & HER-2 & Lum A & Lum B \\
+%         \midrule
+%         DIABLO          & \makecell{??                                                                                                                        \\ 78.47                                                                                                                     } & \makecell{ ?? \\ 72.62} & \makecell{?? \\ 73.82} & \makecell{?? \\ 79.59} & \makecell{?? \\ \textbf{100.00}} & \makecell{?? \\ 40.00} & \makecell{?? \\ 85.71} & \makecell{?? \\ 69.57} \\
+%         \midrule
+%         Decision Tree   & \makecell{74.90                                                                                                                     \\ 62.01} & \makecell{ 75.00 \\ 63.69 } & \makecell{74.92 \\ 62.45} & \makecell{75.00 \\ 61.22} & \makecell{91.43 \\ 88.89} & \makecell{58.82 \\ 54.55} & \makecell{\textbf{81.42} \\ 61.90} & \makecell{51.16 \\ 44.44} \\
+
+%         Logistic Reg.   & \makecell{72.63                                                                                                                     \\ 77.22} & \makecell{70.19 \\ 75.60 } &
+%         \makecell{ 70.99                                                                                                                                      \\ 75.57} & \makecell{ 70.19 \\ 79.59} & \makecell{ 78.79 \\
+%         94.12 }         & \makecell{44.44                                                                                                                     \\ 54.55 } & \makecell{ 76.64 \\ \textbf{86.96}} &
+%         \makecell{ 60.00                                                                                                                                      \\ 66.67} \\
+
+%         XGBoost         & \makecell{\textbf{77.05}                                                                                                            \\ \textbf{90.06}} &
+%         \makecell{\textbf{77.88}                                                                                                                              \\ \textbf{79.17}} & \makecell{\textbf{77.21} \\
+%         \textbf{82.17}} & \makecell{\textbf{77.88}                                                                                                            \\ \textbf{83.67}} &
+%         \makecell{\textbf{100.00}                                                                                                                             \\ \textbf{100.00}} & \makecell{\textbf{70.59} \\
+%         \textbf{66.67}} & \makecell{81.36                                                                                                                     \\ 85.11} & \makecell{51.28 \\
+%         \textbf{76.92}}                                                                                                                                       \\ \bottomrule
+%     \end{tabular}
+
+%     \begin{tablenotes}
+%         \small
+%         \item \textit{Note: on each cell, the value at the top refers to the result obtained on these experiments, whereas the value at the bottom is from the table of results of the previous chapter \ref{tab:previous_chapter_ref}.}
+%     \end{tablenotes}
+
+% \end{threeparttable}
+% \end{table}
+
+\todo{mencionar no texto antes da tabela que estamos a usar a mesma arquitetura para o dataset grande}
+
+\todo{Rever esta tabela com o professor para saber se é legível}
+\begin{table}[h]
   \centering
-  \includegraphics[width=1.0\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/workplan.png}
-  \caption{Gantt chart illustrating the work plan and expected timeline for the project.}
-  \label{fig:gantt_chart}
-\end{figure}
+    \begin{threeparttable}
+    \renewcommand{\arraystretch}{2.0}
+    \setlength{\tabcolsep}{6pt}
+    \caption{Homogenous models. Comparison with previous results (miRNAs only).}
+    \label{tab:homogenous_comparison}
 
-Although the Gantt chart provides a visual overview of the timeline, some
-details may not be fully legible. For clarity, the main tasks and milestones
-are listed below.
+    \small
+    \begin{tabular}{lcccccccc}
+        \toprule
+                            & \multicolumn{4}{c}{\textbf{Overall}} & \multicolumn{4}{c}{\textbf{F1-Score per subtype}}                                            \\
+        \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+        \textbf{Model}       & P                                    & R                                                 & F1 & Acc & Basal & HER-2 & Lum A & Lum B \\
+        \midrule
 
-\begin{enumerate}
-  \item Assessing Statistical Robustness of Preliminary Results
-  \item Pipeline Consolidation with Non-linear Models
-  \item Feature Selection from microRNA and Clinical Attributes
-  \item Improving Statistical Robustness of microRNA Biomarkers Identification
-  \item Evaluation Cross-Checking with In-vitro/In-vivo Analysis
-  \item Thesis writing
-\end{enumerate}
+        DIABLO               & \makecell{69.06                                                                                                                     \\ \color{oldgray} 75.27 \\ \diff{69.06}{75.27}} &
+        \makecell{70.19                                                                                                                                            \\ \color{oldgray} 67.26 \\ \diff{70.19}{67.26}} &
+        \makecell{68.51                                                                                                                                            \\ \color{oldgray} 67.69 \\ \diff{68.51}{67.69}} &
+        \makecell{70.19                                                                                                                                            \\ \color{oldgray} 73.47 \\ \diff{70.19}{73.47}} &
+        \makecell{77.42                                                                                                                                            \\ \color{oldgray} \textbf{100.00} \\ \diff{77.42}{100.00}} &
+        \makecell{46.15                                                                                                                                            \\ \color{oldgray} 40.00 \\ \diff{46.15}{40.00}} &
+        \makecell{78.74                                                                                                                                            \\ \color{oldgray} 80.77 \\ \diff{78.74}{80.77}} &
+        \makecell{43.24                                                                                                                                            \\ \color{oldgray} 50.00 \\ \diff{43.24}{50.00}} \\
+
+        \midrule
+
+        Decision Tree        & \makecell{74.90                                                                                                                     \\ \color{oldgray} 57.35 \\
+        \diff{74.90}{57.35}} & \makecell{75.00                                                                                                                     \\ \color{oldgray} 56.40 \\
+        \diff{75.00}{56.40}} & \makecell{74.92                                                                                                                     \\ \color{oldgray} 56.79 \\
+        \diff{74.92}{56.79}} & \makecell{75.00                                                                                                                     \\ \color{oldgray} 57.14 \\
+        \diff{75.00}{57.14}} & \makecell{91.43                                                                                                                     \\ \color{oldgray} 87.50 \\
+        \diff{91.43}{87.50}} & \makecell{58.82                                                                                                                     \\ \color{oldgray} 36.36 \\
+        \diff{58.82}{36.36}} & \makecell{\textbf{81.42}                                                                                                            \\ \color{oldgray} 61.90 \\
+        \diff{81.42}{61.90}} & \makecell{51.16                                                                                                                     \\ \color{oldgray} 41.38 \\
+        \diff{51.16}{41.38}}                                                                                                                                       \\
+
+        Logistic Reg.        & \makecell{72.63                                                                                                                     \\ \color{oldgray} 80.26 \\
+        \diff{72.63}{80.26}} & \makecell{70.19                                                                                                                     \\ \color{oldgray} \textbf{75.60} \\
+        \diff{70.19}{75.60}} & \makecell{70.99                                                                                                                     \\ \color{oldgray} 73.50 \\
+        \diff{70.99}{73.50}} & \makecell{70.19                                                                                                                     \\ \color{oldgray} \textbf{77.55} \\
+        \diff{70.19}{77.55}} & \makecell{78.79                                                                                                                     \\ \color{oldgray} 94.12 \\
+        \diff{78.79}{94.12}} & \makecell{44.44                                                                                                                     \\ \color{oldgray} 61.54 \\
+        \diff{44.44}{61.54}} & \makecell{76.64                                                                                                                     \\ \color{oldgray} \textbf{85.71} \\
+        \diff{76.64}{85.71}} & \makecell{\textbf{60.00}                                                                                                            \\ \color{oldgray}
+        \textbf{52.63}                                                                                                                                             \\ \diff{60.00}{52.63}} \\
+
+        XGBoost              & \makecell{\textbf{77.05}                                                                                                            \\ \color{oldgray} \textbf{86.96} \\
+        \diff{77.05}{86.96}} & \makecell{\textbf{77.88}                                                                                                            \\ \color{oldgray} 74.40 \\
+        \diff{77.88}{74.40}} & \makecell{\textbf{77.21}                                                                                                            \\ \color{oldgray}
+        \textbf{76.73}                                                                                                                                             \\ \diff{77.21}{76.73}} & \makecell{\textbf{77.88} \\
+        \color{oldgray} 75.51                                                                                                                                      \\ \diff{77.88}{75.51}} & \makecell{\textbf{100.00} \\
+        \color{oldgray} \textbf{100.00}                                                                                                                            \\ \diff{100.00}{100.00}} &
+        \makecell{\textbf{70.59}                                                                                                                                   \\ \color{oldgray} \textbf{80.00} \\
+        \diff{70.59}{80.00}} & \makecell{81.36                                                                                                                     \\ \color{oldgray} 76.92 \\
+        \diff{81.36}{76.92}} & \makecell{51.28                                                                                                                     \\ \color{oldgray} 50.00 \\
+        \diff{51.28}{50.00}}                                                                                                                                       \\ \bottomrule
+    \end{tabular}
+
+    \begin{tablenotes}
+        \small
+        \item \textit{Note: Each cell displays the result of this experiment in the main dataset (top), the previous result (meaning, on the subset of the dataset) (\color{oldgray}middle\color{black}), and the calculated delta (bottom). \textbf{Bold} indicates best-in-class for each dataset comparison.}
+    \end{tablenotes}
+
+    \end{threeparttable}
+\end{table}
+
+
+\begin{table}
+  \centering
+  \begin{threeparttable}
+    \renewcommand{\arraystretch}{2.0}
+    \setlength{\tabcolsep}{6pt}
+    \caption{Heterogeneous models (\underline{miRNAs} + \underline{Clinical Data}). Comparison with previous results.}
+    \label{tab:heterogeneous_comparison}
+
+    \small
+    \begin{tabular}{lcccccccc}
+      \toprule
+                           & \multicolumn{4}{c}{\textbf{Overall}} & \multicolumn{4}{c}{\textbf{F1-Score per subtype}}                                            \\
+      \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+      \textbf{Model}       & P                                    & R                                                 & F1 & Acc & Basal & HER-2 & Lum A & Lum B \\
+      \midrule
+
+      DIABLO               & \makecell{69.06 \\ \color{oldgray} 78.47 \\ \diff{69.06}{78.47}} &
+      \makecell{70.19 \\ \color{oldgray} 72.62 \\ \diff{70.19}{72.62}} &
+      \makecell{68.51 \\ \color{oldgray} 73.82 \\ \diff{68.51}{73.82}} &
+      \makecell{70.19 \\ \color{oldgray} 79.59 \\ \diff{70.19}{79.59}} &
+      \makecell{77.42 \\ \color{oldgray} 100.00 \\ \diff{77.42}{100.00}} &
+      \makecell{46.15 \\ \color{oldgray} 40.00 \\ \diff{46.15}{40.00}} &
+      \makecell{78.74 \\ \color{oldgray} 85.71 \\ \diff{78.74}{85.71}} &
+      \makecell{43.24 \\ \color{oldgray} 69.57 \\ \diff{43.24}{69.57}} \\ 
+
+      \midrule
+
+      Decision Tree        & \makecell{71.88 \\ \color{oldgray} 62.01 \\
+      \diff{71.88}{62.01}} & \makecell{72.12 \\ \color{oldgray} 63.69 \\
+      \diff{72.12}{63.69}} & \makecell{71.97 \\ \color{oldgray} 62.45 \\
+      \diff{71.97}{62.45}} & \makecell{72.12 \\ \color{oldgray} 61.22 \\
+      \diff{72.12}{61.22}} & \makecell{84.85 \\ \color{oldgray} 88.89 \\
+      \diff{84.85}{88.89}} & \makecell{50.00 \\ \color{oldgray} 54.55 \\
+      \diff{50.00}{54.55}} & \makecell{81.03 \\ \color{oldgray} 61.90 \\
+      \diff{81.03}{61.90}} & \makecell{46.51 \\ \color{oldgray} 44.44 \\
+      \diff{46.51}{44.44}}                                                                                                                                       \\
+
+      Logistic Reg.        & \makecell{72.81 \\ \color{oldgray} 77.22 \\
+      \diff{72.81}{77.22}} & \makecell{71.15 \\ \color{oldgray} 75.60 \\
+      \diff{71.15}{75.60}} & \makecell{71.70 \\ \color{oldgray} 75.57 \\
+      \diff{71.70}{75.57}} & \makecell{71.15 \\ \color{oldgray} 79.59 \\
+      \diff{71.15}{79.59}} & \makecell{76.47 \\ \color{oldgray} 94.12 \\
+      \diff{76.47}{94.12}} & \makecell{47.06 \\ \color{oldgray} 54.55 \\
+      \diff{47.06}{54.55}} & \makecell{77.78 \\ \color{oldgray} \textbf{86.96} \\
+      \diff{77.78}{86.96}} & \makecell{\textbf{61.22} \\ \color{oldgray} 66.67 \\
+      \diff{61.22}{66.67}}                                                                                                                                       \\
+
+      XGBoost              & \makecell{\textbf{77.81} \\ \color{oldgray} \textbf{90.06} \\
+      \diff{77.81}{90.06}} & \makecell{\textbf{78.85} \\ \color{oldgray}
+      \textbf{79.17} \\ \diff{78.85}{79.17}} & \makecell{\textbf{77.96} \\
+      \color{oldgray} \textbf{82.17} \\ \diff{77.96}{82.17}} &
+      \makecell{\textbf{78.85} \\ \color{oldgray} \textbf{83.67} \\
+      \diff{78.85}{83.67}} & \makecell{\textbf{97.14} \\ \color{oldgray}
+      \textbf{100.00} \\ \diff{97.14}{100.00}} & \makecell{\textbf{70.59} \\
+      \color{oldgray} \textbf{66.67} \\ \diff{70.59}{66.67}} & \makecell{\textbf{83.05} \\
+      \color{oldgray} 85.11 \\ \diff{83.05}{85.11}} & \makecell{52.63 \\
+      \color{oldgray} \textbf{76.92} \\ \diff{52.63}{76.92}} \\ \bottomrule
+    \end{tabular}
+
+    \begin{tablenotes}
+      \small
+      \item \textit{Note: Each cell displays the current result (top), the previous result from chapter \ref{tab:prev} (\color{oldgray}middle\color{black}), and the calculated delta (bottom). \textbf{Bold} indicates best-in-class for each dataset.}
+    \end{tablenotes}
+
+  \end{threeparttable}
+\end{table}
+
+\todo{No texto a seguir à tabela, adicionar uma análise da diferença de valores entre implementações}
+
+4.2.2 Performance Metrics: Accuracy, F1-Score, and AUC-ROC for each Breast Cancer Subtype.
+
+\section{Model Interpretability and Biomarker Discovery}
+4.3.1 Global Interpretability: Feature Importance (SHAP/Gain) across the whole cohort.
+
+4.3.2 Local Interpretability: Identifying subtype-specific miRNA signatures.
+
+4.3.3 Clinical Relevance: Mapping the top miRNAs to known biological pathways.
+
