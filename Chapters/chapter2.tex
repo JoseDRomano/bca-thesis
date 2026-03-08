@@ -589,7 +589,7 @@ human experts in the diagnosis of malignant skin lesions.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.7\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/NN.png}
+  \includegraphics[width=0.7\textwidth]{Chapters/Figures/NN.png}
   \caption{Structure of an deep neural network (DNNs). It shows the input, hidden, and output layers, with connections between neurons responsible for processing information \cite{analyticsvidhya_image}.}
   \label{fig:DNN}
 \end{figure}
@@ -604,7 +604,7 @@ the image pixels, without the need for specialized preprocessing
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=1.0\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/CNN_derma.png}
+  \includegraphics[width=1.0\textwidth]{Chapters/Figures/CNN_derma.png}
   \caption{Schematic of the CNN used by \textcite{ai_in_dermacancer_esteva2017} with Inception v3 architecture, adapted to classify skin lesions based on clinical images. The network generates a probability distribution over clinical classes, based on a structured medical taxonomy.}
   \label{fig:CNN_derma}
 \end{figure}
@@ -630,7 +630,7 @@ this model were:
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.5\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/taxonomy.png}
+  \includegraphics[width=0.5\textwidth]{Chapters/Figures/taxonomy.png}
   \caption{A subset of the hierarchical taxonomy developed in the study by \textcite{ai_in_dermacancer_esteva2017}, with diseases organized by clinical and visual similarity into three major groups: benign, malignant, and non-neoplastic.}
   \label{fig:taxonomy}
 \end{figure}
@@ -652,14 +652,14 @@ performance.
   \centering
   \begin{subfigure}[b]{0.50\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/conf-matrix-docs.png}
+    \includegraphics[width=\textwidth]{Chapters/Figures/conf-matrix-docs.png}
     \caption{(Confusion matrices comparison)}
     \label{fig:conf-matrix-docs}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.50\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/AUC_derma_2.png}
+    \includegraphics[width=\textwidth]{Chapters/Figures/AUC_derma_2.png}
     \caption{AUC curves analysis}
     \label{fig:AUC_dnn_model}
   \end{subfigure}
@@ -690,7 +690,7 @@ utility.
 
 \begin{figure} [h]
   \centering
-  \includegraphics[width=0.5\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/t_sne_derma.png}
+  \includegraphics[width=0.5\textwidth]{Chapters/Figures/t_sne_derma.png}
   \caption{t-SNE projection of the internal representations of the last hidden layer of the CNN \cite{ai_in_dermacancer_esteva2017}. The different classes of lesions are grouped into distinct clouds, revealing the model's ability to extract relevant discriminative features.}
   \label{fig:tsne_derma}
 \end{figure}
@@ -737,7 +737,7 @@ fails to generalize to new examples.
 
 \begin{figure} [h]
   \centering
-  \includegraphics[width=0.7\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/overfit.png}
+  \includegraphics[width=0.7\textwidth]{Chapters/Figures/overfit.png}
   \caption{Examples of underfitting, proper fitting, and overfitting.
     From left to right: the model underfits the data, fits it appropriately, and overfits by capturing noise instead of the underlying pattern \cite{overfiting_ailab_mti_image}.}
   \label{fig:overfitting}
@@ -757,7 +757,7 @@ classification task:
   \item \textbf{K-nearest Neighbors (\textit{kNN})}: classifies new data based on the K nearest neighbors in the feature space \cite{knn_article}.
         \begin{figure} [h]
           \centering
-          \includegraphics[width=0.45\linewidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/knn-example.jpg}
+          \includegraphics[width=0.45\linewidth]{Chapters/Figures/knn-example.jpg}
           \caption{Illustration of the k-Nearest Neighbors (k-NN) classification process. The top-left panel shows the initial labeled data (Class A in yellow, Class B in purple) and a new unlabeled sample (?). The top-right panel demonstrates the calculation of distances from the new sample to all existing points. The bottom panel shows the selection of the k=3 nearest neighbors and class assignment based on majority voting, resulting in the classification of the new sample.}
         \end{figure}
 
@@ -770,14 +770,14 @@ classification task:
 
         \begin{figure} [h]
           \centering
-          \includegraphics[width=0.45\linewidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/dt-example.png}
+          \includegraphics[width=0.45\linewidth]{Chapters/Figures/dt-example.png}
           \caption{Example of a Decision Tree for Classification Based on Attributes: Income, Age, Student Status, and Credit Rating (CR). The tree predicts a binary decision outcome (Yes/No) using hierarchical decision rules \cite{decision_trees_Jijo2021Classification}.}
         \end{figure}
 
   \item \textbf{Support Vector Machine (\textit{SVM})}: This algorithm constructs an optimal hyperplane that best separates samples from different classes. The goal of SVM is to maximize the margin between the two classes for better generalization. Support vectors are the data points that lie closest to the hyperplane and define its position.
         \begin{figure} [h]
           \centering
-          \includegraphics[width=0.45\linewidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/SVM.png}
+          \includegraphics[width=0.45\linewidth]{Chapters/Figures/SVM.png}
           \caption{Visualization of a Support Vector Machine (SVM) classifier. The red line represents the optimal hyperplane that separates two classes (blue and green points), while the dashed lines indicate the margins.}
         \end{figure}
 \end{itemize}
@@ -961,7 +961,7 @@ clinical environment.
 
 \begin{figure}
   \centering
-  \includegraphics[width = 1.0\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/workflow_gastric.png}
+  \includegraphics[width = 1.0\textwidth]{Chapters/Figures/workflow_gastric.png}
   \caption{Fluxogram of the methodology used in this study, including all the results obtained on each step. \cite{ml_gastric_Azari2023}}
 \end{figure}
 
@@ -1032,7 +1032,7 @@ more human-friendly.
 
 \begin{figure}
   \centering
-  \includegraphics[width = 0.6\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/up-down-regulation-azari.png}
+  \includegraphics[width = 0.6\textwidth]{Chapters/Figures/up-down-regulation-azari.png}
   \caption{
     Differential regulation levels of the 29 \gls{mirna} selected by the SVM model in the study by \textcite{ml_gastric_Azari2023}. Positive logFC (log fold-change) values indicate overexpressed \gls{mirna} (magenta) and negative values indicate underexpressed \gls{mirna} (green) in gastric cancer samples compared to healthy tissue.}
   \label{fig:regulation_levels}
@@ -1072,13 +1072,13 @@ potential as a dual biomarker.
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.49\textwidth}
-    \includegraphics[width =\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/roc_azari.png}
+    \includegraphics[width =\textwidth]{Chapters/Figures/roc_azari.png}
     \caption{}
     \label{fig:roc_azari}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.45\textwidth}
-    \includegraphics[width =\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/mirna_to_gene.png}
+    \includegraphics[width =\textwidth]{Chapters/Figures/mirna_to_gene.png}
     \caption{}
     \label{fig:mirna_to_gene}
   \end{subfigure}
@@ -1137,7 +1137,7 @@ paragraphs.
 
 \begin{figure}
   \centering
-  \includegraphics[width = 0.5\textwidth]{/Users/JoseRomano/Documents/Tese/bca-thesis/Chapters/Figures/pipeline_validation_mirna.png}
+  \includegraphics[width = 0.5\textwidth]{Chapters/Figures/pipeline_validation_mirna.png}
   \caption{Workflow chart used in the following study.}
   \label{fig:workflow_val}
 \end{figure}
