@@ -61,11 +61,12 @@ preprocessing pipeline in Section~\ref{sec:preprocessing}.
 \label{subsec:working_cohort}
 % ---------------------------------------------------------------
 
-The full clinical release contains records for 463 patients. However, not all
+The full clinical release and the miRNA expression data contain records for 463 
+patients and 272 patients, respectively. However, not all
 patients in the clinical table have a corresponding miRNA expression profile
 available in the molecular data release, which will drastically decrease our 
 working cohort given that our objective is to find meaningful associations between 
-\gls{mirna}, (potentionally) clinical features and subtypes of \gls{bc} . 
+\gls{mirna}, (potentionally) clinical features and subtypes of \gls{bc}. 
 After restricting the cohort to
 individuals for whom matched miRNA expression profiles existed, a \textbf{working
 cohort of 272 samples} was obtained with the intersection of the two data sources.
@@ -75,7 +76,7 @@ All 272 samples correspond to primary solid tumour tissue
 
 \todo{Aceito Sugestões para mais dados interessantes que se possam inserir aqui}
 
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \caption{Detailed Descriptive Statistics of the TCGA Dataset}
     \label{tab:detailed_statistics}
@@ -548,13 +549,104 @@ the full unique expression signal. The resulting feature matrix is both more
 compact and more interpretable, with each remaining miRNA representing a
 genuinely distinct molecular measurement.
 
+Now that we have characterised the data sources and the working cohort, 
+we can proceed to the pre-processing pipeline that transforms the raw data 
+into a clean, numerical feature matrix suitable for machine learning. The next 
+section describes this pipeline in detail, including the handling of missing 
+values, feature selection decisions, and the critical steps taken to avoid 
+data leakage between training and test partitions.
+
+
+% ================================================================
+\section{Data Pre-processing Pipeline}
+\label{sec:preprocessing}
+% ================================================================
+
+Before any learning algorithm was applied, the raw data sources described in
+Section~\ref{sec:data_acquisition} underwent a structured sequence of
+transformations designed to produce a clean, fully numerical, and
+modelling-ready feature matrix. The pipeline was designed with two overriding
+principles in mind: preserving the biological authenticity of the data at every
+step, and strictly preventing any statistical information from the test set from
+influencing the training process (\textbf{Data Leakage Prevention}). The full procedure is summarised
+schematically in Figure~\ref{fig:pipeline_diagram}, and each step is described
+in the subsections below.
+
+% [MEDIA: Pipeline diagram showing the sequential stages as a flowchart.
+% Boxes: (1) Raw miRNA matrix (888×272) → Transpose + align → (272×888) |
+% (2) Clinical table (463×37) → Inner join → Integrated matrix (272×925) |
+% (3) Deduplicate miRNAs → (272×479) |
+% (4) Drop uninformative clinical cols → (272×464) |
+% (5) Listwise deletion + Normal-like exclusion → (244×464) |
+% (6) Categorical encoding → (244×464, all numeric) |
+% (7) Stratified 80/20 split → Train (195) / Test (49) |
+% (8) StandardScaler fitted on Train only → applied to both.
+% Arrows should emphasise that step 8 happens AFTER the split.]
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.70\textwidth]{diagrama_pre_processamento.drawio.png}
+    \caption{Schematic overview of the data pre-processing pipeline. The raw miRNA
+             expression matrix and clinical data table are transformed through a
+             series of steps including integration, deduplication, feature
+             selection, and encoding, culminating in a stratified train-test split
+             and final scaling. Each step is designed to preserve data integrity
+             while preparing the dataset for robust machine learning modelling.}
+    \label{fig:pipeline_diagram}
+\end{figure}
+
+% ---------------------------------------------------------------
+\subsection{Data Integration}
+\label{subsec:integration}
+% ---------------------------------------------------------------
+
+The two raw data sources arrived in structurally incompatible orientations. The
+miRNA expression matrix followed the conventional bioinformatics layout:
+features (miRNAs) as rows and patients as columns, yielding a matrix of
+$888 \times 275$ (where 3 of the 275 columns are metadata fields:
+\texttt{entrezGeneId}, \texttt{hugoGeneSymbol}, and \texttt{type}). The
+clinical data table, by contrast, followed the standard tabular layout with
+patients as rows and variables as columns ($463 \times 37$). Before any join
+could be performed, the miRNA matrix had to be transformed to match this
+convention.
+The transformation proceeded in four steps:
+
+\begin{itemize}
+    \item[(i)] the metadata columns \texttt{entrezGeneId} and \texttt{type} were dropped, retaining only the gene symbol and expression values;
+    \item[(ii)] the matrix was transposed, placing patients on the rows and miRNAs on the columns;
+    \item[(iii)] the first row of the transposed matrix (which contained the miRNA identifiers) was promoted to serve as the column header;
+    \item[(iv)] the row index was renamed to \texttt{sampleId} to establish a common join key with the clinical table.
+\end{itemize}
+
+The two tables were then merged via an \textbf{inner join} on \texttt{sampleId}.
+The inner join naturally restricts the combined dataset to patients for whom
+both miRNA expression data and clinical annotations are available
+simultaneously, yielding an integrated matrix of \textbf{272 samples} and
+$888 + 37 = 925$ features prior to any reduction step. The 191 clinical
+records without matched miRNA profiles were discarded at this stage.
+
+% ---------------------------------------------------------------
+\subsection{miRNA Deduplication}
+\label{subsec:mirna_dedup}
+% ---------------------------------------------------------------
+
+As described in Section~\ref{subsec:mirna_data}, the 888 miRNA features in
+the raw matrix do not represent 888 biologically independent measurements.
+A substantial fraction of entries share the same precursor base identifier,
+for example, \texttt{MIR-758/758}, \texttt{MIR-758/3P}, and
+\texttt{MIR-758/5P} (visually explained in Table~\ref{tab:mirna-variants}). These 
+carry \textbf{identical numerical expression values} across all 272 samples.
+This redundancy comes from the limited sensibility of the extraction technique 
+used to collect these miRNA expression values which cannot distinguish between 
+closely related isoforms of the same precursor, and consequently assigns the 
+same measured abundance to all of them.
+
 % [SUGGESTION: A small illustrative table showing three example base identifiers
 % (e.g.\ MIR-758, MIR-744, MIR-766) and their variants, with a column showing
 % that expression values are identical across all patients, would make this point
 % very concrete for the reader without requiring them to inspect the raw data
 % themselves.]
 
-\begin{table}[h]
+\begin{table}[H]
         \centering
         \caption{Example of miRNA identifier variants sharing identical expression values
                 across patients. Each row corresponds to a distinct annotation of the same
@@ -577,239 +669,400 @@ genuinely distinct molecular measurement.
     \end{tabular}
 \end{table}
 
-Now that we have characterised the data sources and the working cohort, 
-we can proceed to the pre-processing pipeline that transforms the raw data 
-into a clean, numerical feature matrix suitable for machine learning. The next 
-section describes this pipeline in detail, including the handling of missing 
-values, feature selection decisions, and the critical steps taken to avoid 
-data leakage between training and test partitions.
+From a machine learning standpoint, retaining these duplicate columns is not
+merely wasteful: \textbf{it is actively harmful}. Identical features contribute zero
+additional information to the model while artificially inflating the apparent
+dimensionality of the feature space, exacerbating the curse of dimensionality
+in an already data-sparse regime. They also introduce perfect multicollinearity,
+which can distort coefficient estimates in linear models and destabilise
+feature importance rankings in tree-based models.
 
-% ============================================================
+To address this, all miRNA features sharing identical expression profiles
+across all samples were identified and all but one representative were removed.
+The deduplication was applied by grouping features according to their base
+identifier and retaining only those with a unique expression vector. This step
+reduced the miRNA feature count from \textbf{888 to 442}, eliminating 446
+redundant features without discarding any unique biological signal.
 
-\section{Data Pre-processing Pipeline}
-\label{sec:preprocessing}
+% ---------------------------------------------------------------
+\subsection{Removal of Uninformative Clinical Features}
+\label{subsec:clinical_drop}
+% ---------------------------------------------------------------
 
-Before any learning algorithm was applied, both the clinical and miRNA expression
-data underwent a structured pre-processing pipeline. This pipeline was designed
-to produce a clean, fully numerical feature matrix while strictly avoiding data
-leakage between training and test partitions. The full procedure is described in
-the following subsections and is summarised schematically in
-Figure~\ref{fig:preprocessing-pipeline}.
+When we look at the 37 original clinical variables, 15 were removed prior to modelling on
+the grounds summarised in Table~\ref{tab:dropped_features}. These columns
+fell into four categories: 
 
-% --------------------------------------------------------------
-\subsection{Handling Missing Values and Feature Selection}
-\label{subsec:missing-outliers}
-
-\subsubsection{Dataset Integration}
-
-The pre-processing pipeline began by integrating the two data sources described
-in Section~\ref{subsec:primary-cohort}. The miRNA expression matrix was first
-transposed from its original feature-by-sample orientation
-(888 miRNAs $\times$ 272 samples) to the conventional sample-by-feature layout
-(272 $\times$ 888), and the row index was renamed to \texttt{sampleId} to
-establish a common join key. The resulting expression table was then merged with
-the clinical annotation table via an inner join on \texttt{sampleId}, yielding
-an integrated matrix of 272 samples and 925 columns prior to any reduction step.
-
-\subsubsection{Removal of Uninformative Clinical Features}
-
-A first round of feature elimination targeted clinical variables that carry no
-discriminative information for the classification task. Specifically, 15 columns
-were removed on the grounds listed in Table~\ref{tab:dropped-cols}. Broadly,
-these fall into four categories: \\
-(i) \textbf{redundant identifiers} (\texttt{patientId}); \\
-(ii) \textbf{zero-variance fields}, i.e.\ columns that
-take a single value across all samples (\texttt{studyId}, \texttt{CANCER\_TYPE},
-\texttt{CANCER\_TYPE\_DETAILED}, \texttt{ONCOTREE\_CODE}, \texttt{SAMPLE\_TYPE},
-\texttt{SOMATIC\_STATUS}, \texttt{SAMPLE\_COUNT}, \texttt{SEX}); \\
-(iii) \textbf{high-missingness fields}, where the proportion of missing values was
-deemed too large to recover reliably (\texttt{RPPA\_CLUSTER} at
-$\approx$24\% missing; \texttt{INTEGRATED\_CLUSTERS\_NO\_EXP},
-\texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP}, and
-\texttt{INTEGRATED\_CLUSTERS\_WITH\_PAM50} each at $\approx$25\% missing); \\
-and (iv) \textbf{task-irrelevant derived features} (\texttt{SIGCLUST\_INTRINSIC\_MRNA},
-a cluster label derived from mRNA rather than miRNA data, and
-\texttt{SURVIVAL\_DATA\_FORM}, a near-zero-variance administrative field).
-
-\begin{table}[h!]
-    \centering
-    \caption{Clinical columns removed during the feature elimination step and
-             the corresponding rationale.}
-    \label{tab:dropped-cols}
-    \begin{tabular}{ll}
-        \hline
-        \textbf{Column} & \textbf{Rationale for removal} \\
-        \hline
-        \texttt{patientId}                         & Redundant sample identifier \\
-        \texttt{studyId}                           & Constant value across all samples \\
-        \texttt{CANCER\_TYPE}                      & Constant value (\textit{Breast Cancer}) \\
-        \texttt{CANCER\_TYPE\_DETAILED}            & Constant value (\textit{Invasive Breast Carcinoma}) \\
-        \texttt{ONCOTREE\_CODE}                    & Constant value (\texttt{BRCA}) \\
-        \texttt{SAMPLE\_TYPE}                      & Constant value (\textit{Primary}) \\
-        \texttt{SOMATIC\_STATUS}                   & Constant value (\textit{Matched}) \\
-        \texttt{SAMPLE\_COUNT}                     & Constant value (1) \\
-        \texttt{SEX}                               & Constant value (\textit{Female}) \\
-        \texttt{RPPA\_CLUSTER}                     & $\approx$24\% missing values \\
-        \texttt{INTEGRATED\_CLUSTERS\_NO\_EXP}     & $\approx$25\% missing values \\
-        \texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP}  & $\approx$25\% missing values \\
-        \texttt{INTEGRATED\_CLUSTERS\_WITH\_PAM50} & $\approx$25\% missing values; PAM50-derived \\
-        \texttt{SIGCLUST\_INTRINSIC\_MRNA}         & mRNA-derived cluster; not relevant to miRNA study \\
-        \texttt{SURVIVAL\_DATA\_FORM}              & Near-zero variance; administrative annotation \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{Handling Residual Missing Values}
-
-After the elimination of high-missingness columns, a small number of samples
-still contained at least one missing value in the remaining clinical features.
-Specifically, 8 of the 272 samples were affected, with missingness concentrated
-in five fields: 
 \begin{itemize}
-    \item \texttt{FRACTION\_GENOME\_ALTERED} ($n$\,=\,2),
-    \item \texttt{HER2\_STATUS} ($n$\,=\,1),
-    \item \texttt{METASTASIS\_CODED} ($n$\,=\,4),
-    \item \texttt{TUMOR\_T1\_CODED} ($n$\,=\,3),
-    \item  \texttt{METASTASIS} ($n$\,=\,4).
+    \item redundant patient identifiers that carry no predictive signal (\texttt{patientId}); 
+    \item zero-variance fields that take a single value across all samples and therefore provide no discriminative information (\texttt{studyId}, \texttt{CANCER\_TYPE}, \texttt{CANCER\_TYPE\_DETAILED}, \\ \texttt{ONCOTREE\_CODE}, \texttt{SAMPLE\_TYPE}, \texttt{SOMATIC\_STATUS}, \texttt{SAMPLE\_COUNT}, \texttt{SEX});
+    \item high-missingness fields where the proportion of missing values rendered the feature unreliable (\texttt{RPPA\_CLUSTER} at ${\approx}24\%$ missing; 
+    \item \texttt{INTEGRATED\_CLUSTERS\_NO\_EXP}, \texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP}, and  \\ \texttt{INTEGRATED\_CLUSTERS\_WITH\_PAM50} each at ${\approx}25\%$ missing);
+    \item task-irrelevant derived features (\texttt{SIGCLUST\_INTRINSIC\_MRNA}, a cluster assignment derived from mRNA rather than miRNA data, and \texttt{SURVIVAL\_DATA\_FORM}, a near-zero-variance administrative field).
 \end{itemize}
 
-Handling missing values in a dataset with a relatively small sample size is a
-non-trivial challenge. Working with biological data adds further complexity:
-the human body operates as an interconnected system of molecular processes,
-and filling in missing clinical measurements through standard imputation methods
-risks introducing artificial patterns that do not reflect any true biological
-signal. Given that the affected rows represent only 2.9\% of the cohort, and
-that no systematic structure was identified in the missingness, these samples
-were removed via listwise deletion. This approach ensures that all models are
-trained on complete and reliable observations, prioritising data integrity over
-sample size - a trade-off that is well-established in biomedical machine
-learning~\cite{sterne2009multiple}. The miRNA expression matrix itself contained
-no missing values (see Section~\ref{subsec:mirna-profiles}), so this step
-exclusively affected rows with incomplete clinical annotations.
-
-Following listwise deletion, the working cohort comprised \textbf{264 samples},
-with the PAM50 subtype distribution revised to: Luminal~A ($n$\,=\,114),
-Luminal~B ($n$\,=\,73), Basal-like ($n$\,=\,43), HER2-enriched ($n$\,=\,30),
-and Normal-like ($n$\,=\,4).
-
-\subsubsection{Categorical Encoding}
-
-The 20 clinical features retained after the elimination step comprise two
-distinct types: nine \textbf{numerical} fields (\texttt{CN\_CLUSTER},
-\texttt{FRACTION\_GENOME\_ALTERED}, \texttt{METHYLATION\_CLUSTER},
-\texttt{MIRNA\_CLUSTER}, \texttt{MUTATION\_COUNT},
-\texttt{SIGCLUST\_UNSUPERVISED\_MRNA}, \texttt{TMB\_NONSYNONYMOUS},
-\texttt{AGE}, and \texttt{OS\_MONTHS}), which required no transformation; and
-eleven \textbf{categorical} fields that were converted to integer codes via
-manual label encoding. The encoding schemes are listed in
-Table~\ref{tab:label-encoding}. For ordinal variables - such as
-\texttt{CONVERTED\_STAGE}, \texttt{TUMOR\_STAGE}, and \texttt{NODES} - the
-integer codes were assigned to preserve the natural clinical ordering. For
-nominal binary variables - such as \texttt{ER\_STATUS}, \texttt{HER2\_STATUS},
-\texttt{PR\_STATUS}, \texttt{NODE\_CODED}, \texttt{METASTASIS\_CODED},
-\texttt{METASTASIS}, and \texttt{OS\_STATUS} - integer codes were assigned
-arbitrarily. The target variable \texttt{PAM50\_SUBTYPE} was also encoded at
-this stage (Basal-like\,=\,0, HER2-enriched\,=\,1, Luminal~A\,=\,2,
-Luminal~B\,=\,3), with Normal-like samples excluded from the supervised
-experiments due to their insufficient representation ($n$\,=\,4).
-
-\begin{table}[h!]
-    \centering
-    \caption{Label encoding schemes applied to categorical clinical features.}
-    \label{tab:label-encoding}
-    \small
-    \begin{tabular}{lp{9cm}}
-        \hline
-        \textbf{Feature} & \textbf{Encoding} \\
-        \hline
-        \texttt{CONVERTED\_STAGE}  & No\_Conversion\,=\,0; Stage~I\,=\,2; Stage~IIA\,=\,1;
-                                     Stage~IIB\,=\,3; Stage~IIIA\,=\,5; Stage~IIIB\,=\,7;
-                                     Stage~IIIC\,=\,4; Stage~IV\,=\,6 \\
-        \texttt{ER\_STATUS}        & Negative\,=\,0; Performed but Not Available\,=\,1;
-                                     Positive\,=\,2; Indeterminate\,=\,3 \\
-        \texttt{HER2\_STATUS}      & Negative\,=\,0; Equivocal\,=\,1; Positive\,=\,2 \\
-        \texttt{METASTASIS\_CODED} & Negative\,=\,0; Positive\,=\,1 \\
-        \texttt{NODES}             & N0\,=\,0; N1\,=\,1; N2\,=\,2; N3\,=\,3 \\
-        \texttt{NODE\_CODED}       & Negative\,=\,0; Positive\,=\,1 \\
-        \texttt{PR\_STATUS}        & Negative\,=\,0; Positive\,=\,1;
-                                     Performed but Not Available\,=\,2; Indeterminate\,=\,3 \\
-        \texttt{TUMOR\_STAGE}      & T1\,=\,1; T2\,=\,2; T3\,=\,3; T4\,=\,4 \\
-        \texttt{TUMOR\_T1\_CODED}  & T\_Other\,=\,0; T1\,=\,1 \\
-        \texttt{METASTASIS}        & M0\,=\,0; M1\,=\,1 \\
-        \texttt{OS\_STATUS}        & Living\,=\,0; Deceased\,=\,1 \\
-        \hline
-    \end{tabular}
+\begin{table}[h]
+\centering
+\caption{Clinical columns removed during pre-processing, with the
+rationale for each exclusion.}
+\label{tab:dropped_features}
+\small
+\begin{tabular}{p{5.8cm} p{2.5cm} p{5.0cm}}
+\hline
+\textbf{Column} & \textbf{Reason} & \textbf{Detail} \\
+\hline
+\texttt{patientId}
+    & Redundant identifier
+    & Duplicate of \texttt{sampleId}. \\
+\texttt{studyId}, \texttt{CANCER\_TYPE}, \texttt{CANCER\_TYPE\_DETAILED},
+\texttt{ONCOTREE\_CODE}, \texttt{SAMPLE\_TYPE}, \texttt{SOMATIC\_STATUS},
+\texttt{SAMPLE\_COUNT}, \texttt{SEX}
+    & Zero variance
+    & Single value across all 272 samples (all primary female BRCA). \\
+\texttt{RPPA\_CLUSTER}
+    & High missingness
+    & ${\approx}24\%$ missing values. \\
+\texttt{INTEGRATED\_CLUSTERS\_NO\_EXP}, \texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP},
+\texttt{INTEGRATED\_CLUSTERS\_WITH\_PAM50}
+    & High missingness
+    & ${\approx}25\%$ missing values each. \\
+\texttt{SIGCLUST\_INTRINSIC\_MRNA}
+    & Task-irrelevant
+    & Derived from mRNA, not miRNA; circular with target. \\
+\texttt{SURVIVAL\_DATA\_FORM}
+    & Near-zero variance
+    & Administrative field with negligible variation. \\
+\hline
+\end{tabular}
 \end{table}
 
-Upon completion of this stage, the integrated dataset consisted of 264 samples
-described by \textbf{909 features}: 20 clinical variables (including the encoded
-categorical fields) and 888 miRNA expression values.
+After these removals, 20 clinical features were retained alongside the 442
+deduplicated miRNA expression features, for an intermediate feature matrix of
+272 samples $\times$ 462 features (plus the \texttt{sampleId} identifier and
+the \texttt{PAM50\_SUBTYPE} target).
 
-% --------------------------------------------------------------
-\subsection{Dimensionality and Feature Scaling}
-\label{subsec:dim-reduction-scaling}
 
-\subsubsection{The Curse of Dimensionality in the Context of This Dataset}
+% ---------------------------------------------------------------
+\subsection{Handling Missing Values \& Low Representation Classes}
+\label{subsec:missing_values}
+% ---------------------------------------------------------------
 
-The final feature matrix ($264 \times 909$) exhibits a moderately
-high-dimensional structure. When the 20 clinical features are excluded and only
-the miRNA expression panel is considered, the ratio of features to samples
-reaches $p/n \approx 3.4$, which can degrade the generalisation performance of
-many classifiers and renders unregularised models prone to overfitting. This
-motivates the use of both intrinsic regularisation (e.g.\ in Support Vector
-Machines and penalised regression variants) and explicit feature selection
-strategies, which are described in detail in Chapter~4.
+Following the elimination of high-missingness columns, a small residual
+number of samples still contained at least one missing value across the
+remaining clinical features. Specifically, the affected fields and their
+missing-value counts were: \texttt{FRACTION\_GENOME\_ALTERED} ($n = 2$),
+\texttt{HER2\_STATUS} ($n = 1$), \texttt{METASTASIS\_CODED} ($n = 4$),
+\texttt{TUMOR\_T1\_CODED} ($n = 3$), and \texttt{METASTASIS} ($n = 4$).
+The miRNA expression matrix itself contained no missing values.
 
-\subsubsection{Feature Scaling and the Prevention of Data Leakage}
-\label{subsubsec:leakage}
+Deciding how to handle missing data is never a purely technical choice: the
+appropriate strategy depends on the nature of the data, the mechanism
+generating the missingness, and the downstream use. In computational studies
+applied to purely numerical or synthetic data, some imputation methods such as
+mean substitution, k-nearest neighbour imputation, or generative approaches
+like MICE~\cite{buuren2011mice} are standard and often effective. In a
+biological dataset such as this one, however, the situation is qualitatively
+different. Clinical measurements such as metastasis status, HER2 assessment,
+or genomic alteration fraction reflect real, heterogeneous biological processes
+in individual patients. Filling in a missing HER2 status with the cohort mean,
+or inferring a missing metastasis record from neighbouring samples, risks
+fabricating a clinical picture that does not correspond to any real biological
+state. Imputed values could mislead the model into learning artificial patterns
+(in effect, training on synthetic patients that never existed). Given the
+already limited size of the cohort, introducing even a small number of
+biologically implausible observations could meaningfully distort the learned
+decision boundaries.
 
-Many of the machine learning algorithms employed in this work - in particular
-distance-based and gradient-based methods - are sensitive to the absolute scale
-of input features. Raw miRNA expression values span a range of approximately
-$[-2.72,\; 18.66]$ on the log$_2$ scale (see Table~\ref{tab:mirna-stats}),
-while clinical features such as \texttt{MUTATION\_COUNT} and
-\texttt{TMB\_NONSYNONYMOUS} operate on entirely different numerical scales.
-Standardisation to zero mean and unit variance was therefore applied to bring
-all features onto a common scale prior to model training.
+Given that the number of affected samples is small relative to the overall cohort, 
+and given the potential for imputed values to introduce bias, the affected samples 
+were removed via \textbf{listwise deletion}. The miRNA expression matrix contained no missing values, so this
+step exclusively affected rows with incomplete clinical annotations. In total,
+28 samples were removed, \textbf{reducing the cohort from 272 to 251 samples.} This
+represents a loss of 10.3\% of the working cohort, a non-trivial reduction,
+but one that is justified by the imperative of data integrity in a biomedical
+context. In addition, at the encoding stage described below, the 5 remaining
+Normal-like samples were excluded from the supervised experiments due to their
+insufficient representation for reliable learning and evaluation, bringing the
+final modelling cohort to \textbf{244 samples} across four PAM50 subtypes:
+Luminal A ($n = 103$), Luminal B ($n = 71$), Basal-like ($n = 41$), and
+HER2-enriched ($n = 29$).
+ 
+% ---------------------------------------------------------------
+\subsection{Categorical Encoding}
+\label{subsec:encoding}
+% ---------------------------------------------------------------
+Machine learning algorithms operate on numerical representations: they compute
+distances, gradients, and split criteria over real-valued feature spaces.
+Categorical variables, those that take a finite set of discrete named
+values rather than continuous numbers, cannot be directly ingested by most
+learning algorithms without first being converted to a numerical form. Among
+the 20 retained clinical features, 11 are categorical and required explicit
+encoding, while the remaining 9 are already numerical and required no
+transformation: \texttt{CN\_CLUSTER}, \texttt{FRACTION\_GENOME\_ALTERED},
+\texttt{METHYLATION\_CLUSTER}, \texttt{MIRNA\_CLUSTER},
+\texttt{MUTATION\_COUNT}, \texttt{SIGCLUST\_UNSUPERVISED\_MRNA},
+\texttt{TMB\_NONSYNONYMOUS}, \texttt{AGE}, and \texttt{OS\_MONTHS}.
 
-A critical methodological requirement is that standardisation must not be
-fitted on any data that will later be used for evaluation. Fitting a scaler on
-the full dataset before splitting into training and test partitions would
-constitute \textbf{data leakage}: the test set statistics would silently
-influence the scaling parameters, producing an overly optimistic - and
-therefore misleading - estimate of generalisation performance. To prevent this,
-the following protocol was strictly enforced throughout all experiments:
+Two fundamentally different types of categorical variables appear in this
+dataset, and they call for different encoding strategies:
+
+\textbf{Ordinal variables} carry a natural rank ordering among their
+categories: the categories are not merely distinct names but lie on a
+meaningful scale. For these variables, integer codes were assigned to
+\textit{preserve the natural clinical ordering}, so that the numerical
+distance between codes reflects the conceptual distance between categories.
+For example, \texttt{NODES} (lymph node involvement) follows the TNM
+classification N0 $<$ N1 $<$ N2 $<$ N3 in order of increasing severity, and
+was encoded accordingly as $\{0, 1, 2, 3\}$. Similarly, \texttt{TUMOR\_STAGE}
+was encoded as T1$\to$1, T2$\to$2, T3$\to$3, T4$\to$4 to preserve the
+size-based ordering.
+
+\textbf{Nominal variables} have categories that are qualitatively distinct but
+carry no inherent ordering. For binary nominal variables (such as
+\texttt{METASTASIS\_CODED} (Negative/Positive), \texttt{NODE\_CODED},
+\texttt{METASTASIS} (M0/M1), and \texttt{OS\_STATUS} (0:LIVING/1:DECEASED))
+standard 0/1 integer encoding was applied, since with only two categories
+the choice of which value maps to 0 or 1 is arbitrary and carries no
+structural implication. For multi-valued nominal variables with no meaningful
+ordering, a judgment call was required. \texttt{ER\_STATUS} and
+\texttt{PR\_STATUS}, for instance, each take four values
+(Negative, Positive, Performed but Not Available, Indeterminate), and
+\texttt{HER2\_STATUS} takes three (Negative, Equivocal, Positive). These were
+encoded with manual integer mappings. It should be noted that for
+\texttt{HER2\_STATUS}, there is a partial clinical ordering
+(Negative $<$ Equivocal $<$ Positive), and the encoding 0/1/2 was chosen to
+reflect this.
+
+The complete encoding scheme for all 11 categorical features is listed in
+Table~\ref{tab:encoding_scheme}.
+
+\begin{table}[h!]
+\centering
+\caption{Encoding scheme for the 11 categorical clinical features. Ordinal
+features are highlighted; the ordering of the integer codes reflects the
+natural clinical ranking.}
+\label{tab:encoding_scheme}
+\small
+\begin{tabular}{p{3.8cm} p{1.5cm} p{7.0cm}}
+\hline
+\textbf{Feature} & \textbf{Type} & \textbf{Encoding} \\
+\hline
+\texttt{NODES}
+    & Ordinal
+    & N0$\to$0, N1$\to$1, N2$\to$2, N3$\to$3 \\
+\texttt{TUMOR\_STAGE}
+    & Ordinal
+    & T1$\to$1, T2$\to$2, T3$\to$3, T4$\to$4 \\
+\texttt{CONVERTED\_STAGE}
+    & Ordinal
+    & No\_Conversion$\to$0, Stage~I$\to$2, Stage~IIA$\to$1,
+      Stage~IIB$\to$3, Stage~IIIA$\to$5, Stage~IIIB$\to$7,
+      Stage~IIIC$\to$4, Stage~IV$\to$6 \\
+\texttt{HER2\_STATUS}
+    & Ordinal*
+    & Negative$\to$0, Equivocal$\to$1, Positive$\to$2 \\
+\texttt{ER\_STATUS}
+    & Nominal
+    & Negative$\to$0, Performed but Not Available$\to$1,
+      Positive$\to$2, Indeterminate$\to$3 \\
+\texttt{PR\_STATUS}
+    & Nominal
+    & Negative$\to$0, Positive$\to$1,
+      Performed but Not Available$\to$2, Indeterminate$\to$3 \\
+\texttt{TUMOR\_T1\_CODED}
+    & Binary
+    & T\_Other$\to$0, T1$\to$1 \\
+\texttt{NODE\_CODED}
+    & Binary
+    & Negative$\to$0, Positive$\to$1 \\
+\texttt{METASTASIS\_CODED}
+    & Binary
+    & Negative$\to$0, Positive$\to$1 \\
+\texttt{METASTASIS}
+    & Binary
+    & M0$\to$0, M1$\to$1 \\
+\texttt{OS\_STATUS}
+    & Binary
+    & 0:LIVING$\to$0, 1:DECEASED$\to$1 \\
+\hline
+\multicolumn{3}{l}{\footnotesize * Partial ordering exists clinically; encoding reflects severity progression.} \\
+\end{tabular}
+\end{table}
+
+The target variable \texttt{PAM50\_SUBTYPE} was also encoded at this stage:
+Basal-like$\to$0, HER2-enriched$\to$1, Luminal~A$\to$2, Luminal~B$\to$3.
+Normal-like samples received no mapping and were thus excluded from the
+supervised modelling cohort, as noted in Section~\ref{subsec:missing_values}.
+Upon completion of the encoding step, the dataset had the shape of \textbf{244
+samples} described by \textbf{462 features} distributed in 20 clinical variables 
+and 442
+miRNA expression values - all represented as real numbers now.
+
+% ---------------------------------------------------------------
+\subsection{Train/Test Split and Prevention of Data Leakage}
+\label{subsec:split}
+% ---------------------------------------------------------------
+
+The final processing step before model training was the partition of the
+dataset into a training set and a held-out test set, followed by feature
+standardisation. The order in which these operations are performed is not a
+minor implementation detail: it is a methodologically critical design decision
+that determines whether reported performance metrics are trustworthy estimates
+of generalisation ability or inflated artefacts of inadvertent information
+leakage.
+
+\subsubsection*{Stratified Splitting \& Data Leakage Prevention}
+
+To ensure a robust evaluation, the dataset was divided into an \textbf{80\% training set} 
+(195 samples) and a \textbf{20\% test set} (49 samples) using stratified random 
+sampling. Stratification was essential to maintain the proportion of each PAM50 
+subtype across both partitions, thereby preventing the accidental over-representation 
+or under-representation of minority classes: a critical safeguard given the class 
+imbalance documented in Section~\ref{subsec:working_cohort}. The resulting class 
+distributions, which demonstrate the consistency of this split, are shown in 
+Figure~\ref{fig:subtype_histogram_sub}.
+
+\begin{figure}[!ht]
+    \centering
+    % --- LADO ESQUERDO: TABELA ---
+    \begin{minipage}[c]{0.52\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lr}
+        \toprule
+        \textbf{Property} & \textbf{Value} \\
+        \midrule
+        \multicolumn{2}{l}{\textit{Dimensionality}} \\
+        \quad Total samples                                  & 244 \\
+        \quad miRNA features                                 & 442 \\
+        \quad Clinical features                              & 20 \\
+        \quad Total features                                 & 462 \\
+        \quad Feature-to-sample ratio ($p/n$)                & 1.89 \\
+        \midrule
+        \multicolumn{2}{l}{\textit{Data quality}} \\
+        \quad Missing values                                 & 0 \\
+        \quad miRNAs with variance $> 1.0$                   & 250 \;(56.6\%) \\
+        \midrule
+        \multicolumn{2}{l}{\textit{miRNA expression (log$_2$ scale)}} \\
+        \quad Range                                          & $[-2.37,\; 18.66]$ \\
+        \quad Mean $\pm$ std                                 & $4.87 \pm 3.99$ \\
+        \quad Median                                         & 4.07 \\
+        \quad Values $< 0$ (low-abundance artefact)          & 7.1\% \\
+        \midrule
+        \multicolumn{2}{l}{\textit{Clinical continuous features}} \\
+        \quad Age (years)                                    & $59.7 \pm 13.4$ \;\;[26, 89] \\
+        \quad Mutation count                                 & $45.7 \pm 36.3$ \;\;[10, 223] \\
+        \quad Overall survival (months)                      & $34.3 \pm 41.4$ \;\;[0, 234] \\
+        \quad Fraction genome altered                        & $0.34 \pm 0.21$ \;\;[0.00, 0.95] \\
+        \quad TMB non-synonymous                             & $1.53 \pm 1.21$ \;\;[0.30, 7.40] \\
+        \bottomrule
+        \end{tabular}
+        }
+        \subcaption{Summary statistics of the final dataset.}
+        \label{tab:dataset_summary}
+    \end{minipage}
+    \hfill
+    % --- LADO DIREITO: GRÁFICO ---
+    \begin{minipage}[c]{0.45\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \begin{tikzpicture}
+            \begin{axis}[
+                ybar,
+                enlargelimits=0.15,
+                legend style={
+                    at={(0.5,-0.35)}, 
+                    anchor=north,
+                    legend columns=-1,
+                    font=\small
+                },
+                ylabel={Number of Samples},
+                symbolic x coords={Basal, Her2, Luminal A, Luminal B},
+                xtick=data,
+                x tick label style={rotate=45, anchor=east, font=\small},
+                nodes near coords,
+                nodes near coords style={font=\tiny},
+                nodes near coords align={vertical},
+                ]
+                
+                \addplot[fill=gray!30] coordinates {(Basal,41) (Her2,29) (Luminal A,103) (Luminal B,71)};
+                \addplot[fill=blue!30] coordinates {(Basal,33) (Her2,23) (Luminal A,82) (Luminal B,57)};
+                \addplot[fill=red!30] coordinates {(Basal,8) (Her2,6) (Luminal A,21) (Luminal B,14)};
+                
+                \legend{Total, Train, Test}
+            \end{axis}
+        \end{tikzpicture}
+        }
+        \subcaption{Subtype distribution histogram.}
+        \label{fig:subtype_histogram_sub}
+    \end{minipage}
+
+    \vspace{10pt}
+    \caption{Overview of the final modelling dataset: (a) detailed summary of clinical and molecular features; (b) distribution of PAM50 subtypes across the full dataset and the stratified train/test partitions.}
+    \label{fig:dataset_overview_full}
+\end{figure}
+
+This partitioning serves as the primary defense against \textbf{data leakage}, 
+which occurs when information from outside the training set is used during the 
+learning process. Leakage is a frequent source of overly optimistic performance 
+estimates, as the model inadvertently learns patterns from data that would be 
+unavailable at inference time. In this pipeline, the prevention of leakage was 
+strictly enforced, particularly regarding \textbf{scaling leakage}. This common 
+pitfall manifests if a \textit{StandardScaler} is fitted on the full dataset before the 
+split; in such cases, the scaling parameters (the mean $\mu$ and standard 
+deviation $\sigma$ per feature) would be derived from both training and test 
+samples. By ensuring the split occurs before any statistic-based transformation, 
+the test set remains truly unseen, preserving the independence assumption 
+required for a meaningful evaluation.
+
+To prevent this, the following protocol was strictly enforced throughout all
+experiments:
 
 \begin{enumerate}
-    \item The dataset was split into training and test partitions 
-          \textit{before} any scaling was performed, using stratified sampling 
-          to preserve the PAM50 subtype proportions in both partitions.
-    
-    \item A \texttt{StandardScaler} was fitted \textit{exclusively} on the 
-          training fold, computing the per-feature mean ($\mu_{train}$) and 
-          standard deviation ($\sigma_{train}$) from training samples only:
-          \begin{equation}
-              z = \frac{x - \mu_{train}}{\sigma_{train}}
-          \end{equation}
-          where $z$ represents the scaled feature, $x$ is the original value, 
-          $\mu_{train}$ is the training mean, and $\sigma_{train}$ is the 
-          training standard deviation.
+    \item The 80/20 stratified split was performed \textbf{first}, before any
+    scaling parameter was computed.
 
-    \item The scaler fitted on the training fold was then applied 
-          \textit{without re-fitting} to transform both the training and the 
-          test fold. This ensures that the test set remains an unbiased 
-          representation of unseen data.
+    \item A \textit{StandardScaler} was then fitted \textbf{exclusively on the
+    training fold}, computing the per-feature mean $\mu_{\text{train}}$ and
+    standard deviation $\sigma_{\text{train}}$ from training samples only.
+
+    \item The transformation derived from the training fold was then applied
+    \textbf{without re-fitting} to both the training and test folds:
+    \begin{equation}
+        z = \frac{x - \mu_{\text{train}}}{\sigma_{\text{train}}}
+        \label{eq:zscore}
+    \end{equation}
+    where $z$ is the standardised feature value and $x$ is the original value.
+    The test fold is thus transformed using training statistics, simulating the
+    situation at deployment time where the model encounters data whose
+    distribution it has not observed.
 \end{enumerate}
 
-\todo{Meter o diagrama da pipeline de tratamento de dados que fizemos no paper (vamos montando as peças)} 
+Standardisation was applied to two groups of features: the five continuous
+clinical variables with heterogeneous scales (\texttt{MUTATION\_COUNT},
+\texttt{SIGCLUST\_UNSUPERVISED\_MRNA}, \texttt{TMB\_NONSYNONYMOUS},
+\texttt{AGE}, \texttt{OS\_MONTHS}), and all 442 miRNA expression columns.
+The remaining clinical features, those already encoded as small integers
+(representing ordinal or binary categories) were left unscaled as their
+values are already bounded and comparable in magnitude.
 
-This procedure was applied consistently at every cross-validation fold and for
-every train/test split used in the supervised experiments of Chapter~4. In the
-unsupervised experiments of Chapter~5, where no held-out test set is defined,
-scaling was applied to the full dataset in a single step, as no risk of label
-leakage exists in that context. The enforcement of this protocol ensures that
-all reported performance metrics are reliable estimates of out-of-sample
-performance on genuinely unseen data.
+Raw miRNA expression values span the range $[-2.37,\, 18.66]$ on the
+log$_2$ scale, with a mean of $4.97$ and a standard deviation of $4.03$.
+Clinical continuous features operate on entirely different numerical scales:
+\texttt{MUTATION\_COUNT} ranges from 10 to 223, \texttt{OS\_MONTHS} from 0 to
+234, and \texttt{FRACTION\_GENOME\_ALTERED} from 0 to 0.95. Without
+standardisation, algorithms sensitive to feature magnitude, such as
+distance-based methods and gradient-based optimisers, would disproportionately
+weight high-magnitude features irrespective of their actual predictive value.
+
+\todo{Rever depois isto tendo em conta a descrição que vai ser feita na parte de supervised learning (sobre cross validation)}
+This protocol was applied consistently at every cross-validation fold used in
+the experiments described in Chapter~\ref{chap:supervised}. At each fold, a
+fresh scaler was fitted on the training partition of that fold and applied to
+both partitions, ensuring that no information from any held-out partition ever
+influenced the feature statistics used during training. This discipline is the
+procedural guarantee that all reported performance metrics are reliable,
+unbiased estimates of out-of-sample generalisation.
 
 \section{The Supervised Learning Framework}
 \label{sec:supervised_small_cohort}
