@@ -1,0 +1,209 @@
+% ============================================================
+\section{Data Acquisition and Characterisation}
+% ============================================================
+
+\subsection{The Primary Cohort (\textit{N}\,=\,272): Source and Clinical Features}
+\label{subsec:primary-cohort}
+
+The dataset used throughout this work was obtained from The Cancer Genome Atlas
+Breast Invasive Carcinoma (TCGA-BRCA) study, accessed via the cBioPortal for
+Cancer Genomics~\cite{https://www.cbioportal.org/study/summary?id=brca_tcga_pub}
+under the identifier \texttt{brca\_tcga\_pub}. TCGA-BRCA is one of the most
+comprehensive multi-omics repositories available for breast cancer research,
+providing harmonised clinical annotations, genomic profiles, and molecular
+expression data for a large cohort of patients profiled with standardised
+protocols.
+
+The full clinical release contains records for 463 patients. After restricting
+the cohort to individuals for whom matched miRNA expression profiles were
+available (see Section~\ref{subsec:mirna-profiles}), a final working cohort of
+\textbf{272 samples} was obtained. All samples correspond to primary solid tumour
+tissue (\texttt{SAMPLE\_TYPE = Primary}) from female patients, consistent with
+the epidemiology of the disease. The clinical data matrix comprises 37 variables
+per patient, covering receptor status, tumour staging, survival outcomes, and
+several integrative molecular annotations.
+
+\paragraph{Molecular subtype labels.}
+The primary classification target in this thesis is the \textbf{PAM50 intrinsic
+subtype}~\cite{parker2009supervised}, a well-established gene-expression-based
+taxonomy that partitions breast cancer into five biologically distinct subtypes.
+Table~\ref{tab:bc_subtypes_summary} summarises the key biological characteristics
+of the four main subtypes; Normal-like is the fifth but is omitted from that
+summary due to its low prevalence in the dataset. The subtype distribution
+within the working cohort is presented in Table~\ref{tab:pam50-distribution}.
+Luminal~A is the dominant class (43\%), whereas Normal-like is severely
+underrepresented ($n$\,=\,5; 1.8\%). This pronounced class imbalance is a
+central challenge addressed in the modelling strategy described in Chapter~4.
+
+\todo{Melhorar estes gráficos}
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \caption{table}{PAM50 subtype distribution in the working cohort ($N$\,=\,272).}
+        \label{tab:pam50-distribution}
+        \begin{tabular}{lrr}
+            \hline
+            \textbf{PAM50 Subtype} & \textbf{Count} & \textbf{\%} \\
+            \hline
+            Luminal A      & 117 & 43.0 \\
+            Luminal B      &  75 & 27.6 \\
+            Basal-like     &  45 & 16.5 \\
+            HER2-enriched  &  30 & 11.0 \\
+            Normal-like    &   5 &  1.8 \\
+            \hline
+            \textbf{Total} & \textbf{272} & \textbf{100.0} \\
+            \hline
+        \end{tabular}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \pie[
+                radius      = 2.6,
+                color       = {
+                    blue!50,
+                    blue!25,
+                    red!55,
+                    orange!70,
+                    gray!40
+                },
+                text        = legend,
+                before number = \footnotesize,
+                after number  = \%,
+                sum           = 100
+            ]{
+                43.0/Luminal A,
+                27.6/Luminal B,
+                16.5/Basal-like,
+                11.0/HER2-enriched,
+                1.8/Normal-like
+            }
+        \end{tikzpicture}
+    \end{minipage}
+    \caption*{PAM50 subtype distribution across the 272-sample working cohort.
+    Luminal A represents the dominant class, comprising over 43\% of samples,
+    while Normal-like is the smallest group at under 2\%.}
+\end{figure}
+
+% \begin{table}[h!]
+%     \centering
+%     \caption{PAM50 subtype distribution in the working cohort ($N$\,=\,272).}
+%     \label{tab:pam50-distribution}
+%     \begin{tabular}{lrr}
+%         \hline
+%         \textbf{PAM50 Subtype} & \textbf{Count} & \textbf{Proportion (\%)} \\
+%         \hline
+%         Luminal A      & 117 & 43.0 \\
+%         Luminal B      &  75 & 27.6 \\
+%         Basal-like     &  45 & 16.5 \\
+%         HER2-enriched  &  30 & 11.0 \\
+%         Normal-like    &   5 &  1.8 \\
+%         \hline
+%         \textbf{Total} & \textbf{272} & \textbf{100.0} \\
+%         \hline
+%     \end{tabular}
+% \end{table}
+
+\paragraph{Demographic and clinical characteristics.}
+Patient ages range from 26 to 90 years, with a mean of 57.9\,$\pm$\,13.3 years
+(median\,=\,58). The age distribution is approximately symmetric around the
+sixth decade of life, consistent with the known epidemiology of post-menopausal
+breast cancer~\cite{Postmenopausal_bca_Rosenberg2006Risk}.
+
+Receptor status was assessed immunohistochemically for the three canonical
+markers. Oestrogen receptor (ER) positivity was recorded in 76.5\% of patients,
+progesterone receptor (PR) positivity in 65.9\%, and HER2 amplification in
+14.7\%. These proportions reflect the expected distribution in an unselected
+breast cancer population and align with the PAM50 subtype assignments: the
+Basal-like subclass is largely composed of triple-negative tumours
+(ER$^{-}$/PR$^{-}$/HER2$^{-}$), a well-documented biological correspondence
+that provides a useful sanity check for classifier outputs.
+
+Tumour stage at diagnosis was available for 271 patients: stage T2 was the most
+frequent (57.9\%), followed by T1 (25.9\%), T3 (11.7\%), and T4 (3.7\%). From
+an overall survival perspective, 87.5\% of patients ($n$\,=\,238) were alive at
+the time of last follow-up, with 58 recorded deaths.
+
+\paragraph{Missing data.}
+Several integrative annotation fields - specifically the
+\texttt{INTEGRATED\_CLUSTERS} variables ($\approx$25\% missing) and the
+\texttt{RPPA\_CLUSTER} field ($\approx$24\% missing) - contain substantial
+proportions of missing values, reflecting the multi-platform nature of the
+TCGA-BRCA data collection, where not every assay was performed on every sample.
+Beyond these high-missingness columns, a small number of samples present
+isolated missing values in fields such as \texttt{HER2\_STATUS},
+\texttt{METASTASIS\_CODED}, and \texttt{TUMOR\_T1\_CODED}. The precise
+treatment of all missing data is described in Section~\ref{subsec:missing-outliers}.
+The PAM50 label, however, is complete across all 272 samples and was therefore
+adopted as the sole ground-truth annotation for all supervised and unsupervised
+experiments in this thesis.
+
+% --------------------------------------------------------------
+\subsection{miRNA Expression Profiles: Data Distribution and Normalisation}
+\label{subsec:mirna-profiles}
+
+\subsubsection{Dataset Dimensions and Data Type}
+
+The miRNA expression matrix was obtained from the same TCGA-BRCA release and
+encompasses \textbf{888 miRNA features} measured across \textbf{272 patient
+samples}. This is a canonical example of a \textit{high-dimensional,
+low-sample-size} (HDLSS) setting, where the number of features ($p = 888$)
+greatly exceeds the number of observations ($n = 272$), posing well-known
+challenges for statistical learning that motivate the feature selection
+strategies explored in Chapter~4.
+
+\subsubsection{Upstream Processing and Normalisation}
+
+The expression values delivered by the TCGA data portal had already undergone
+upstream processing by the GDC harmonisation pipeline: raw sequencing reads were
+aligned to the reference genome, per-miRNA read counts were quantified, and
+values were normalised and log$_2$-transformed. The presence of negative values
+in the matrix (6.3\% of all entries, minimum\,=\,$-2.72$) is consistent with a
+log$_2$-transformed representation in which low-abundance miRNAs fall below the
+baseline signal. No raw count data were therefore used; all analyses operate
+directly on the log$_2$-transformed profiles provided by the GDC pipeline. Any
+further transformations applied as part of the pre-processing pipeline - in
+particular, feature standardisation and the prevention of data leakage - are
+described in Section~\ref{subsec:dim-reduction-scaling}.
+
+\subsubsection{Distributional Properties}
+
+Global summary statistics for the expression matrix are reported in
+Table~\ref{tab:mirna-stats}. The overall distribution is slightly right-skewed
+(mean\,$>$\,median), reflecting a subset of miRNAs with very high expression
+levels (14.1\% of values exceed 10 on the log$_2$ scale). No missing values
+were present in the matrix, which eliminates the need for imputation.
+
+\begin{table}[h!]
+    \centering
+    \caption{Global summary statistics for the miRNA expression matrix
+             ($272$ samples $\times$ $888$ features).}
+    \label{tab:mirna-stats}
+    \begin{tabular}{lr}
+        \hline
+        \textbf{Statistic} & \textbf{Value} \\
+        \hline
+        Number of miRNA features   & 888     \\
+        Number of samples          & 272     \\
+        Missing values             & 0       \\
+        Global minimum             & $-2.72$ \\
+        Global maximum             & $18.66$ \\
+        Global mean                & $5.13$  \\
+        Global standard deviation  & $4.10$  \\
+        Global median              & $4.35$  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\paragraph{Per-feature variance.}
+Examining the distribution of per-miRNA standard deviations reveals substantial
+heterogeneity in inter-patient variability across features. Standard deviations
+range from 0.53 to 2.75, with a mean of 1.14. Notably, 37 miRNAs (4.2\% of the
+panel) exhibit a standard deviation greater than 2.0, indicating a high degree
+of inter-patient variability. These high-variance features are expected to carry
+the greatest discriminative signal for subtype classification, a hypothesis that
+is systematically investigated through the feature selection analyses presented
+in sections \ref{sec:supervised_small_cohort} and \ref{sec:unsupervised_small_cohort}.

@@ -26,164 +26,566 @@
 
 Small introduction to the Chapter.
 
-% ============================================================
+% ================================================================
 \section{Data Acquisition and Characterisation}
-% ============================================================
+\label{sec:data_acquisition}
+% ================================================================
 
-\subsection{The Primary Cohort (\textit{N}\,=\,272): Source and Clinical Features}
-\label{subsec:primary-cohort}
+% ---------------------------------------------------------------
+\subsection{Data Source}
+\label{subsec:data_source}
+% ---------------------------------------------------------------
 
-The dataset used throughout this work was obtained from The Cancer Genome Atlas
-Breast Invasive Carcinoma (TCGA-BRCA) study, accessed via the cBioPortal for
-Cancer Genomics~\cite{https://www.cbioportal.org/study/summary?id=brca_tcga_pub}
-under the identifier \texttt{brca\_tcga\_pub}. TCGA-BRCA is one of the most
-comprehensive multi-omics repositories available for breast cancer research,
-providing harmonised clinical annotations, genomic profiles, and molecular
-expression data for a large cohort of patients profiled with standardised
-protocols.
+The dataset used in this work originates from \textbf{The Cancer Genome Atlas
+Breast Invasive Carcinoma} (TCGA-BRCA) project, a large-scale, publicly available
+multi-omics repository maintained by the National Cancer Institute. TCGA-BRCA
+represents one of the most comprehensively characterised breast cancer cohorts in
+the biomedical literature, providing standardised genomic, transcriptomic, and
+clinical data for a large cohort of patients profiled with uniform experimental
+protocols. Its public availability, scale, and annotation quality make it the
+canonical benchmark dataset for computational breast cancer subtyping studies,
+and it has been used as the primary data source in the majority of related work
+discussed in Chapter~\ref{chap:background}.
 
-The full clinical release contains records for 463 patients. After restricting
-the cohort to individuals for whom matched miRNA expression profiles were
-available (see Section~\ref{subsec:mirna-profiles}), a final working cohort of
-\textbf{272 samples} was obtained. All samples correspond to primary solid tumour
-tissue (\texttt{SAMPLE\_TYPE = Primary}) from female patients, consistent with
-the epidemiology of the disease. The clinical data matrix comprises 37 variables
-per patient, covering receptor status, tumour staging, survival outcomes, and
-several integrative molecular annotations.
+Two complementary data releases were obtained from the TCGA-BRCA portal and
+used jointly throughout this work: a \textbf{microRNA expression matrix},
+containing quantified expression levels for 888 miRNA features across 272
+patient samples, and a \textbf{clinical data table}, containing 37 variables per
+patient across a total of 463 records. These two sources are described in detail
+in Sections~\ref{subsec:clinical_data} and~\ref{subsec:mirna_data} respectively.
+Their integration into a unified modelling dataset is described as part of the
+preprocessing pipeline in Section~\ref{sec:preprocessing}.
 
-\paragraph{Molecular subtype labels.}
-The primary classification target in this thesis is the \textbf{PAM50 intrinsic
-subtype}~\cite{parker2009supervised}, a well-established gene-expression-based
-taxonomy that partitions breast cancer into five biologically distinct subtypes.
-Table~\ref{tab:bc_subtypes_summary} summarises the key biological characteristics
-of the four main subtypes; Normal-like is the fifth but is omitted from that
-summary due to its low prevalence in the dataset. The subtype distribution
-within the working cohort is presented in Table~\ref{tab:pam50-distribution}.
-Luminal~A is the dominant class (43\%), whereas Normal-like is severely
-underrepresented ($n$\,=\,5; 1.8\%). This pronounced class imbalance is a
-central challenge addressed in the modelling strategy described in Chapter~4.
+% ---------------------------------------------------------------
+\subsection{The Working Cohort}
+\label{subsec:working_cohort}
+% ---------------------------------------------------------------
 
-\begin{table}[h!]
+The full clinical release contains records for 463 patients. However, not all
+patients in the clinical table have a corresponding miRNA expression profile
+available in the molecular data release, which will drastically decrease our 
+working cohort given that our objective is to find meaningful associations between 
+\gls{mirna}, (potentionally) clinical features and subtypes of \gls{bc} . 
+After restricting the cohort to
+individuals for whom matched miRNA expression profiles existed, a \textbf{working
+cohort of 272 samples} was obtained with the intersection of the two data sources.
+All 272 samples correspond to primary solid tumour tissue
+(\texttt{SAMPLE\_TYPE = Primary}) from mostly female patients (with over 99\% representation)
+, consistent with the epidemiology of breast cancer as a predominantly female disease.
+
+\todo{Aceito Sugestões para mais dados interessantes que se possam inserir aqui}
+
+\begin{table}[h]
     \centering
-    \caption{PAM50 subtype distribution in the working cohort ($N$\,=\,272).}
-    \label{tab:pam50-distribution}
-    \begin{tabular}{lrr}
-        \hline
-        \textbf{PAM50 Subtype} & \textbf{Count} & \textbf{Proportion (\%)} \\
-        \hline
-        Luminal A      & 117 & 43.0 \\
-        Luminal B      &  75 & 27.6 \\
-        Basal-like     &  45 & 16.5 \\
-        HER2-enriched  &  30 & 11.0 \\
-        Normal-like    &   5 &  1.8 \\
-        \hline
-        \textbf{Total} & \textbf{272} & \textbf{100.0} \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\paragraph{Demographic and clinical characteristics.}
-Patient ages range from 26 to 90 years, with a mean of 57.9\,$\pm$\,13.3 years
-(median\,=\,58). The age distribution is approximately symmetric around the
-sixth decade of life, consistent with the known epidemiology of post-menopausal
-breast cancer~\cite{Postmenopausal_bca_Rosenberg2006Risk}.
-
-Receptor status was assessed immunohistochemically for the three canonical
-markers. Oestrogen receptor (ER) positivity was recorded in 76.5\% of patients,
-progesterone receptor (PR) positivity in 65.9\%, and HER2 amplification in
-14.7\%. These proportions reflect the expected distribution in an unselected
-breast cancer population and align with the PAM50 subtype assignments: the
-Basal-like subclass is largely composed of triple-negative tumours
-(ER$^{-}$/PR$^{-}$/HER2$^{-}$), a well-documented biological correspondence
-that provides a useful sanity check for classifier outputs.
-
-Tumour stage at diagnosis was available for 271 patients: stage T2 was the most
-frequent (57.9\%), followed by T1 (25.9\%), T3 (11.7\%), and T4 (3.7\%). From
-an overall survival perspective, 87.5\% of patients ($n$\,=\,238) were alive at
-the time of last follow-up, with 58 recorded deaths.
-
-\paragraph{Missing data.}
-Several integrative annotation fields - specifically the
-\texttt{INTEGRATED\_CLUSTERS} variables ($\approx$25\% missing) and the
-\texttt{RPPA\_CLUSTER} field ($\approx$24\% missing) - contain substantial
-proportions of missing values, reflecting the multi-platform nature of the
-TCGA-BRCA data collection, where not every assay was performed on every sample.
-Beyond these high-missingness columns, a small number of samples present
-isolated missing values in fields such as \texttt{HER2\_STATUS},
-\texttt{METASTASIS\_CODED}, and \texttt{TUMOR\_T1\_CODED}. The precise
-treatment of all missing data is described in Section~\ref{subsec:missing-outliers}.
-The PAM50 label, however, is complete across all 272 samples and was therefore
-adopted as the sole ground-truth annotation for all supervised and unsupervised
-experiments in this thesis.
-
-% --------------------------------------------------------------
-\subsection{miRNA Expression Profiles: Data Distribution and Normalisation}
-\label{subsec:mirna-profiles}
-
-\subsubsection{Dataset Dimensions and Data Type}
-
-The miRNA expression matrix was obtained from the same TCGA-BRCA release and
-encompasses \textbf{888 miRNA features} measured across \textbf{272 patient
-samples}. This is a canonical example of a \textit{high-dimensional,
-low-sample-size} (HDLSS) setting, where the number of features ($p = 888$)
-greatly exceeds the number of observations ($n = 272$), posing well-known
-challenges for statistical learning that motivate the feature selection
-strategies explored in Chapter~4.
-
-\subsubsection{Upstream Processing and Normalisation}
-
-The expression values delivered by the TCGA data portal had already undergone
-upstream processing by the GDC harmonisation pipeline: raw sequencing reads were
-aligned to the reference genome, per-miRNA read counts were quantified, and
-values were normalised and log$_2$-transformed. The presence of negative values
-in the matrix (6.3\% of all entries, minimum\,=\,$-2.72$) is consistent with a
-log$_2$-transformed representation in which low-abundance miRNAs fall below the
-baseline signal. No raw count data were therefore used; all analyses operate
-directly on the log$_2$-transformed profiles provided by the GDC pipeline. Any
-further transformations applied as part of the pre-processing pipeline - in
-particular, feature standardisation and the prevention of data leakage - are
-described in Section~\ref{subsec:dim-reduction-scaling}.
-
-\subsubsection{Distributional Properties}
-
-Global summary statistics for the expression matrix are reported in
-Table~\ref{tab:mirna-stats}. The overall distribution is slightly right-skewed
-(mean\,$>$\,median), reflecting a subset of miRNAs with very high expression
-levels (14.1\% of values exceed 10 on the log$_2$ scale). No missing values
-were present in the matrix, which eliminates the need for imputation.
-
-\begin{table}[h!]
-    \centering
-    \caption{Global summary statistics for the miRNA expression matrix
-             ($272$ samples $\times$ $888$ features).}
-    \label{tab:mirna-stats}
-    \begin{tabular}{lr}
-        \hline
+    \caption{Detailed Descriptive Statistics of the TCGA Dataset}
+    \label{tab:detailed_statistics}
+    \small
+    \begin{tabular}{lc}
+        \toprule
         \textbf{Statistic} & \textbf{Value} \\
-        \hline
-        Number of miRNA features   & 888     \\
-        Number of samples          & 272     \\
-        Missing values             & 0       \\
-        Global minimum             & $-2.72$ \\
-        Global maximum             & $18.66$ \\
-        Global mean                & $5.13$  \\
-        Global standard deviation  & $4.10$  \\
-        Global median              & $4.35$  \\
-        \hline
+        \midrule
+        \textbf{General Metrics} & \\
+        Total miRNA Samples ($N$) & 272 \\
+        Total Clinical Samples & 463 \\
+        Number of microRNAs & 888 \\
+        Clinical Attributes & 37 \\
+        \midrule
+        \textbf{Clinical Data Insights} & \\
+        Age Range & 26--90 years \\
+
+        % \midrule
+        % \textbf{Sample Distribution by Subtype} & \\
+        % Basal-like & 41 \\
+        % HER2-enriched & 29 \\
+        % Luminal A & 103 \\
+        % Luminal B & 71 \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
-\paragraph{Per-feature variance.}
-Examining the distribution of per-miRNA standard deviations reveals substantial
-heterogeneity in inter-patient variability across features. Standard deviations
-range from 0.53 to 2.75, with a mean of 1.14. Notably, 37 miRNAs (4.2\% of the
-panel) exhibit a standard deviation greater than 2.0, indicating a high degree
-of inter-patient variability. These high-variance features are expected to carry
-the greatest discriminative signal for subtype classification, a hypothesis that
-is systematically investigated through the feature selection analyses presented
-in sections \ref{sec:supervised_small_cohort} and \ref{sec:unsupervised_small_cohort}.
+The classification target throughout this work is the \textbf{PAM50 intrinsic
+subtype}, a well-established gene-expression-based taxonomy that partitions
+breast cancer into five biologically distinct classes: Luminal A, Luminal B,
+HER2-enriched, Basal-like, and Normal-like (we have already explored the molecular 
+and biological characteristics of each subtype in Section~\ref{sec:breast_cancer}). 
+The subtype distribution within the working cohort is shown in 
+Table~\ref{tab:pam50-distribution} and the accompanying Figure~\ref{fig:pam50-pie}.
+
+\todo{A Figura está meio estranha, parece que lhe falta alguma coisa - um título ou algo do género}
+% --- PAM50 distribution table + pie chart ---
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.46\textwidth}
+        \centering
+        \captionof{table}{PAM50 subtype distribution in the working cohort
+        ($N$\,=\,272).}
+        \label{tab:pam50-distribution}
+        \begin{tabular}{lrr}
+            \hline
+            \textbf{PAM50 Subtype} & \textbf{Count} & \textbf{\%} \\
+            \hline
+            Luminal A     & 117 & 43.0 \\
+            Luminal B     &  75 & 27.6 \\
+            Basal-like    &  45 & 16.5 \\
+            HER2-enriched &  30 & 11.0 \\
+            Normal-like   &   5 &  1.8 \\
+            \hline
+            \textbf{Total} & \textbf{272} & \textbf{100.0} \\
+            \hline
+        \end{tabular}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.50\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \pie[
+                radius      = 2.6,
+                color       = {
+                    blue!50,
+                    blue!25,
+                    red!55,
+                    orange!70,
+                    gray!40
+                },
+                text        = legend,
+                before number = \footnotesize,
+                after number  = \%,
+                sum           = 100
+            ]{
+                43.0/Luminal A,
+                27.6/Luminal B,
+                16.5/Basal-like,
+                11.0/HER2-enriched,
+                1.8/Normal-like
+            }
+        \end{tikzpicture}
+    \end{minipage}
+    \caption{PAM50 subtype distribution across the 272-sample working cohort.
+    Luminal A is the dominant class (43\%), while Normal-like is severely
+    underrepresented ($n = 5$; 1.8\%). This pronounced class imbalance is a
+    central challenge addressed in the modelling strategy in
+    Section~\ref{subsec:split}.}
+    \label{fig:pam50-pie}
+\end{figure}
+
+The class distribution reveals a pronounced imbalance that is characteristic
+of breast cancer populations in clinical and research settings. Luminal A is
+the dominant subtype, comprising 117 of 272 patients (43.0\%), while
+Normal-like is severely underrepresented with only 5 samples (1.8\%). This
+asymmetry has direct consequences for model training and evaluation: a naive
+classifier that always predicts Luminal A would achieve over 43\% accuracy
+without learning anything about the underlying biology. The modelling decisions
+described in Section~\ref{sec:supervised} are informed by this imbalance, and
+stratified sampling is used throughout to ensure that each experimental fold
+preserves the original class proportions.
+
+
+% ---------------------------------------------------------------
+\subsection{Clinical Data}
+\label{subsec:clinical_data}
+% ---------------------------------------------------------------
+
+The clinical data table contains 37 variables per patient. Several of these
+are administrative or redundant fields (e.g., \texttt{sampleId}, \texttt{patientId}, 
+\texttt{studyId}, \texttt{CANCER\_TYPE}), 
+that carry no predictive information for subtype classification and were excluded during
+preprocessing. A (pre) feature selection process was applied to the clinical data, 
+resulting in a subset of 20 variables. These were retained based on their 
+perceived relevance and informative value for the predictive model. These features are listed in
+Table~\ref{tab:clinical_features}, along with their data type, possible values,
+and a brief description of what each variable represents clinically.
+
+% --- Clinical features table ---
+\begin{table}[h!]
+\centering
+\caption{Clinical features retained for modelling, with data type, possible
+values, and clinical meaning.}
+\label{tab:clinical_features}
+\small
+\begin{tabular}{p{3.8cm} p{2.0cm} p{3.5cm} p{4.5cm}}
+\hline
+\textbf{Feature} & \textbf{Type} & \textbf{Values} & \textbf{Description} \\
+\hline
+\texttt{AGE}
+    & Integer
+    & 26--90
+    & Patient age at diagnosis (years). \\
+
+\texttt{ER\_STATUS}
+    & Categorical
+    & Positive, Negative, Indeterminate, Not Available
+    & Oestrogen receptor status assessed by immunohistochemistry. \\
+
+\texttt{PR\_STATUS}
+    & Categorical
+    & Positive, Negative, Indeterminate, Not Available
+    & Progesterone receptor status assessed by immunohistochemistry. \\
+
+\texttt{HER2\_STATUS}
+    & Categorical
+    & Positive, Negative, Equivocal
+    & HER2 receptor amplification status. \\
+
+\texttt{TUMOR\_STAGE}
+    & Ordinal
+    & T1, T2, T3, T4, TX
+    & Primary tumour size/extent per TNM staging. \\
+
+\texttt{TUMOR\_T1\_CODED}
+    & Binary
+    & T1, T\_Other
+    & Binarised tumour stage: T1 vs.\ all others. \\
+
+\texttt{NODES}
+    & Ordinal
+    & N0, N1, N2, N3
+    & Regional lymph node involvement per TNM staging. \\
+
+\texttt{NODE\_CODED}
+    & Binary
+    & Positive, Negative
+    & Binarised lymph node involvement. \\
+
+\texttt{METASTASIS}
+    & Binary
+    & M0, M1
+    & Presence of distant metastasis per TNM staging. \\
+
+\texttt{METASTASIS\_CODED}
+    & Binary
+    & Positive, Negative
+    & Binarised metastasis indicator. \\
+
+\texttt{CONVERTED\_STAGE}
+    & Categorical
+    & No\_Conversion, Stage I, Stage IIA, Stage IIB, Stage IIIA, Stage IIIB, Stage IIIC, Stage IV
+    & Overall AJCC composite stage derived from TNM. \\
+
+\texttt{FRACTION\_GENOME\_ALTERED}
+    & Continuous
+    & $[0,\,1]$
+    & Proportion of the genome showing copy-number alterations. \\
+
+\texttt{MUTATION\_COUNT}
+    & Integer
+    & $\geq 0$
+    & Total number of somatic mutations detected. \\
+
+\texttt{TMB\_NONSYNONYMOUS}
+    & Continuous
+    & $\geq 0$
+    & Tumour mutational burden (non-synonymous mutations per Mb). \\
+
+\texttt{OS\_MONTHS}
+    & Continuous
+    & $\geq 0$
+    & Overall survival time from diagnosis to last follow-up (months). \\
+
+\texttt{OS\_STATUS}
+    & Binary
+    & 0:LIVING, 1:DECEASED
+    & Patient vital status at last follow-up. \\
+
+\texttt{CN\_CLUSTER}
+    & Integer (cluster)
+    & 1--5
+    & Copy-number cluster assignment from TCGA integrative analysis. \\
+
+\texttt{METHYLATION\_CLUSTER}
+    & Integer (cluster)
+    & 1--5
+    & DNA methylation cluster from TCGA integrative analysis. \\
+
+\texttt{MIRNA\_CLUSTER}
+    & Integer (cluster)
+    & 1--7
+    & miRNA expression cluster from TCGA integrative analysis. \\
+
+\texttt{SIGCLUST\_UNSUPERVISED\_MRNA}
+    & Integer
+    & Signed integer scores
+    & Significance of cluster assignment from unsupervised mRNA analysis. \\
+\hline
+\end{tabular}
+\end{table}
+
+The 20 retained features span a broad range of clinical and molecular
+dimensions. The three receptor statuses, \texttt{ER\_STATUS},
+\texttt{PR\_STATUS}, and \texttt{HER2\_STATUS}, are the canonical markers
+used in clinical breast cancer diagnosis and are intrinsically aligned with the
+PAM50 subtype labels: for example, the Basal-like subtype is largely composed
+of triple-negative tumours (ER$^-$/PR$^-$/HER2$^-$), a well-documented
+biological correspondence that provides a natural consistency check for
+classifier outputs. The TNM staging variables (\texttt{TUMOR\_STAGE},
+\texttt{NODES}, \texttt{METASTASIS}) encode the anatomical extent of the
+disease at diagnosis, while the genomic variables (\texttt{MUTATION\_COUNT},
+\texttt{TMB\_NONSYNONYMOUS}, \texttt{FRACTION\_GENOME\_ALTERED}) reflect
+tumour mutational characteristics that may (or may not) correlate with subtype-specific
+oncogenic programmes. The integrative cluster assignments
+(\texttt{CN\_CLUSTER}, \texttt{METHYLATION\_CLUSTER}, \texttt{MIRNA\_CLUSTER})
+are derived from TCGA's own multi-omics analyses and encode cross-modal
+molecular patterns that may complement the raw miRNA expression signal.
+
+A descriptive overview of selected clinical characteristics within the working
+cohort is as follows. Patient ages range from 26 to 90 years, with a mean of
+$59.3 \pm 13.3$ years (median = 60), consistent with the known epidemiology of
+breast cancer as predominantly a post-menopausal disease. Oestrogen receptor
+positivity was recorded in 77.2\% of patients ($n = 210$), progesterone receptor
+positivity in 64.7\% ($n = 176$), and HER2 amplification in 13.6\% ($n = 37$).
+These proportions are broadly representative of an unselected breast cancer
+population. Tumour stage at diagnosis was dominated by T2 lesions (61.4\%,
+$n = 167$), followed by T1 (19.5\%), T3 (12.9\%), and T4 (5.1\%). From a
+survival perspective, 89.0\% of patients ($n = 242$) were alive at the time of
+last follow-up, with 30 recorded deaths.
+
+% \begin{figure}[h!]
+% \centering
+
+% \begin{tikzpicture}
+
+% % ── LEFT PANEL: Receptor status stacked horizontal bars ──────────────────────
+% \begin{axis}[
+%     name        = receptor,
+%     xbar stacked,
+%     width       = 0.44\textwidth,
+%     height      = 5.2cm,
+%     bar width   = 14pt,
+%     xmin = 0, xmax = 100,
+%     xtick       = {0, 25, 50, 75, 100},
+%     xticklabel  = {$\pgfmathprintnumber{\tick}\%$},
+%     xticklabel style = {font=\small},
+%     ytick       = {1, 2, 3},
+%     yticklabels = {HER2, PR, ER},
+%     yticklabel style = {font=\small\bfseries},
+%     xlabel      = {Proportion of cohort (\%)},
+%     xlabel style = {font=\small, yshift=-2pt},
+%     title       = {(a)~Receptor Status},
+%     title style = {font=\small\bfseries, yshift=4pt},
+%     enlarge y limits = 0.45,
+%     legend style = {
+%         at          = {(0.5,-0.30)},
+%         anchor      = north,
+%         legend columns = 3,
+%         font        = \footnotesize,
+%         draw        = none,
+%         column sep  = 6pt,
+%     },
+%     legend cell align = left,
+%     tick style  = {draw=none},
+%     axis line style = {draw=none},
+%     ymajorgrids = false,
+%     xmajorgrids = true,
+%     grid style  = {gray!20, thin},
+% ]
+
+% % Positive (blue)
+% \addplot[xbar, fill=blue!55, draw=none] coordinates {
+%     (13.6, 1)   % HER2+
+%     (64.7, 2)   % PR+
+%     (77.2, 3)   % ER+
+% };
+
+% % Negative (red)
+% \addplot[xbar, fill=red!45, draw=none] coordinates {
+%     (84.9, 1)   % HER2-
+%     (33.8, 2)   % PR-
+%     (21.7, 3)   % ER-
+% };
+
+% % Other / Equivocal / Not available (grey)
+% \addplot[xbar, fill=gray!35, draw=none] coordinates {
+%     (1.5,  1)   % HER2 equivocal
+%     (1.5,  2)   % PR other
+%     (1.1,  3)   % ER other
+% };
+
+% \legend{Positive, Negative, Equivocal / N.A.}
+
+% % Inline percentage labels — positive bars
+% \node[font=\scriptsize, text=white, anchor=west] at (axis cs: 1,  1) {13.6\%};
+% \node[font=\scriptsize, text=white, anchor=west] at (axis cs: 1,  2) {64.7\%};
+% \node[font=\scriptsize, text=white, anchor=west] at (axis cs: 1,  3) {77.2\%};
+
+% \end{axis}
+
+% % ── RIGHT PANEL: Tumour stage grouped vertical bars ──────────────────────────
+% \begin{axis}[
+%     name        = stage,
+%     at          = {(receptor.east)},
+%     anchor      = west,
+%     xshift      = 1.6cm,
+%     ybar,
+%     width       = 0.40\textwidth,
+%     height      = 5.2cm,
+%     bar width   = 18pt,
+%     ymin = 0, ymax = 75,
+%     ytick       = {0, 20, 40, 60},
+%     yticklabel  = {$\pgfmathprintnumber{\tick}\%$},
+%     yticklabel style = {font=\small},
+%     xtick       = {1, 2, 3, 4, 5},
+%     xticklabels = {T1, T2, T3, T4, TX},
+%     xticklabel style = {font=\small\bfseries},
+%     ylabel      = {Proportion of cohort (\%)},
+%     ylabel style = {font=\small, yshift=2pt},
+%     title       = {(b)~Tumour Stage},
+%     title style = {font=\small\bfseries, yshift=4pt},
+%     enlarge x limits = 0.18,
+%     nodes near coords,
+%     nodes near coords style = {font=\scriptsize, anchor=south, yshift=1pt},
+%     nodes near coords align = {vertical},
+%     tick style  = {draw=none},
+%     axis line style = {draw=none},
+%     xmajorgrids = false,
+%     ymajorgrids = true,
+%     grid style  = {gray!20, thin},
+% ]
+
+% \addplot[fill=blue!45, draw=none] coordinates {
+%     (1, 19.5)   % T1
+%     (2, 61.4)   % T2
+%     (3, 12.9)   % T3
+%     (4,  5.1)   % T4
+%     (5,  1.1)   % TX
+% };
+
+% \end{axis}
+
+% \end{tikzpicture}
+
+% \caption{Clinical profile of the working cohort ($N$\,=\,272).
+% \textit{(a)} Receptor status distribution for oestrogen receptor (ER),
+% progesterone receptor (PR), and HER2 amplification, shown as stacked
+% horizontal bars (positive, negative, equivocal/not available).
+% \textit{(b)} Tumour stage distribution at diagnosis per TNM classification.
+% T2 lesions dominate (61.4\%), and ER positivity is the most prevalent
+% receptor finding (77.2\%). TX indicates cases where tumour extent could
+% not be assessed.}
+% \label{fig:clinical_profile}
+% \end{figure}
+
+Several clinical features contain missing values that require attention during
+preprocessing. The integrative cluster columns
+(\texttt{INTEGRATED\_CLUSTERS\_NO\_EXP},
+\texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP},
+\texttt{INTEGRATED\_CLUSTERS\_WITH\_PAM50}) and \texttt{RPPA\_CLUSTER} are
+missing for a large fraction of patients (approximately 76 and 73 records
+respectively) and were therefore excluded from the modelling feature set prior
+to the cohort restriction step. Among the 20 retained features, missing values
+are sparse (at most 4 records for \texttt{METASTASIS} and
+\texttt{METASTASIS\_CODED}). The strategy for handling these residual
+missing values is described in Section~\ref{sec:preprocessing}.
+
+
+% ---------------------------------------------------------------
+\subsection{MicroRNA Expression Data}
+\label{subsec:mirna_data}
+% ---------------------------------------------------------------
+
+The miRNA expression matrix contains quantified expression levels for
+\textbf{888 miRNA features} measured across the 272 patient samples in the
+working cohort. Each entry $x_{ij}$ represents the expression level of
+miRNA $j$ in patient $i$, where higher values indicate greater expression
+abundance in the tumour tissue. This constitutes a canonical
+\textbf{high-dimensional, low-sample-size (HDLSS)} setting: the number of
+features ($p = 888$) greatly exceeds the number of observations ($n = 272$),
+a regime that poses well-known challenges for statistical learning and motivates
+the feature selection strategies explored throughout this work. This complexity 
+can be visually appreciated in the heatmap shown in Figure~\ref{fig:mirna-heatmap}, 
+which displays the expression patterns of a random subset of 50 patients and 50 miRNAs, 
+with the PAM50 subtype associated for context.
+
+% [MEDIA: Heatmap of a random subset of patients $\times$ miRNAs (e.g.\ 50 patients
+% $\times$ 50 miRNAs, sorted by subtype) to visually convey the high-dimensional
+% nature of the expression matrix and give an intuition of the expression
+% variation across subtypes. A colourbar from low (blue) to high (red) expression
+% would work well here.]
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{miRNA_heatmap_complexity.png}
+    \caption{miRNA expression heatmap for a random subset of 50 patients and the 50
+             highest-variance miRNAs from the TCGA breast cancer cohort. Rows are
+             grouped by PAM50 subtype (colour strip, left); columns are individual
+             miRNA features. Expression values are z-scored per miRNA; blue denotes
+             low and red denotes high expression. The block structure reflects
+             subtype-specific miRNA signatures.}
+    \label{fig:mirna-heatmap}
+\end{figure}
+
+\subsubsection*{The miRNA Redundancy Problem}
+
+A critical characteristic of the raw miRNA expression data, which becomes
+apparent upon close examination, is the presence of widespread feature
+redundancy. The 888 features in the raw matrix do not represent 888
+biologically distinct microRNAs. Instead, a large number of entries share the
+same \textit{base identifier} - for example, \texttt{MIR-758/758},
+\texttt{MIR-758/3P}, and \texttt{MIR-758/5P} all derive from the same
+precursor microRNA (MIR-758), differing only in the strand arm or isoform
+designation. Across the full matrix, 888 Hugo gene symbols map to only 442
+unique base identifiers, meaning that 446 features are variants of a base
+miRNA already present in the data.
+
+More importantly, upon inspection of the actual expression values, many of
+these variants are found to carry \textbf{identical expression profiles} across
+all 272 patients - that is, for a given patient, \texttt{MIR-758/758},
+\texttt{MIR-758/3P}, and \texttt{MIR-758/5P} all report exactly the same
+numerical value. This redundancy is attributable to a fundamental limitation of
+the sequencing and quantification technology used to generate the TCGA-BRCA
+expression data: the platform lacks the resolution to distinguish between
+closely related isoforms of the same precursor miRNA, and consequently assigns
+the same measured abundance to all of them. From a machine learning perspective,
+these duplicated features add no discriminative information whatsoever (they
+are mathematically identical columns in the feature matrix) and including
+them in the model would artificially inflate the apparent feature space while
+introducing collinearity that could distort feature importance estimates.
+
+This observation directly motivates one of the first and most consequential
+preprocessing decisions in the pipeline: the identification and removal of
+duplicate expression profiles, described in detail in
+Section~\ref{sec:preprocessing}. As reported in our published study
+\cite{ourpaper}, this deduplication step reduces the miRNA feature count from
+888 to 464, eliminating 446 non-informative redundant features while retaining
+the full unique expression signal. The resulting feature matrix is both more
+compact and more interpretable, with each remaining miRNA representing a
+genuinely distinct molecular measurement.
+
+% [SUGGESTION: A small illustrative table showing three example base identifiers
+% (e.g.\ MIR-758, MIR-744, MIR-766) and their variants, with a column showing
+% that expression values are identical across all patients, would make this point
+% very concrete for the reader without requiring them to inspect the raw data
+% themselves.]
+
+\begin{table}[h]
+        \centering
+        \caption{Example of miRNA identifier variants sharing identical expression values
+                across patients. Each row corresponds to a distinct annotation of the same
+                base identifier (\texttt{MIR-744}), yet all variants carry the exact same
+                expression value for every patient - here illustrated for two example
+                patient IDs (\texttt{TCGA-A1-A0SE-01} and \texttt{TCGA-A1-A0SH-01}).
+                This redundancy across variant annotations motivates the filtering step
+                applied prior to modelling.}
+        \label{tab:mirna-variants}
+        \small
+        \begin{tabular}{llcc}
+        \toprule
+        \textbf{Hugo Gene Symbol} & \textbf{Type} & \textbf{TCGA-A1-A0SE-01} & \textbf{TCGA-A1-A0SH-01} \\
+        \midrule
+        \texttt{MIR-744/744*} & miRNA & 3.67519164 & 3.03321064 \\
+        \texttt{MIR-744/744}  & miRNA & 3.67519164 & 3.03321064 \\
+        \texttt{MIR-744/3P}   & miRNA & 3.67519164 & 3.03321064 \\
+        \texttt{MIR-744/5P}   & miRNA & 3.67519164 & 3.03321064 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Now that we have characterised the data sources and the working cohort, 
+we can proceed to the pre-processing pipeline that transforms the raw data 
+into a clean, numerical feature matrix suitable for machine learning. The next 
+section describes this pipeline in detail, including the handling of missing 
+values, feature selection decisions, and the critical steps taken to avoid 
+data leakage between training and test partitions.
 
 % ============================================================
+
 \section{Data Pre-processing Pipeline}
 \label{sec:preprocessing}
 
@@ -461,7 +863,7 @@ discrimination represents one of the hardest classification challenges in the da
 
 Machine learning broadly encompasses three major paradigms: supervised learning, 
 unsupervised learning, and reinforcement learning. The choice between them is not 
-arbitrary — it is dictated by the structure of the available data and by the nature 
+arbitrary, but it is dictated by the structure of the available data and by the nature 
 of the question being asked. In this work, the availability of clinically validated 
 PAM50 subtype labels for each patient in the TCGA-BRCA dataset is the decisive factor 
 that makes supervised learning not only possible but the most appropriate choice for 
@@ -474,16 +876,18 @@ The model learns a function $f: \mathbb{R}^d \rightarrow \mathcal{Y}$ that minim
 loss over the training set and is expected to generalise to unseen examples. In our 
 case, $\mathbf{x}_i$ is a high-dimensional vector combining miRNA expression values and 
 clinical variables, and $\mathcal{Y} = \{0, 1, 2, 3\}$ corresponds to the four PAM50 
-subtypes encoded as integers. The learning objective is to find $f$ such 
-that $f(\mathbf{x}_i) \approx y_i$ as faithfully as possible.
+subtypes encoded as integers, Basal-like, HER2-Status, Luminal A and Luminal B respectively. 
+The learning objective is to find $f$ such that $f(\mathbf{x}_i) \approx y_i$ as 
+closely as possible for all $i$ in the training set, and to ensure that this mapping 
+holds for new patients as well.
 
 The existence of ground-truth labels is what distinguishes supervised from unsupervised 
-learning. Unsupervised methods — such as clustering algorithms — do not use label 
+learning. Unsupervised methods, such as clustering algorithms, do not use label 
 information during training; instead, they discover structure inherent to the data 
 distribution itself. While unsupervised exploration has its own scientific value 
-(and is pursued separately in Section~\ref{subsec:unsupervised}), it cannot directly 
-answer the question of whether a patient belongs to a clinically defined subtype, 
-because those subtypes are not purely data-driven constructs — they are biologically 
+(and is pursued separately in Section~\ref{subsec:unsupervised_small_cohort}), 
+it cannot directly answer the question of whether a patient belongs to a clinically defined subtype, 
+because those subtypes are not purely data-driven constructs as they are biologically 
 and clinically validated categories. Supervised learning, by contrast, directly 
 optimises for the task of correctly assigning these validated labels, making it the 
 natural and principled choice for the classification objective.
@@ -492,10 +896,12 @@ It is also worth distinguishing supervised learning from reinforcement learning 
 this context. Reinforcement learning involves an agent learning through interaction 
 with an environment via reward signals, and is primarily suited for sequential 
 decision-making tasks. Breast cancer subtype classification is a static, batch 
-learning problem — there is no sequential interaction, no environment, and no 
-reward signal to exploit. The supervised paradigm, with its direct mapping from 
-patient features to subtype labels, is therefore the correct abstraction for this problem.
-
+learning problem, so there is no sequential interaction, no environment, and no 
+reward signal to exploit. This method would also require a lot of computational 
+and data that we, unfortunately, do not have access to due to the precision and 
+nature of the tests needed to extract this type of information from cancer patients. 
+The supervised paradigm, with its direct mapping from patient features to subtype 
+labels, is therefore the correct abstraction for this problem.
 
 % ---------------------------------------------------------------
 \subsubsection*{The Proxy Inference Strategy}
@@ -504,16 +910,17 @@ patient features to subtype labels, is therefore the correct abstraction for thi
 Perhaps the most important conceptual contribution of this supervised framework 
 is the way in which the classification task is reinterpreted as an instrument 
 rather than an end in itself. The ultimate scientific goal of this work is not 
-simply to build a classifier that correctly assigns breast cancer subtypes — 
+simply to build a classifier that correctly assigns breast cancer subtypes - 
 that alone, while clinically useful, would not advance the biological 
 understanding of the molecular mechanisms distinguishing those subtypes. The 
 deeper goal is to identify \textbf{which microRNAs are most discriminative for each subtype}, 
-and to do so in a way that is grounded in data-driven evidence rather than prior biological assumptions.
+and to do so in a way that is grounded in data-driven evidence rather than prior 
+biological assumptions.
 
 This is where the concept of \textbf{proxy inference} becomes central. The idea 
 is the following: if a well-performing discriminative model is trained on the full 
 feature space and then interrogated about what it learned, the internal structure 
-of that model — specifically, the importance it assigns to individual features — 
+of that model - specifically, the importance it assigns to individual features - 
 provides an indirect but quantitatively meaningful signal about which features 
 carry discriminative information for each class. The classifier thus acts as a 
 \textit{proxy}: it transforms the problem of identifying discriminative miRNAs 
@@ -521,8 +928,14 @@ into the problem of training a good classifier and reading off its feature
 importance scores. This two-stage reasoning is illustrated schematically as:
 
 \begin{enumerate}
-    \item \textbf{Stage 1 — Discriminative modelling:} Train a high-performing multi-class classifier on the combined miRNA and clinical feature space. Validate its performance rigorously using cross-validation and multiple evaluation metrics.
-    \item \textbf{Stage 2 — Proxy feature discovery:} Extract per-class feature importance from the trained model. Identify the top-$k$ miRNAs most responsible for each subtype's classification. Validate the sufficiency of this reduced feature set by retraining and comparing against the full-feature baseline.
+    \item \textbf{Stage 1 — Discriminative modelling:} Train a high-performing 
+    multi-class classifier on the combined miRNA and clinical feature space. 
+    Validate its performance rigorously using cross-validation and multiple evaluation metrics.
+    
+    \item \textbf{Stage 2 — Proxy feature discovery:} Extract per-class feature 
+    importance from the trained model. Identify the top-$k$ miRNAs most 
+    responsible for each subtype's classification. Validate the sufficiency of 
+    this reduced feature set by retraining and comparing against the full-feature baseline.
 \end{enumerate}
 
 This framework is sometimes referred to in the literature as 
@@ -537,75 +950,12 @@ in Section~\ref{subsec:classifiers}.
 A critical methodological requirement of this strategy is that the classifier 
 must first achieve genuinely strong performance before its feature importances 
 can be trusted as meaningful signals. A poorly performing model may assign high 
-importance to features for spurious reasons — noise, overfitting, or dataset 
-artefacts — rather than because those features are biologically discriminative. 
+importance to features for spurious reasons (noise, overfitting, or dataset 
+artefacts) rather than because those features are biologically discriminative. 
 The evaluation protocol described in Section~\ref{subsec:evaluation} is therefore 
 not merely a performance benchmark but a \textit{prerequisite} for the validity of 
 the proxy inference step.
 
-
-% ---------------------------------------------------------------
-\subsubsection*{Multi-Source Data: Integrating miRNA Expression and Clinical Variables}
-% ---------------------------------------------------------------
-
-A defining characteristic of the dataset used in this work is that it combines 
-two qualitatively different types of information: \textbf{microRNA expression data}, 
-consisting of quantitative expression levels for over 220 miRNA features measured from 
-tumour tissue, and \textbf{clinical variables}, including receptor statuses (ER, PR, HER2), 
-tumour staging, node involvement, mutation counts, methylation cluster assignments, and 
-demographic information such as patient age. These two modalities have fundamentally 
-different natures — one is high-dimensional and continuous, reflecting the molecular 
-state of the tumour; the other is lower-dimensional and mixed (continuous, ordinal, 
-and categorical), reflecting the clinical characterisation of the patient and disease.
-
-The decision to integrate both modalities into a unified feature vector was not made 
-arbitrarily. It is grounded in empirical evidence from our own published work~\cite{ourpaper}, 
-in which we systematically evaluated the impact of clinical data on classification 
-performance in this exact problem context. The results of that study demonstrated 
-clear and statistically significant improvements in classification performance when 
-clinical features were included alongside miRNA expression data, compared to miRNA-only 
-models. This finding is biologically interpretable: clinical variables such as ER status, 
-HER2 status, and methylation cluster are themselves proxies for the molecular subtype, and 
-their inclusion provides the model with complementary discriminative signals that 
-reinforce the patterns present in the miRNA data.
-
-However, the integration of clinical features into a proxy inference framework for 
-miRNA discovery introduces an important methodological tension. If the model assigns 
-high discriminative importance to clinical variables — which, as confirmed by our 
-prior work, it likely will — then naively reading off the top features by importance 
-score would mix clinical and molecular signals, potentially obscuring the miRNA-specific 
-contributions. To address this, the feature importance analysis in Stage 2 is performed 
-with explicit awareness of the feature modality, allowing the contributions of clinical 
-and miRNA features to be examined separately. This ensures that the proxy inference step 
-delivers a clean, interpretable ranking of miRNAs for each subtype, rather than a 
-confounded mixture of molecular and clinical signals. The specific analytical approach 
-is detailed in Section~\ref{subsec:mirna_selection}.
-
-
-% ---------------------------------------------------------------
-\subsubsection*{Roadmap of the Supervised Framework}
-% ---------------------------------------------------------------
-
-Having established the conceptual foundations — the multi-class classification 
-formulation, the supervised learning paradigm, the proxy inference strategy, 
-and the multi-source data integration — the remainder of Section~\ref{sec:supervised} 
-describes the concrete implementation of this framework in a sequential pipeline. 
-Section~\ref{subsec:split} addresses the critical question of how to partition 
-the data into training and test sets in a way that prevents data leakage and 
-ensures that reported performance metrics reflect true generalisation. 
-Section~\ref{subsec:normalisation} describes the normalisation strategy 
-applied to the two feature modalities. Section~\ref{subsec:classifiers} 
-presents the ensemble of classifiers evaluated, with particular focus on 
-XGBoost as the primary model, alongside logistic regression and decision 
-trees as interpretable baselines. Section~\ref{subsec:evaluation} defines 
-the evaluation protocol, including the repeated stratified cross-validation 
-scheme and the statistical tests used to compare model configurations. Finally, 
-Section~\ref{subsec:mirna_selection} details the proxy feature discovery pipeline, 
-describing how per-class miRNA panels of varying sizes are extracted, validated, 
-and statistically compared against the full-feature baseline. Together, these 
-components constitute a rigorous and reproducible supervised learning framework 
-whose dual purpose — achieving strong classification and identifying discriminative 
-miRNAs — reflects the central thesis of this work.
 
 % ================================================================
 \subsection{Baseline Model Evaluation}
@@ -617,7 +967,7 @@ several candidate models was conducted in order to establish a reliable performa
 baseline and to justify the choice of the primary model used in subsequent analyses. 
 This initial evaluation included four classifiers spanning a range of model families 
 and complexities: \textbf{Random Forest}, \textbf{XGBoost}, \textbf{Naive Bayes}, \textbf{Logistic Regression}, 
-and \textbf{Decision Tree}. This breadth of candidates was deliberate --- by including 
+and \textbf{Decision Tree}. This breadth of candidates was deliberate - by including 
 both simple and complex models, as well as both linear and non-linear approaches, 
 it becomes possible to reason about whether the discriminative signal in the data 
 requires non-linearity, whether ensemble methods offer genuine gains over single 
@@ -897,7 +1247,7 @@ in the following section, can be conducted with confidence.
 
 %=============================================================
 \section{Unsupervised Exploration: Finding Hidden Patterns}\
-\label{sec:unsupervised_small_cohort}
+\label{subsec:unsupervised_small_cohort}
 
 3.4.1 Clustering Analysis (K-Means/Hierarchical): Do clinical subtypes match genetic clusters?
 
