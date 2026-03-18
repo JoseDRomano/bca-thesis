@@ -1579,9 +1579,698 @@ the reduced-feature model for each subtype. This is the key result figure for th
 subsection and should be prominently placed.]
 
 %=============================================================
-\section{Unsupervised Exploration: Finding Hidden Patterns}\
-\label{subsec:unsupervised_small_cohort}
+% ============================================================
+%  UNSUPERVISED APPROACH — K-MEANS CLUSTERING
+%  Thesis: Learning to map miRNAs to subtypes of breast cancer
+%         using Machine Learning
+% ============================================================
 
-3.4.1 Clustering Analysis (K-Means/Hierarchical): Do clinical subtypes match genetic clusters?
+\section{Unsupervised Approach}
+\label{sec:unsupervised}
 
-3.4.2 Silhouette Analysis and Cluster Stability.
+% ----------------------------------------------------------
+\subsection{Motivation and Framing}
+\label{sec:unsupervised:motivation}
+
+The previous section addressed the problem of breast cancer subtype classification through
+a supervised learning lens: labelled samples were used to train models that learn an explicit
+decision boundary between the four PAM50 subtypes. While this is the conventional formulation
+for clinical classification tasks, it rests on a fundamental assumption — that the labels are
+reliable, complete, and the only relevant structure in the data.
+
+This section deliberately sets those labels aside. The core question we ask is different:
+\textit{does the miRNA expression data itself, without any guidance from clinical annotations,
+organise into groups that reflect the known biological subtypes?} If such structure exists, it
+suggests that the subtype-discriminating signal is intrinsic to the transcriptomic landscape and
+not merely an artefact of how patients were clinically classified. Moreover, for any cluster
+that aligns strongly with a known subtype, we can identify which miRNAs drive that alignment
+— directly complementing the feature importance analysis performed in the supervised section.
+
+% ----------------------------------------------------------
+\subsection{Background: Unsupervised Learning and K-Means}
+\label{sec:unsupervised:background}
+
+Unsupervised learning refers to a family of methods that operate on unlabelled data, seeking
+to discover latent structure without explicit supervision \cite{hastie2009elements}. The
+prototypical task is \textit{clustering}: partitioning a dataset into groups such that samples
+within a group are more similar to each other than to samples in other groups. Unlike supervised
+classification, there is no ground truth to optimise against during training; evaluation relies
+either on internal geometric measures or on post-hoc comparison with external labels when
+available.
+
+K-Means is among the oldest and most widely used clustering algorithms. Originally
+introduced by \citeauthor{macqueen1967some} \cite{macqueen1967some}, it partitions $n$ samples
+into $K$ clusters by iteratively minimising the within-cluster sum of squared Euclidean
+distances (inertia):
+
+\begin{equation}
+    \mathcal{L} = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k}
+    \left\| \mathbf{x}_i - \boldsymbol{\mu}_k \right\|^2
+    \label{eq:kmeans_objective}
+\end{equation}
+
+\noindent where $C_k$ denotes the set of samples assigned to cluster $k$ and
+$\boldsymbol{\mu}_k$ is the centroid of that cluster. The algorithm alternates between two
+steps: (1) assigning each sample to its nearest centroid, and (2) recomputing each centroid as
+the mean of its assigned samples. Convergence is guaranteed but only to a local minimum, so
+multiple random initialisations are typically used in practice
+\cite{hastie2009elements}.
+
+Unsupervised learning methods have been applied to genomic and transcriptomic cancer data since
+the early studies of molecular classification. Notably, hierarchical clustering on gene
+expression microarray data was used to identify intrinsic breast cancer subtypes in the landmark
+work of \citeauthor{perou2000molecular} \cite{perou2000molecular}, demonstrating that
+transcriptomic profiles alone — without clinical labels — can recover biologically meaningful
+tumour classes. More recent work has extended this paradigm to miRNA expression data, where
+clustering approaches have been used to identify miRNA signatures associated with distinct
+tumour phenotypes \cite{iorio2005microrna}.
+
+% ----------------------------------------------------------
+\subsection{Why This Approach Is Non-Conventional}
+\label{sec:unsupervised:nonconventional}
+
+Applying unsupervised learning to a problem that has well-defined class labels is, by most
+standards, a non-conventional choice. Standard practice in breast cancer subtype research, 
+or in other cancer research areas, would typically involve using the labels (in 
+this case the PAM50 gene signature) to train a supervised classifier and then
+treat subtype assignment as a supervised classification problem leveraging the ground truth (similiar to \cite{ml_gastric_Azari2023}).
+
+The unconventional nature of this approach is deliberate. Rather than asking \textit{can we
+predict the subtype of a patient?}, we ask \textit{does the data naturally group itself in a
+way that corresponds to known subtypes?} These are fundamentally different questions. The first
+is a performance question; the second is a structural one. A high-performing supervised
+classifier may exploit subtle decision boundaries that have no clear biological interpretation.
+A cluster that achieves high purity with respect to a known subtype, by contrast, asserts
+that the subtype occupies a geometrically coherent and isolated region of the miRNA expression
+space — a stronger biological claim.
+
+Furthermore, this framing makes the analysis robust to label noise: the clustering algorithm
+never sees the labels, so any correspondence between clusters and subtypes that emerges is
+entirely data-driven.
+
+% ----------------------------------------------------------
+\subsection{Implementation}
+\label{sec:unsupervised:implementation}
+
+\subsubsection{Dataset and Experimental Conditions}
+
+Experiments were conducted on the small cohort ($n = 244$ samples). Two experimental
+conditions were evaluated in parallel:
+
+\begin{itemize}
+    \item \textbf{miRNA only:} 442 miRNA expression features, after preprocessing.
+    \item \textbf{miRNA + clinical:} 462 features, combining miRNA expression with clinical
+    covariates.
+\end{itemize}
+
+Both conditions follow the same pipeline, enabling a direct comparison of whether the addition
+of clinical data modifies the cluster structure recovered from miRNA alone.
+
+\subsubsection{Feature Preprocessing}
+
+K-Means minimises Euclidean distances in feature space, making it sensitive to feature scale.
+A feature with values in the range $[0, 1000]$ will dominate distance calculations over a
+feature in $[0, 1]$, regardless of their relative biological importance.
+Accordingly, all features were standardised using \textit{StandardScaler}, transforming each
+feature to zero mean and unit variance prior to clustering.
+
+No correlation-based redundancy removal was applied. Although correlated features may inflate
+the weight of certain directions in Euclidean space — a known limitation of K-Means — removing
+features based on pairwise correlation would risk discarding biologically relevant miRNAs. In
+particular, a miRNA identified as a discriminative feature in the supervised analysis could be
+silently removed as a correlated redundant, breaking the cross-comparison between the two
+approaches. Retaining the full feature space ensures that the post-hoc feature importance
+analysis (Section~\ref{sec:unsupervised:importance}) operates on the same miRNA vocabulary as
+the supervised section, enabling a direct comparison of which miRNAs are flagged by each
+paradigm. The presence of correlated features is acknowledged as a methodological constraint.
+
+\subsubsection{Choice of K}
+
+The number of clusters $K$ was set to 4, corresponding to the four known PAM50 breast cancer
+subtypes (Basal-Like, HER2-Enriched, Luminal A, and Luminal B). This is a deliberate design
+choice anchored to prior biological knowledge rather than pure data-driven criteria.
+Figure~\ref{fig:kmeans_k_selection} shows both curves post-hoc: the elbow method produces a
+gradual, continuously declining inertia curve with no clear inflection point at any $K$, and
+the silhouette score peaks at $K = 2$ ($\approx 0.115$) and decreases monotonically thereafter,
+reaching $0.069$ at $K = 4$. Both findings indicate that in this standardised high-dimensional
+space the data does not organise into well-separated spherical clusters of any particular $K$
+— an expected property of transcriptomic data. Consequently, neither curve provides
+unambiguous data-driven support for $K = 4$, reinforcing that the choice must be grounded in
+domain knowledge.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{miRNA_only_k_selection.png}
+    \caption{Elbow method (inertia vs.\ $K$, left) and mean silhouette score vs.\ $K$ (right)
+    for the miRNA-only condition. The red dashed line marks the chosen value $K = 4$.}
+    \label{fig:kmeans_k_selection}
+\end{figure}
+
+This choice is justified on two grounds. First, the downstream evaluation — measuring cluster
+purity against the four PAM50 classes — is only meaningful when the number of clusters matches
+the number of classes. Setting $K = 3$ or $K = 5$, for instance, would inevitably create
+clusters that either merge or split subtypes, making purity comparisons with the supervised
+results ambiguous. Second, one of the main observations from the supervised section was
+that Luminal A and Luminal B are the most difficult subtypes to separate. Setting $K = 4$
+preserves that boundary, allowing us to examine directly whether the clustering algorithm
+manages to recover it from the unlabelled data. A finding of $K=3$ from purely data-driven
+methods would be scientifically interesting in itself (suggesting Luminal A and B are
+indistinguishable from miRNA expression) but would not serve the cross-comparison objective
+of this section.
+
+\subsubsection{Model Training}
+
+K-Means was trained with $n\_init = 10$ random restarts and a fixed random seed
+(\texttt{random\_state} $= 42$) to ensure reproducibility. The best solution across all
+restarts (lowest inertia) was retained. The per-sample silhouette plot for the final model
+is shown in Figure~\ref{fig:kmeans_silhouette}.
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=0.85\textwidth]{miRNA_only_silhouette_plot.png}
+    \caption{Per-sample silhouette plot for $K = 4$ on the miRNA-only condition.
+    Each coloured band corresponds to one cluster. Bars to the right of zero indicate
+    well-assigned samples; bars to the left indicate potential misassignments.
+    The red dashed line marks the mean silhouette score ($= 0.069$).}
+    \label{fig:kmeans_silhouette}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Evaluation Metrics}
+\label{sec:unsupervised:metrics}
+
+Four complementary metrics were computed to evaluate the quality of the clustering solution.
+The first is \textit{internal} (does not use labels); the remaining three are \textit{external}
+(compare cluster assignments against the ground-truth PAM50 labels post-hoc).
+
+\paragraph{Silhouette Score.}
+The silhouette coefficient \cite{rousseeuw1987silhouettes} for a sample $i$ is defined as:
+
+\begin{equation}
+    s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
+    \label{eq:silhouette}
+\end{equation}
+
+\noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other samples
+in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest neighbouring cluster.
+Values close to $+1$ indicate that the sample is well matched to its own cluster and poorly
+matched to neighbouring clusters; values near $0$ indicate overlap; negative values indicate
+potential misassignment. The overall silhouette score is the mean over all samples.
+
+\paragraph{Purity.}
+Cluster purity measures, for each cluster, the proportion of samples belonging to the most
+frequent true class within that cluster. The overall purity is the weighted average across
+clusters:
+
+\begin{equation}
+    \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
+    \label{eq:purity}
+\end{equation}
+
+\noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total number of
+samples. Purity ranges from 0 to 1, with higher values indicating better alignment between
+clusters and true classes.
+
+\paragraph{Adjusted Rand Index (ARI).}
+The Rand Index counts the fraction of sample pairs for which the clustering and the
+ground-truth labelling agree (both in the same group or both in different groups). The
+\textit{Adjusted} Rand Index \cite{hubert1985comparing} corrects for chance agreement:
+
+\begin{equation}
+    \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) - \mathbb{E}[\text{RI}]}
+    \label{eq:ari}
+\end{equation}
+
+\noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better than
+random; negative values are possible and indicate systematic disagreement.
+
+\paragraph{Adjusted Mutual Information (AMI).}
+AMI \cite{vinh2010information} measures the information shared between the cluster assignments
+and the true labels, normalised and adjusted for chance:
+
+\begin{equation}
+    \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) - \mathbb{E}[I(U;V)]}
+    \label{eq:ami}
+\end{equation}
+
+\noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the true
+labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
+AMI $= 0$ is random.
+
+% ----------------------------------------------------------
+\subsection{Results}
+\label{sec:unsupervised:results}
+
+\subsubsection{Overall Performance}
+
+Table~\ref{tab:kmeans_summary} reports the four evaluation metrics for both experimental
+conditions. All values are computed on the small cohort ($n = 244$).
+
+\begin{table}[htbp]
+\centering
+\caption{K-Means performance summary for $K = 4$ on the small cohort ($n = 244$).}
+\label{tab:kmeans_summary}
+\begin{tabular}{lrrrrr}
+\hline
+\textbf{Condition} & \textbf{Features} & \textbf{Silhouette} & \textbf{Purity} & \textbf{ARI} & \textbf{AMI} \\
+\hline
+miRNA only          & 442 & 0.069 & 0.611 & 0.203 & 0.258 \\
+miRNA + clinical    & 462 & 0.068 & 0.598 & 0.192 & 0.222 \\
+\hline
+\end{tabular}
+\end{table}
+
+The silhouette scores are low for both conditions ($\approx 0.07$), indicating that the clusters
+do not form geometrically compact and well-separated regions in the standardised feature space.
+This is not unexpected: K-Means assumes convex, isotropic clusters of similar size, an
+assumption that high-dimensional transcriptomic data rarely satisfies. The low silhouette is
+therefore a property of the data geometry in this space, not necessarily evidence that no
+biological structure exists.
+
+The external metrics tell a more informative story. An overall purity of $0.611$ means that,
+across the four clusters, 61\% of samples are assigned to the cluster where their true subtype
+is the majority class. Given that a random assignment of 244 samples into 4 equal clusters
+over 4 classes would yield an expected purity of approximately $0.25$, this represents a
+meaningful above-chance alignment between the discovered clusters and the PAM50 subtypes.
+The ARI of $0.203$ and AMI of $0.258$ similarly indicate a modest but non-trivial correspondence
+that is well above what would be expected by chance.
+
+Notably, the miRNA-only condition slightly outperforms miRNA + clinical across all four
+metrics. This suggests that the addition of clinical features does not improve — and marginally
+degrades — the cluster structure relative to miRNA data alone, supporting the hypothesis that
+miRNA expression is the primary source of subtype-discriminating signal in this cohort.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{miRNA_only_purity_heatmap.png}
+    \caption{Cluster $\times$ Subtype purity heatmap for the miRNA-only condition.
+    Each cell reports the proportion of samples of the column subtype within the row cluster.}
+    \label{fig:kmeans_purity_heatmap}
+\end{figure}
+
+\subsubsection{Cluster Composition}
+
+Table~\ref{tab:kmeans_cluster_composition} and Figure~\ref{fig:kmeans_pie_charts} detail
+the subtype composition of each cluster under the miRNA-only condition.
+
+\begin{table}[htbp]
+\centering
+\caption{Subtype composition of each cluster (miRNA-only condition, $n = 244$).
+The dominant subtype and its proportion within the cluster are highlighted in bold.}
+\label{tab:kmeans_cluster_composition}
+\begin{tabular}{lrrrrrl}
+\hline
+\textbf{Cluster} & \textbf{$n$} & \textbf{Basal-Like} & \textbf{HER2} & \textbf{Lum.\ A} & \textbf{Lum.\ B} & \textbf{Dominant} \\
+\hline
+Cluster 0 & 69 & 1  & 1  & \textbf{45} & 22 & \textbf{Lum.\ A (65.2\%)}   \\
+Cluster 1 & 63 & 0  & 5  & \textbf{43} & 15 & \textbf{Lum.\ A (68.3\%)}   \\
+Cluster 2 & 49 & \textbf{35} & 5  & 1  & 8  & \textbf{Basal-Like (71.4\%)} \\
+Cluster 3 & 63 & 5  & 18 & 14 & \textbf{26} & \textbf{Lum.\ B (41.3\%)}   \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{miRNA_only_cluster_pie_charts.png}
+    \caption{Subtype distribution within each cluster for the miRNA-only condition.
+    Each ring shows the percentage breakdown of PAM50 subtypes within that cluster.}
+    \label{fig:kmeans_pie_charts}
+\end{figure}
+
+Several observations merit discussion:
+
+\paragraph{Cluster 2 — strong Basal-Like signal.}
+Cluster 2 is the most biologically coherent of the four, with 71.4\% of its 49 samples
+belonging to the Basal-Like subtype, followed by Luminal B (16.3\%) and HER2-Enriched
+(10.2\%). This is the highest per-cluster purity achieved and suggests that the Basal-Like
+miRNA expression profile is the most geometrically distinct in this dataset — a finding
+consistent with the clinical literature, where Basal-Like (triple-negative) tumours are known
+to exhibit a markedly different molecular profile from hormone-receptor-positive subtypes
+\cite{perou2000molecular}.
+
+\paragraph{Clusters 0 and 1 — Luminal A fragmentation.}
+Two clusters (0 and 1) are dominated by Luminal A, with purities of 65.2\% ($n = 69$) and
+68.3\% ($n = 63$) respectively. Both clusters show a secondary Luminal B component (31.9\%
+and 23.8\%), with only negligible Basal-Like and HER2-Enriched representation. Rather than
+being a failure of the clustering, this fragmentation is itself informative: it suggests that
+Luminal A tumours do not occupy a single compact region in miRNA expression space but instead
+form at least two separable subgroups with distinct miRNA centroid profiles. This is
+consistent with the supervised analysis, where Luminal A showed heterogeneous behaviour across
+feature subsets, and aligns with evidence in the literature of biological heterogeneity within
+the Luminal A class \cite{perou2000molecular}.
+
+\paragraph{Cluster 3 — diffuse Luminal B / HER2-Enriched mixture.}
+Cluster 3 has the lowest purity (41.3\%, $n = 63$), with a composition of Luminal B (41.3\%),
+HER2-Enriched (28.6\%), Luminal A (22.2\%), and a small Basal-Like component (7.9\%).
+The near-equal presence of Luminal B and HER2-Enriched within this cluster mirrors the
+difficulty observed in the supervised section with these two subtypes: neither occupies a
+well-defined region in miRNA expression space, and their expression profiles are sufficiently
+similar that K-Means assigns them to the same geometric neighbourhood without supervision.
+\subsubsection{UMAP Projection}
+
+Figure~\ref{fig:kmeans_umap} shows the UMAP \cite{mcinnes2018umap} projection of both cluster
+assignments and ground-truth labels onto the same two-dimensional embedding. UMAP is used here
+purely as a visualisation tool — it was not involved in the clustering itself. The juxtaposition
+of the two panels allows visual assessment of the degree to which the K-Means partition
+corresponds to the known subtype structure. A clear separation in the right panel (ground truth)
+that aligns with a separation in the left panel (K-Means) provides geometric confirmation of
+the purity values reported in Table~\ref{tab:kmeans_cluster_composition}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{miRNA_only_umap_2d.png}
+    \caption{UMAP projection of the miRNA-only standardised feature space ($n = 244$).
+    \textit{Left:} samples coloured by K-Means cluster assignment.
+    \textit{Right:} same projection coloured by ground-truth PAM50 subtype.
+    Correspondence between left and right panels reveals where clustering recovers
+    biological structure.}
+    \label{fig:kmeans_umap}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Comparing miRNA-Only vs.\ miRNA + Clinical Conditions}
+\label{sec:unsupervised:conditions}
+
+Having examined the miRNA-only results in detail, this subsection directly compares the two
+experimental conditions — miRNA expression alone (442 features) versus miRNA combined with
+clinical features (462 features) — across quantitative metrics, cluster composition, and
+feature signatures.
+
+An important methodological note before proceeding: K-Means does not produce labelled clusters,
+so cluster indices ($0, 1, 2, 3$) are arbitrary and not comparable across conditions by index
+alone. Two clusters from different conditions are considered to correspond to the same biological
+entity if they share the same dominant PAM50 subtype and a substantial overlap in their top
+feature lists.
+
+% ----------------------------------------------------------
+\subsubsection{Quantitative Metrics}
+
+Table~\ref{tab:kmeans_summary} shows that the miRNA-only condition outperforms miRNA + clinical
+across all four evaluation metrics. The differences are modest in absolute terms but consistent
+in direction:
+
+\begin{itemize}
+    \item \textbf{Silhouette:} $0.069$ vs.\ $0.068$ \quad ($\Delta = -0.001$, $-1.4\%$)
+    \item \textbf{Purity:} $0.611$ vs.\ $0.598$ \quad ($\Delta = -0.013$, $-2.1\%$)
+    \item \textbf{ARI:} $0.203$ vs.\ $0.192$ \quad ($\Delta = -0.011$, $-5.4\%$)
+    \item \textbf{AMI:} $0.258$ vs.\ $0.222$ \quad ($\Delta = -0.036$, $-14.0\%$)
+\end{itemize}
+
+The AMI drop is the largest in relative terms ($\approx 14\%$), indicating that the information
+shared between the discovered partition and the ground-truth labels decreases noticeably when
+clinical features are added. The consistency of this direction across all four metrics —
+including the three external ones that directly measure biological alignment — points to a clear
+conclusion: clinical features act as noise rather than signal for this clustering task.
+
+The reason is methodological. K-Means uses Euclidean distance and treats all features
+symmetrically, regardless of type. When clinical variables (e.g.\ patient age, tumour grade,
+receptor status) are appended to the miRNA expression matrix, each clinical variable occupies
+one dimension with the same weight as any miRNA. After standardisation, these variables
+introduce independent axes of variation not correlated with PAM50 subtype boundaries,
+effectively diluting the subtype-discriminating geometry present in the miRNA expression space
+alone.
+
+% ----------------------------------------------------------
+\subsubsection{Cluster Composition and Subtype Alignment}
+
+Table~\ref{tab:kmeans_both_composition} presents the cluster compositions for both conditions
+side by side, annotated with their dominant subtype.
+
+\begin{table}[htbp]
+\centering
+\caption{Cluster composition for both experimental conditions ($K = 4$, $n = 244$).
+Each cell reports the raw count of samples of that subtype in that cluster.
+The dominant subtype per cluster is indicated in the rightmost column with its within-cluster
+purity in parentheses.}
+\label{tab:kmeans_both_composition}
+\begin{tabular}{clrrrrl}
+\hline
+\textbf{Condition} & \textbf{Cluster} & \textbf{Basal} & \textbf{HER2} & \textbf{Lum.\ A} & \textbf{Lum.\ B} & \textbf{Dominant (purity)} \\
+\hline
+\multirow{4}{*}{miRNA only}
+ & C0 ($n=68$) &  0 &  6 & \textbf{45} & 17 & Lum.\ A (66.2\%) \\
+ & C1 ($n=47$) & \textbf{34} &  5 &  1 &  7 & Basal-Like (72.3\%) \\
+ & C2 ($n=66$) &  3 &  0 & \textbf{42} & 21 & Lum.\ A (63.6\%) \\
+ & C3 ($n=63$) &  4 & 18 & 15 & \textbf{26} & Lum.\ B (41.3\%) \\
+\hline
+\multirow{4}{*}{miRNA + clinical}
+ & C0 ($n=62$) &  0 &  4 & \textbf{43} & 15 & Lum.\ A (69.4\%) \\
+ & C1 ($n=65$) &  5 & 18 & 15 & \textbf{27} & Lum.\ B (41.5\%) \\
+ & C2 ($n=67$) &  2 &  2 & \textbf{43} & 20 & Lum.\ A (64.2\%) \\
+ & C3 ($n=50$) & \textbf{34} &  5 &  2 &  9 & Basal-Like (68.0\%) \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    % [MEDIA: side-by-side purity heatmaps — miRNA only (left) vs miRNA+clinical (right)]
+    \caption{Cluster $\times$ Subtype purity heatmaps for miRNA-only (left) and
+    miRNA + clinical (right) conditions. Note the cluster index relabelling between
+    conditions: the Basal-Like-dominant cluster appears as C1 in miRNA-only and C3 in
+    miRNA + clinical.}
+    \label{fig:kmeans_purity_both}
+\end{figure}
+
+At the level of dominant subtypes, the partition recovered by both conditions is broadly
+similar: both produce one Basal-Like cluster, two Luminal A clusters, and one mixed
+Luminal B / HER2 cluster. However, the composition details reveal meaningful differences.
+
+The Basal-Like cluster weakens slightly when clinical features are added: purity drops from
+$72.3\%$ (miRNA-only C1, $n=47$) to $68.0\%$ (miRNA+clinical C3, $n=50$). Both clusters
+contain the same 34 Basal-Like samples, but the miRNA+clinical cluster draws in 3 additional
+non-Basal samples. This indicates that clinical features shift the Euclidean neighbourhood of
+a small number of non-Basal samples closer to the Basal centroid, contaminating an otherwise
+clean cluster.
+
+The two Luminal A clusters are structurally stable across conditions, with per-cluster purities
+consistently in the $63$–$69\%$ range in both. The mixed Luminal B / HER2-Enriched cluster is
+also reproduced with near-identical composition ($\approx 41\%$ purity, $n = 63$ vs.\
+$n = 65$), confirming that the difficulty of separating these two subtypes is an intrinsic
+property of the miRNA expression space and not an artefact of the feature set.
+
+% ----------------------------------------------------------
+\subsubsection{Feature Signature Stability Across Conditions}
+
+To assess how much clinical features alter the miRNA-level characterisation of each cluster,
+we computed the complete $4 \times 4$ pairwise overlap matrix between the top-20 feature lists
+of every cluster pair across the two conditions.
+Table~\ref{tab:kmeans_overlap_matrix} presents the full matrix.
+
+\begin{table}[htbp]
+\centering
+\caption{Top-20 feature overlap between every pair of clusters across conditions.
+Each cell reports the number of features shared between the top-20 list of the miRNA-only
+cluster (rows) and the miRNA + clinical cluster (columns). Dominant subtype of each cluster
+is given in parentheses.}
+\label{tab:kmeans_overlap_matrix}
+\begin{tabular}{lcccc}
+\hline
+ & \textbf{clin-C0} & \textbf{clin-C1} & \textbf{clin-C2} & \textbf{clin-C3} \\
+ & \small{Lum.\ A (69.4\%)} & \small{Lum.\ B (41.5\%)} & \small{Lum.\ A (64.2\%)} & \small{Basal (68.0\%)} \\
+\hline
+\textbf{miRNA-C0} \small{Lum.\ A (66.2\%)}   &  0 &  0 &  8 &  9 \\
+\textbf{miRNA-C1} \small{Basal (72.3\%)}      &  9 & 16 &  0 &  0 \\
+\textbf{miRNA-C2} \small{Lum.\ A (63.6\%)}   & \textbf{17} &  8 &  0 &  0 \\
+\textbf{miRNA-C3} \small{Lum.\ B (41.3\%)}   &  0 &  0 & \textbf{16} &  0 \\
+\hline
+\end{tabular}
+\end{table}
+
+Three findings stand out.
+
+\paragraph{One Luminal A cluster is the only biologically consistent match.}
+The single highest overlap in the entire matrix is miRNA-C2 vs.\ clin-C0 (17/20), both
+dominated by Luminal A. This pair shares a consistent set of miRNAs including MIR-18A/18A*,
+MIR-17/17*, MIR-505/505, MIR-505/3P, MIR-577/577, MIR-19A/19A, and MIR-19B-1/19B — several
+of which belong to the miR-17-92 polycistronic cluster, a well-characterised oncogenic miRNA
+family \cite{olive2010mir17}. This is the only cluster pair across the two conditions that is
+both biologically consistent (same dominant subtype) and feature-stable (17/20 shared). It
+suggests that the miR-17-92-driven Luminal A signal is the most robust structure in this
+dataset, persisting even when clinical covariates are added.
+
+\paragraph{The Basal-Like clusters share zero features.}
+The most striking result is that the two Basal-Like clusters — miRNA-C1 (72.3\% purity) and
+clin-C3 (68.0\% purity) — share \textbf{zero features} in their respective top-20 lists
+(overlap $= 0$, Table~\ref{tab:kmeans_overlap_matrix}). Despite recovering the same 34
+Basal-Like samples, the centroid of each cluster points in a completely different direction in
+feature space. In the miRNA-only condition, the Basal cluster is characterised by
+MIR-197/197, MIR-324/5P, MIR-186/186*, MIR-146B/5P, and MIR-339/5P. In the
+miRNA + clinical condition, the top features of the Basal cluster are MIR-199B/5P,
+MIR-199A-2/5P, MIR-199A-1/5P, MIR-199-S/5P, and MIR-145/145 — a completely different
+set.
+
+This divergence has a direct geometric explanation. When 20 clinical features are added to
+the 442-miRNA space, the centroid in the 462-dimensional space is pulled by the clinical
+dimensions, shifting the position of every cluster centroid in the original miRNA subspace.
+The result is that the miRNA-level feature importance of the Basal-Like cluster becomes
+unreliable under the miRNA + clinical condition: it reflects the geometry of a
+mixed miRNA-clinical space rather than the pure miRNA expression signature.
+
+\paragraph{Cross-subtype feature matching dominates.}
+Inspection of the full overlap matrix reveals that the highest overlaps are often between
+clusters of \textit{different} biological identities: miRNA-C1 (Basal, 72.3\%) matches
+clin-C1 (Luminal B, 41.5\%) with 16/20 features; miRNA-C3 (Luminal B, 41.3\%) matches
+clin-C2 (Luminal A, 64.2\%) with 16/20 features. The fact that biologically dissimilar
+clusters end up sharing more features than biologically similar ones (the Basal-Basal pair
+has 0/20) is direct evidence that clinical features actively re-organise the feature
+space in ways that are not aligned with PAM50 subtype boundaries.
+
+Taken together, these findings establish that the miRNA-only condition is superior to
+miRNA + clinical both quantitatively and interpretively. The former produces better external
+metrics, a cleaner Basal-Like cluster, and feature signatures that are more biologically
+meaningful. The analysis in Section~\ref{sec:unsupervised:importance} therefore focuses
+exclusively on the miRNA-only condition.
+
+\subsubsection{Method}
+
+For each cluster, the most discriminative features were identified using the standardised
+centroid z-score method. After fitting K-Means on the standardised feature matrix
+$\tilde{X} \in \mathbb{R}^{n \times p}$, the centroid of cluster $k$ is denoted
+$\boldsymbol{\mu}_k \in \mathbb{R}^p$. The global mean and standard deviation of each feature
+$j$ over the full dataset are $\bar{x}_j$ and $\sigma_j$, respectively. The importance of
+feature $j$ for cluster $k$ is defined as:
+
+\begin{equation}
+    z_{k,j} = \frac{\mu_{k,j} - \bar{x}_j}{\sigma_j + \epsilon}
+    \label{eq:centroid_zscore}
+\end{equation}
+
+\noindent where $\epsilon$ is a small constant for numerical stability. Features are ranked
+within each cluster by $|z_{k,j}|$: a high absolute z-score indicates that the cluster's
+centroid deviates strongly from the global average for that feature, marking it as
+characteristic of that cluster's miRNA expression profile. This method is the canonical
+interpretation of K-Means centroids, as the centroid is the mathematical definition of the
+cluster \cite{hastie2009elements}.
+
+\subsubsection{Top Features per Cluster}
+
+\begin{figure}[htbp]
+    \centering
+    % Top Row
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster0.png}
+        \caption{Cluster 0 — Luminal A (65.2\%)}
+        \label{fig:cluster0_feats}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster1.png}
+        \caption{Cluster 1 — Luminal A (68.3\%)}
+        \label{fig:cluster1_feats}
+    \end{subfigure}
+
+    \vspace{1em} % Add some vertical spacing between rows
+
+    % Bottom Row
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster2.png}
+        \caption{Cluster 2 — Basal-Like (71.4\%)}
+        \label{fig:cluster2_feats}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster3.png}
+        \caption{Cluster 3 — Luminal B (41.3\%)}
+        \label{fig:cluster3_feats}
+    \end{subfigure}
+
+    \caption{Top 20 most important features per cluster by absolute centroid z-score
+    (miRNA-only condition). Bar length indicates the magnitude of deviation from the
+    global dataset average. Note the difference in x-axis scale across clusters: Cluster 2
+    (Basal-Like) and Cluster 1 (Luminal A) show markedly higher z-scores than Clusters 0
+    and 3, reflecting stronger and more distinctive centroid signals.}
+    \label{fig:kmeans_top_features}
+\end{figure}
+
+Table~\ref{tab:kmeans_top5} summarises the five most important features for each cluster.
+Full rankings for all 442 features are available in the supplementary material.
+
+\begin{table}[htbp]
+\centering
+\caption{Top 5 miRNA features per cluster by absolute centroid z-score (miRNA-only condition).
+The dominant PAM50 subtype of each cluster is indicated in parentheses.}
+\label{tab:kmeans_top5}
+\begin{tabular}{llll}
+\hline
+\textbf{Cluster 0 (Lum.\ A, 65\%)} & \textbf{Cluster 1 (Lum.\ A, 68\%)} & \textbf{Cluster 2 (Basal, 71\%)} & \textbf{Cluster 3 (Lum.\ B, 41\%)} \\
+\hline
+MIR-151/3P    & MIR-197/197   & MIR-18A/18A*  & MIR-3677/3P  \\
+MIR-151A/3P   & MIR-324/5P    & MIR-577/577   & MIR-142/5P   \\
+MIR-199B/5P   & MIR-186/186*  & MIR-505/505   & MIR-33B/33B* \\
+MIR-199A-1/5P & MIR-146B/5P   & MIR-505/3P    & MIR-3607/3P  \\
+MIR-199A-2/5P & MIR-339/5P    & MIR-17/17*    & MIR-326/326  \\
+\hline
+\end{tabular}
+\end{table}
+
+The Basal-Like cluster (Cluster 2) exhibits the strongest feature signal overall, with
+MIR-18A/18A* reaching an absolute z-score of $1.45$ — the highest of any feature across
+all clusters. Cluster 1 (Luminal A, 68.3\%) also shows notably high z-scores with
+MIR-197/197 at $1.09$, suggesting a strong and distinct centroid for this subgroup.
+Strikingly, the two Luminal A clusters (0 and 1) share \textbf{zero features} in their
+respective top-20 rankings: Cluster 0 is dominated by MIR-151 and MIR-199 family members,
+while Cluster 1 is characterised by MIR-197, MIR-24, and members of the miR-17-92 oncogenic
+cluster. This complete divergence in feature signatures reinforces the interpretation that
+the two Luminal A clusters represent genuinely distinct biological subgroups rather than an
+arbitrary split of the same population. Cluster 3, dominated by Luminal B but substantially
+contaminated by HER2-Enriched samples, shows the lowest maximum z-score ($0.89$), consistent
+with its mixed composition and lowest overall purity.
+
+% ----------------------------------------------------------
+\subsection{Comparison with the Supervised Approach}
+\label{sec:unsupervised:comparison}
+
+% [PLACEHOLDER — to be completed when supervised results are finalised]
+%
+% This paragraph will compare the top features identified per cluster with the feature
+% importances obtained in the supervised approach (e.g. Random Forest feature importance,
+% SHAP values, or recursive feature elimination rankings). In particular, it will examine:
+%   (1) whether the miRNAs that best characterise the Basal-Like cluster (Cluster 2:
+%       MIR-18A/18A*, MIR-577/577, MIR-18A/18A*) overlap with features most predictive
+%       of Basal-Like in the supervised classifier;
+%   (2) whether the divergent feature sets of Clusters 0 and 1 (both Luminal A, sharing
+%       zero top-20 features) correspond to distinct supervised importance profiles,
+%       suggesting true biological heterogeneity within that subtype;
+%   (3) whether the weakness of Cluster 3 (Luminal B / HER2, purity 41.3%) is reflected
+%       in correspondingly lower supervised performance for those two classes.
+% ----------------------------------------------------------
+\subsection{Discussion}
+\label{sec:unsupervised:discussion}
+
+The results demonstrate that K-Means clustering on miRNA expression data, applied without any
+label supervision, recovers a partition that is meaningfully aligned with the PAM50 subtype
+structure. An overall purity of $0.611$ and ARI of $0.203$, substantially above chance,
+indicate that the miRNA expression profiles carry genuine subtype-discriminating information
+that is geometrically accessible to a distance-based clustering algorithm.
+
+The most striking finding is the coherence of the Basal-Like cluster (Cluster 2,
+purity $= 0.714$). The Basal-Like subtype is well known to have a distinctive and extreme
+molecular phenotype \cite{perou2000molecular}, and this distinctiveness is reflected in
+the clearest and most compact cluster recovered by the algorithm. The two Luminal A clusters
+further reinforce findings from the supervised section: even without label supervision, Luminal
+A tumours fragment into two geometrically separated subgroups with completely non-overlapping
+miRNA feature signatures — a finding that warrants further biological investigation into
+potential heterogeneity within this subtype.
+
+The observation that miRNA-only clustering slightly outperforms miRNA + clinical clustering
+across all metrics is noteworthy. It suggests that, from a clustering perspective, clinical
+features add noise rather than signal — possibly because clinical variables introduce
+heterogeneous scales and non-continuous attributes that distort the Euclidean geometry
+that K-Means relies on. This contrasts with the typical assumption in clinical machine
+learning that richer feature sets yield better models.
+
+The low silhouette scores deserve explicit acknowledgement as a limitation. They confirm that,
+in the standardised 442-dimensional miRNA space, the subtype clusters are not geometrically
+compact. This is an intrinsic property of high-dimensional biological data, where class
+boundaries are rarely spherical or linearly separable. The external metrics (purity, ARI,
+AMI) are arguably more relevant for the biological question at hand, as they directly measure
+the correspondence between the discovered partition and clinically validated subtypes.
+
+\bigskip
+
