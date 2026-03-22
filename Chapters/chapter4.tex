@@ -17,12 +17,521 @@
 \chapter{Scalling the Analysis: the Expanded Cohort}
 \label{ch:expanded}
 
-\section{Transition to the Larger Dataset}
-4.1.1 Identification and Alignment: Merging the 256-subset with the 700-entry master set.
-- Why do we say that our original dataset is actually a subset of this master set? (optional)
-- What are the key differences between the subset and this master set?
+% ============================================================
+%  CHAPTER: SCALING THE ANALYSIS — THE EXPANDED COHORT
+%  Section: Transition to the Larger Dataset
+% ============================================================
 
-4.1.2 Comparative Analysis: Does the larger dataset change the data distribution?
+\section{Transition to the Larger Dataset}
+
+All supervised and unsupervised experiments described in the preceding chapters were
+developed, tuned, and evaluated on the \emph{pilot cohort}: the 244-sample, 462-feature
+dataset assembled in Chapter~3 from a TCGA-BRCA data release that had been
+pre-processed and curated by our partners at Nova Medical School prior to the start
+of this project. This was the only dataset available at that stage of the work.
+At a later point in the project, access was obtained to a substantially larger
+and independently sourced dataset from the same TCGA-BRCA study, retrieved
+directly from the cBioPortal for Cancer Genomics. The availability of this
+expanded cohort created a natural opportunity to revisit the best-performing
+pipelines developed on the pilot data and assess whether the findings generalise
+to a larger and more representative sample of the same disease population.
+This section documents the origin, composition, and relationship to the pilot
+cohort of the expanded dataset that forms the basis of the analysis presented
+in the remainder of this chapter.
+
+% ============================================================
+\subsection*{Data Source and Acquisition}
+% ============================================================
+
+The expanded dataset was obtained directly from the cBioPortal for Cancer Genomics
+\cite{cerami2012cbio, TCGA2012}, an open-access platform that provides curated
+multi-omics data from The Cancer Genome Atlas (TCGA) \ref{TCGA-BRCA} and other large-scale consortia.
+Specifically, the miRNA expression and clinical data for the TCGA Breast Invasive
+Carcinoma (TCGA-BRCA) study were downloaded from the portal's data export interface.
+Unlike the pilot cohort, which arrived as a pre-processed artefact from an established
+collaboration, this release was obtained at a later stage in the project and represents a
+direct, largely unprocessed export of the TCGA-BRCA repository. The clinical table and
+the miRNA expression matrix were retrieved separately and subsequently merged by
+patient identifier, as described in the preprocessing subsection below.
+ 
+After integration, the raw combined dataset contained $N = 773$ samples described
+by 539 miRNA expression features and 15 clinical variables, plus the PAM50 subtype
+label. Following the application of the preprocessing steps documented in
+Section~\ref{sec:expanded_preprocessing}, the final modelling cohort comprises
+\textbf{702 samples}, making it approximately 2.9 times larger than the pilot cohort.
+\todo{Referenciar secção onde explicamos o pre processamento que tivémos de fazer para este dataset maior}
+
+% ============================================================
+\subsection*{Establishing Common Origin with the Pilot Cohort}
+% ============================================================
+
+Because the two datasets were obtained through different channels and exhibit
+differences in both nomenclature and feature composition (detailed in the next
+subsection), it was necessary to formally verify that they originate from the same
+underlying study before drawing any comparative conclusions. This verification was
+conducted by cross-referencing the patient identifiers present in each dataset.
+
+TCGA assigns every biospecimen a standardised barcode of the form
+\texttt{TCGA-\{TSS\}-\allowbreak\{Participant\}-\allowbreak\{Sample\}}, 
+where the first twelve characters
+(\texttt{TCGA-XX-XXXX}) uniquely identify a patient, independent of sample type
+or processing version. The pilot cohort uses the full barcode including the
+two-digit sample code suffix (\textit{e.g.}, \texttt{TCGA-A1-A0SK-01}), while
+the expanded dataset stores only the patient-level prefix
+(\textit{e.g.}, \texttt{TCGA-A1-A0SK}). After normalising both sets of identifiers
+to the twelve-character patient prefix, we can visualize in Figure~\ref{fig:ver_datasets} 
+that \textbf{176 of the 244 patients in the pilot
+cohort} (72.1\%) were found to have a direct match in the expanded dataset. The
+remaining 68 pilot-cohort patients are absent from the expanded release, most likely
+because they correspond to samples that were present in the specific TCGA data
+version used by Nova Medical School but are not included in the cBioPortal export
+retrieved at a later date, or because they were filtered out by the curation pipeline
+applied at the source.
+
+A 72\% overlap between an independently acquired dataset and a pre-processed
+cohort sourced from the same TCGA study constitutes strong evidence that both
+datasets describe the same patient population and the same underlying
+disease characterisation effort. The patients who appear in the pilot cohort but
+not in the expanded release can be attributed to version differences in the
+TCGA data freeze or to curation decisions applied upstream, rather than to any
+fundamental incompatibility between the two sources.
+
+% [SUGGESTION] Consider presenting the overlap as a Venn diagram or a simple
+% two-column table showing the number of shared vs. exclusive patients in
+% each cohort, to make the relationship immediately legible to the reader.
+% [MEDIA] Venn diagram: pilot cohort (244 patients) ∩ expanded cohort (702 patients) = 176 shared
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.5\textwidth]{vern_datasets.drawio.png}
+    \caption{This is a description of my image.}
+    \label{fig:ver_datasets}
+\end{figure}
+
+% ============================================================
+\subsection*{Differences Between the Two Datasets}
+% ============================================================
+
+Despite originating from the same repository and study, the two datasets differ in
+several important respects. These differences are a direct consequence of the
+independent preprocessing applied to each release, and understanding them is
+necessary to interpret any comparative results.
+
+\paragraph{miRNA Feature Space.}
+The pilot cohort was built from a raw TCGA-BRCA miRNA expression matrix containing
+888 features, which were reduced to 442 unique, non-redundant miRNAs after
+the deduplication step described in Section~\ref{subsec:mirna_dedup}. The features follow a
+HUGO gene symbol convention with isoform suffixes
+(\textit{e.g.}, \texttt{MIR-744/5P}, \texttt{MIR-744/3P}).
+The expanded dataset, by contrast, already provides 539 miRNA features in a
+pre-deduplicated form, using the standard \texttt{hsa-mir-xxx} Ensembl/miRBase
+nomenclature (\textit{e.g.}, \texttt{hsa-mir-744}). The difference in feature count
+(442 vs.\ 539) reflects both the use of a different TCGA data release and the
+different deduplication strategy applied at source: the cBioPortal export retains
+one entry per unique miRNA base identifier, whereas the pilot cohort was filtered
+by matching expression profiles across samples.
+Although the two naming conventions refer to the same biological entities, a
+direct one-to-one mapping between them is not guaranteed without an explicit
+identifier translation step, as the cBioPortal identifiers represent precursor
+miRNA genes while the pilot-cohort identifiers can encode strand-specific isoforms.
+
+% [SUGGESTION] If you have performed any explicit name-mapping analysis between
+% the two miRNA nomenclatures (e.g., a lookup against miRBase), this would be
+% the appropriate place to report it and the fraction of features that can be
+% unambiguously matched.
+
+\paragraph{Clinical Feature Set.}
+The clinical annotations available in the two datasets are largely complementary
+rather than overlapping. The pilot cohort contains a rich set of molecular and
+integrative features curated by Nova Medical School, including receptor status
+indicators (\texttt{ER\_STATUS}, \texttt{PR\_STATUS}, \texttt{HER2\_STATUS}),
+TCGA multi-omics cluster assignments
+(\texttt{CN\_CLUSTER}, \texttt{METHYLATION\_CLUSTER}, \texttt{MIRNA\_CLUSTER}),
+and detailed TNM staging variables. The expanded dataset, drawn directly from the
+cBioPortal clinical export, provides a different profile of 15 variables centred on
+genomic instability and tumour microenvironment metrics: the Aneuploidy Score,
+three independent hypoxia scores (Buffa, Ragnum, and Winter), MSI
+(Microsatellite Instability) scores from two platforms (MSI MANTIS and
+MSIsensor), Tumour Break Load, and TMB (non-synonymous).
+Both datasets share a common core of basic clinical descriptors: patient age at
+diagnosis, tumour stage, lymph node involvement, distant metastasis, fraction of
+the genome altered, mutation count, and TMB; which provides a minimal
+comparable clinical basis across experiments. The key differences in feature
+availability between the two datasets are summarised in Table~\ref{tab:dataset_comparison}.
+
+% [MEDIA] Table comparing the two datasets side by side (see Table template below)
+
+\begin{table}[h!]
+\centering
+\caption{Comparison of the key characteristics of the pilot cohort (Chapter 3) and
+the expanded cohort used in this chapter. Dashes indicate that the feature
+category is not available in that dataset.}
+\label{tab:dataset_comparison}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcc}
+\hline
+\textbf{Property} & \textbf{Pilot Cohort} & \textbf{Expanded Cohort} \\
+\hline
+\multicolumn{3}{l}{\textit{Scale}} \\
+\quad Samples & 244 & 702 \\
+\quad miRNA features & 442 & 539 \\
+\quad Clinical features & 20 & 15 \\
+\quad Total features & 462 & 554 \\
+\hline
+\multicolumn{3}{l}{\textit{Subtype distribution}} \\
+\quad Luminal A & 103 (42.2\%) & 362 (51.6\%) \\
+\quad Luminal B & 71 (29.1\%) & 156 (22.2\%) \\
+\quad Basal-like & 41 (16.8\%) & 117 (16.7\%) \\
+\quad HER2-enriched & 29 (11.9\%) & 67 (9.5\%) \\
+\hline
+\multicolumn{3}{l}{\textit{Clinical feature profile}} \\
+\quad Receptor status (ER/PR/HER2) & \checkmark & --- \\
+\quad Multi-omics cluster assignments & \checkmark & --- \\
+\quad Detailed TNM staging variables & \checkmark & \checkmark \\
+\quad Hypoxia scores (Buffa/Ragnum/Winter) & --- & \checkmark \\
+\quad MSI scores (MANTIS / MSIsensor) & --- & \checkmark \\
+\quad Aneuploidy Score & --- & \checkmark \\
+\quad Tumour Break Load & --- & \checkmark \\
+\quad Overall survival & \checkmark & --- \\
+\hline
+\multicolumn{3}{l}{\textit{miRNA nomenclature}} \\
+\quad Format & \texttt{MIR-xxx/isoform} & \texttt{hsa-mir-xxx} \\
+\hline
+\multicolumn{3}{l}{\textit{Patient overlap}} \\
+\quad Shared patients (12-char prefix) & \multicolumn{2}{c}{176 (72\% of pilot cohort)} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\subsection*{Characteristics of the Expanded Dataset}
+% ============================================================
+
+The final modelling dataset contains 702 samples described by 554 features: 539
+miRNA expression values and 15 clinical variables. All features are fully numeric
+and there are no missing values, as the preprocessing steps described below
+removed samples or imputed values where necessary prior to modelling.
+
+\paragraph{Subtype Distribution.}
+As shown in Table~\ref{tab:dataset_comparison} and Figure~\ref{fig:expanded_subtype_dist},
+the class distribution follows the expected epidemiological pattern, with Luminal A
+comprising the largest fraction of the cohort ($n = 362$; 51.6\%), followed by
+Luminal B ($n = 156$; 22.2\%), Basal-like ($n = 117$; 16.7\%), and HER2-enriched
+($n = 67$; 9.5\%). Compared with the pilot cohort, the expanded dataset shows a
+more pronounced Luminal A dominance (51.6\% vs.\ 42.2\%), which can partially
+be attributed to the absence of the Normal-like class, which had been explicitly
+excluded during the preprocessing of both cohorts. The Normal-like class, as seen 
+in the smaller cohort, has a very low sample size that will unable our models and 
+implementations to find a meaningful feature group that could represent this class.  
+The class imbalance is less severe than in the pilot cohort in relative terms, but
+it remains a relevant modelling challenge: a trivial majority-class classifier
+would achieve 51.6\% accuracy without learning any discriminative signal. The same
+class-imbalance mitigation strategies employed in the pilot study (stratified
+cross-validation and class-weighted loss functions) are therefore retained in all
+experiments described in this chapter.
+
+% [MEDIA] Bar chart or pie chart of subtype distribution in the expanded cohort
+% (analogous to Figure 3.1 in Chapter 3)
+% [SUGGESTION] Consider placing Figure 3.1 and the equivalent expanded-cohort
+% figure side by side in a single two-panel figure to make the distributional
+% shift immediately visible.
+
+\todo{A Figura está meio estranha, parece que lhe falta alguma coisa - um título ou algo do género}
+% --- PAM50 distribution table + pie chart ---
+\begin{figure}[t]
+    \centering
+    \begin{minipage}{0.46\textwidth}
+        \centering
+        \captionof{table}{PAM50 subtype distribution in the Bigger cohort
+        ($N$\,=\,773).}
+        \label{tab:pam50-distribution}
+        \begin{tabular}{lrr}
+            \hline
+            \textbf{PAM50 Subtype} & \textbf{Count} & \textbf{\%} \\
+            \hline
+            Luminal A     & 383 & 49.5 \\
+            Luminal B     &  161 & 20.8 \\
+            Basal-like    &  133 & 17.2 \\
+            HER2-enriched &  70 & 9.1 \\
+            Normal-like   &   26 &  3.4 \\
+            \hline
+            \textbf{Total} & \textbf{773} & \textbf{100.0} \\
+            \hline
+        \end{tabular}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.50\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \pie[
+                radius      = 2.6,
+                color       = {
+                    blue!50,
+                    blue!25,
+                    red!55,
+                    orange!70,
+                    gray!40
+                },
+                text        = legend,
+                before number = \footnotesize,
+                after number  = \%,
+                sum           = 100
+            ]{
+                49.5/Luminal A,
+                20.8/Luminal B,
+                17.2/Basal-like,
+                9.1/HER2-enriched,
+                3.4/Normal-like
+            }
+        \end{tikzpicture}
+    \end{minipage}
+    \caption{PAM50 subtype distribution across the 773-sample Bigger cohort.
+    Luminal A remains the dominant class (almost 50\%), while Normal-like continues severely
+    underrepresented ($n = 26$; 3.4\%).}
+    \label{fig:pam50-pie-big}
+\end{figure}
+
+\paragraph{Patient Demographics.}
+Patient ages range from 26 to 90 years, with a mean of $58.1 \pm 13.4$ years
+(median $= 58$), consistent with the demographic profile of the pilot cohort
+($59.3 \pm 13.3$ years, median $= 60$) and with the known epidemiology of
+breast cancer as a predominantly post-menopausal disease.
+
+% \todo{podemos estar a complicar aqui a descrição dos dados. Rever esta parte abaixo}
+% \paragraph{miRNA Expression Profile.}
+% The 539 miRNA expression values are provided on a raw read-count scale, in contrast
+% to the log\textsubscript{2}-transformed values used in the pilot cohort. Expression
+% values span a wide dynamic range, from 0.0 to approximately 679,286 read counts,
+% with a heavily right-skewed distribution. After the log\textsubscript{2}$(x + 1)$
+% transformation applied during preprocessing, the distribution becomes substantially
+% more symmetric, facilitating downstream standardisation. Of the 539 miRNA features,
+% 340 (63.1\%) exhibit a variance greater than 1.0 after log-transformation, indicating
+% that a substantial fraction of the feature space carries non-trivial biological
+% variation across the cohort.
+
+% % [SUGGESTION] A variance distribution plot (histogram of per-miRNA variances)
+% % analogous to the one that may have been included in the pilot cohort EDA
+% % would be informative here, showing the long tail of high-variance miRNAs that
+% % are likely to be the most discriminative.
+
+\paragraph{Clinical Feature Profile.}
+The 15 clinical variables available in this dataset are described in
+Table~\ref{tab:expanded_clinical_features}. As noted above, this set differs
+substantially from the pilot cohort's clinical annotation. The absence of
+receptor status variables (ER, PR, HER2) is a notable departure: these were
+among the most informative clinical features in the pilot study, given their
+direct biological alignment with the PAM50 classification. Their unavailability
+in the expanded cohort means that the classification task in this chapter relies
+more heavily on miRNA expression and on genomic instability metrics as discriminative
+signals, which may affect both overall performance and the identity of the features
+selected by the feature importance analyses.
+
+% [MEDIA] Table of expanded-cohort clinical features (analogous to Table 3.3)
+
+\begin{table}[t]
+  \centering
+  \caption{Clinical features available in the expanded cohort, with data type
+  and brief clinical description.}
+  \label{tab:expanded_clinical_features}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{llp{7cm}}
+  \hline
+  \textbf{Feature} & \textbf{Type} & \textbf{Description} \\
+  \hline
+  Diagnosis Age & Integer & Patient age at diagnosis (years). \\
+  Neoplasm Stage (AJCC) & Ordinal & Overall AJCC composite stage at diagnosis. \\
+  Aneuploidy Score & Continuous & Number of arm-level copy-number alterations; proxy for chromosomal instability. \\
+  Buffa Hypoxia Score & Continuous & Transcriptomic hypoxia signature (Buffa \textit{et al.}). \\
+  Ragnum Hypoxia Score & Continuous & Transcriptomic hypoxia signature (Ragnum \textit{et al.}). \\
+  Winter Hypoxia Score & Continuous & Transcriptomic hypoxia signature (Winter \textit{et al.}). \\
+  Fraction Genome Altered & Continuous & Proportion of genome with somatic copy-number alterations. \\
+  MSI MANTIS Score & Continuous & Microsatellite instability score (MANTIS algorithm). \\
+  MSIsensor Score & Continuous & Microsatellite instability score (MSIsensor tool). \\
+  Mutation Count & Integer & Total somatic mutation count. \\
+  Metastasis Stage (AJCC) & Binary & Presence of distant metastasis (M0/M1). \\
+  Lymph Node Stage (AJCC) & Ordinal & Regional lymph node involvement (N0–N3). \\
+  Tumour Stage (AJCC) & Ordinal & Primary tumour size/extent (T1–T4). \\
+  Tumour Break Load & Continuous & Number of structural variant breakpoints; proxy for genomic instability. \\
+  TMB (nonsynonymous) & Continuous & Tumour mutational burden (non-synonymous mutations per Mb). \\
+  \hline
+  \end{tabular}
+\end{table}
+
+% ============================================================
+%  CHAPTER: SCALING THE ANALYSIS — THE EXPANDED COHORT
+%  Section: Data Preprocessing Pipeline
+% ============================================================
+
+\section{Data Pre-processing Pipeline}
+\label{sec:expanded_preprocessing}
+
+The expanded dataset was sourced as two separate files from cBioPortal: a miRNA
+expression matrix (\texttt{mirna\_data\_filtered.csv}, 773 patients $\times$ 539
+features) and a clinical annotations table (\texttt{clinical\_data\_filtered.csv},
+773 patients $\times$ 21 columns). Both arrived in patient-as-rows orientation and
+shared a common \texttt{Patient ID} key, so no transposition was needed before
+merging (unlike the pilot cohort), where the miRNA matrix required structural
+realignment (Section~\ref{sec:preprocessing}).
+
+\paragraph{Column removal.}
+Four clinical columns were removed prior to joining: \texttt{Ethnicity Category}
+(14.3\% missing), \texttt{Genetic Ancestry Label} (12.2\% missing), and
+\texttt{Race Category} (6.5\% missing) due to substantial missingness, and
+\texttt{Cancer Type Detailed} as a task-irrelevant field (all samples are
+TCGA-BRCA primaries). This left 15 clinical variables for modelling.
+
+\paragraph{Integration, subtype cleaning, and missing value handling.}
+The two files were merged via an inner join on \texttt{Patient ID}. Since both
+files contained the same 773 patients, the join introduced no sample loss.
+The 26 Normal-like samples (\texttt{BRCA\_Normal}) were then excluded, leaving 747
+samples. Residual missing values remained in three clinical features after this
+exclusion: \texttt{MSI MANTIS Score} ($n = 24$), \texttt{Aneuploidy Score}
+($n = 17$), and \texttt{Neoplasm Disease Stage} ($n = 4$). As in the pilot cohort,
+listwise deletion was applied rather than imputation, given the clinical nature of
+these variables. This removed a further 45 samples, yielding a final cohort of
+\textbf{702 samples}.
+
+\paragraph{Categorical encoding and miRNA renaming.}
+The remaining categorical clinical columns (TNM staging codes, metastasis stage,
+and lymph node stage) were label-encoded using \texttt{sklearn}'s
+\texttt{LabelEncoder}. The PAM50 subtype was mapped to integers consistent with
+the pilot cohort (Basal-like $\to$ 0, HER2-enriched $\to$ 1, Luminal A $\to$ 2,
+Luminal B $\to$ 3). miRNA column identifiers were renamed by stripping the
+\texttt{hsa-} prefix and capitalising \texttt{mir} to \texttt{MIR}
+(\textit{e.g.}, \texttt{hsa-mir-577} $\to$ \texttt{MIR-577}) for readability.
+
+\paragraph{Feature matrix and no-scaling decision.}
+The final feature matrix $\mathbf{X}$ comprises 554 features (539 miRNA $+$ 15 
+clinical) and the target vector $\mathbf{y}$ the integer-encoded subtype. The 
+\texttt{StandardScaler} was applied on the continuous features: all 539 miRNA 
+expression columns and the continuous clinical variables, while the 
+integer-encoded ordinal and binary clinical columns were left unscaled as their 
+values are already bounded and comparable in magnitude. Consistent with the 
+data leakage prevention protocol described in Section~\ref{subsec:split}, the scaler was fitted 
+exclusively on the training fold and subsequently applied without refitting to 
+both the training and test folds.
+
+\paragraph{Train/test split.}
+The dataset was partitioned into an 80/20 stratified split (\texttt{random\_state
+= 42}), yielding 561 training and 141 test samples, with subtype proportions
+preserved across both partitions, as shown in Table~\ref{tab:dataset_summary_expanded_BG}.
+
+\begin{figure}[t]
+    \centering
+    % --- LADO ESQUERDO: TABELA ---
+    \begin{minipage}[c]{0.52\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lr}
+        \toprule
+        \textbf{Property} & \textbf{Value} \\
+        \midrule
+        \multicolumn{2}{l}{\textit{Dimensionality}} \\
+        \quad Total samples                                  & 702 \\
+        \quad miRNA features                                 & 539 \\
+        \quad Clinical features                              & 15 \\
+        \quad Total features                                 & 554 \\
+        \quad Feature-to-sample ratio ($p/n$)                & 0.79 \\
+        \midrule
+        \multicolumn{2}{l}{\textit{Data quality}} \\
+        \quad Missing values                                 & 0 \\
+        \quad miRNAs with variance $> 1.0$                   & 147 \;(27.3\%) \\
+        \midrule
+        \multicolumn{2}{l}{\textit{miRNA expression (log$_2$($x$+1) scale)}} \\
+        \quad Range                                          & $[\;0.00,\; 19.37]$ \\
+        \quad Mean $\pm$ std                                 & $3.11 \pm 3.88$ \\
+        \quad Median                                         & 1.28 \\
+        \midrule
+        \multicolumn{2}{l}{\textit{Clinical continuous features}} \\
+        \quad Age (years)                                    & $58.1 \pm 13.4$ \;\;[26, 90] \\
+        \quad Mutation count                                 & $79.4 \pm 215.9$ \;\;[3, 3879] \\
+        \quad Fraction genome altered                        & $0.31 \pm 0.21$ \;\;[0.00, 1.00] \\
+        \quad TMB non-synonymous                             & $2.76 \pm 7.29$ \;\;[0.10, 130.30] \\
+        \quad Aneuploidy score                               & $12.5 \pm 7.7$ \;\;[0, 34] \\
+        \bottomrule
+        \end{tabular}
+        }
+        \subcaption{Summary statistics of the final dataset.}
+        \label{tab:dataset_summary_expanded_BG}
+    \end{minipage}
+    \hfill
+    % --- LADO DIREITO: GRÁFICO ---
+    \begin{minipage}[c]{0.45\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \begin{tikzpicture}
+            \begin{axis}[
+                ybar,
+                enlargelimits=0.15,
+                legend style={
+                    at={(0.5,-0.35)},
+                    anchor=north,
+                    legend columns=-1,
+                    font=\small
+                },
+                ylabel={Number of Samples},
+                symbolic x coords={Basal, Her2, Luminal A, Luminal B},
+                xtick=data,
+                x tick label style={rotate=45, anchor=east, font=\small},
+                nodes near coords,
+                nodes near coords style={font=\tiny},
+                nodes near coords align={vertical},
+                ]
+ 
+                \addplot[fill=gray!30] coordinates {(Basal,117) (Her2,67) (Luminal A,362) (Luminal B,156)};
+                \addplot[fill=blue!30] coordinates {(Basal,93)  (Her2,54) (Luminal A,289) (Luminal B,125)};
+                \addplot[fill=red!30]  coordinates {(Basal,24)  (Her2,13) (Luminal A,73)  (Luminal B,31)};
+ 
+                \legend{Total, Train, Test}
+            \end{axis}
+        \end{tikzpicture}
+        }
+        \subcaption{Subtype distribution histogram.}
+        \label{fig:subtype_histogram_expanded}
+    \end{minipage}
+ 
+    \vspace{10pt}
+    \caption{Overview of the final modelling dataset for the expanded cohort:
+    (a) detailed summary of clinical and molecular features;
+    (b) distribution of PAM50 subtypes across the full dataset and the
+    stratified train/test partitions.}
+    \label{fig:dataset_overview_expanded}
+\end{figure}
+
+\todo{pode ser retirada esta parte se acharmos que a tese está muito longa}
+\paragraph{Comparison with the pilot cohort pipeline.}
+Table~\ref{tab:pipeline_comparison} summarises the steps applied to each cohort.
+The key omissions in the expanded pipeline are miRNA deduplication (the cBioPortal
+export already provides one entry per unique miRNA) and feature standardisation
+(unnecessary for tree-based models). The key addition is the \texttt{WITH\_CLINICAL}
+flag, which makes the clinical/miRNA-only comparison explicit.
+
+\begin{table}[t]
+\centering
+\caption{Preprocessing steps applied to the pilot cohort (Chapter~3) and the
+expanded cohort. A dash indicates the step was not required.}
+\label{tab:pipeline_comparison}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcc}
+\hline
+\textbf{Step} & \textbf{Pilot cohort} & \textbf{Expanded cohort} \\
+\hline
+miRNA matrix transposition       & \checkmark & ---        \\
+Inner join (miRNA + clinical)    & \checkmark & \checkmark \\
+miRNA deduplication              & \checkmark & ---        \\
+Removal of uninformative columns & \checkmark & \checkmark \\
+Normal-like exclusion            & \checkmark & \checkmark \\
+Listwise deletion                & \checkmark & \checkmark \\
+Categorical encoding             & \checkmark & \checkmark \\
+Subtype integer encoding         & \checkmark & \checkmark \\
+miRNA column renaming            & ---        & \checkmark \\
+With-/without-clinical flag      & ---        & \checkmark \\
+Stratified 80/20 split           & \checkmark & \checkmark \\
+Feature standardisation          & \checkmark & ---        \\
+\hline
+\end{tabular}
+\end{table}
+
+
 
 \section{Applying the Refined Pipeline}
 4.2.1 Re-training the Supervised Models.
