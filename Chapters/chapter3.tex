@@ -37,12 +37,12 @@ Small introduction to the Chapter.
 % ---------------------------------------------------------------
 
 The dataset used in this work originates from \textbf{The Cancer Genome Atlas
-Breast Invasive Carcinoma} (TCGA-BRCA) project, a large-scale, publicly available
+Breast Invasive Carcinoma} (TCGA-BRCA) project \cite{tcga_brca_gdc}, a large-scale, publicly available
 multi-omics repository maintained by the National Cancer Institute. TCGA-BRCA
-represents one of the most comprehensively characterised breast cancer cohorts in
+represents one of the most comprehensively characterized breast cancer cohorts in
 the biomedical literature, providing standardised genomic, transcriptomic, and
 clinical data for a large cohort of patients profiled with uniform experimental
-protocols. Its public availability, scale, and annotation quality make it the
+protocols. Its public availability, scale, and annotation quality makes it the
 canonical benchmark dataset for computational breast cancer subtyping studies,
 and it has been used as the primary data source in the majority of related work
 discussed in Chapter~\ref{chap:background}.
@@ -61,8 +61,7 @@ preprocessing pipeline in Section~\ref{sec:preprocessing}.
 \label{subsec:working_cohort}
 % ---------------------------------------------------------------
 
-The full clinical release and the miRNA expression data contain records for 463 
-patients and 272 patients, respectively. However, not all
+The full clinical release and the miRNA expression data contain records for 463 and 272 patients, respectively. However, not all
 patients in the clinical table have a corresponding miRNA expression profile
 available in the molecular data release, which will drastically decrease our 
 working cohort given that our objective is to find meaningful associations between 
@@ -76,7 +75,7 @@ All 272 samples correspond to primary solid tumour tissue
 
 \todo{Aceito Sugestões para mais dados interessantes que se possam inserir aqui}
 
-\begin{table}[ht]
+\begin{table}[t]
     \centering
     \caption{Detailed Descriptive Statistics of the TCGA Dataset}
     \label{tab:detailed_statistics}
@@ -197,7 +196,7 @@ Table~\ref{tab:clinical_features}, along with their data type, possible values,
 and a brief description of what each variable represents clinically.
 
 % --- Clinical features table ---
-\begin{table}[h!]
+\begin{table}[p]
 \centering
 \caption{Clinical features retained for modelling, with data type, possible
 values, and clinical meaning.}
@@ -327,7 +326,7 @@ oncogenic programmes. The integrative cluster assignments
 are derived from TCGA's own multi-omics analyses and encode cross-modal
 molecular patterns that may complement the raw miRNA expression signal.
 
-A descriptive overview of selected clinical characteristics within the working
+\paragraph{Data Descriptive Statistics} A descriptive overview of selected clinical characteristics within the working
 cohort is as follows. Patient ages range from 26 to 90 years, with a mean of
 $59.3 \pm 13.3$ years (median = 60), consistent with the known epidemiology of
 breast cancer as predominantly a post-menopausal disease. Oestrogen receptor
@@ -466,8 +465,8 @@ last follow-up, with 30 recorded deaths.
 
 Several clinical features contain missing values that require attention during
 preprocessing. The integrative cluster columns
-(\texttt{INTEGRATED\_CLUSTERS\_NO\_EXP},
-\texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP},
+(\texttt{INTEGRATED\_CLUSTERS\_NO\_EXP},\allowbreak
+\texttt{INTEGRATED\_CLUSTERS\_UNSUP\_EXP},\allowbreak
 \texttt{INTEGRATED\_CLUSTERS\_WITH\_PAM50}) and \texttt{RPPA\_CLUSTER} are
 missing for a large fraction of patients (approximately 76 and 73 records
 respectively) and were therefore excluded from the modelling feature set prior
@@ -543,19 +542,18 @@ This observation directly motivates one of the first and most consequential
 preprocessing decisions in the pipeline: the identification and removal of
 duplicate expression profiles, described in detail in
 Section~\ref{sec:preprocessing}. As reported in our published study
-\cite{ourpaper}, this deduplication step reduces the miRNA feature count from
-888 to 464, eliminating 446 non-informative redundant features while retaining
+\ref{ann:EPIA_paper}, this deduplication step reduces the miRNA feature count from
+888 to 442, eliminating 446 non-informative redundant features while retaining
 the full unique expression signal. The resulting feature matrix is both more
 compact and more interpretable, with each remaining miRNA representing a
 genuinely distinct molecular measurement.
 
-Now that we have characterised the data sources and the working cohort, 
+Now that we have characterized the data sources and the working cohort, 
 we can proceed to the pre-processing pipeline that transforms the raw data 
 into a clean, numerical feature matrix suitable for machine learning. The next 
 section describes this pipeline in detail, including the handling of missing 
 values, feature selection decisions, and the critical steps taken to avoid 
 data leakage between training and test partitions.
-
 
 % ================================================================
 \section{Data Pre-processing Pipeline}
@@ -582,7 +580,7 @@ in the subsections below.
 % (7) Stratified 80/20 split → Train (195) / Test (49) |
 % (8) StandardScaler fitted on Train only → applied to both.
 % Arrows should emphasise that step 8 happens AFTER the split.]
-\begin{figure}[ht]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.70\textwidth]{diagrama_pre_processamento.drawio.png}
     \caption{Schematic overview of the data pre-processing pipeline. The raw miRNA
@@ -646,7 +644,7 @@ same measured abundance to all of them.
 % very concrete for the reader without requiring them to inspect the raw data
 % themselves.]
 
-\begin{table}[H]
+\begin{table}[t]
         \centering
         \caption{Example of miRNA identifier variants sharing identical expression values
                 across patients. Each row corresponds to a distinct annotation of the same
@@ -701,7 +699,7 @@ fell into four categories:
     \item task-irrelevant derived features (\texttt{SIGCLUST\_INTRINSIC\_MRNA}, a cluster assignment derived from mRNA rather than miRNA data, and \texttt{SURVIVAL\_DATA\_FORM}, a near-zero-variance administrative field).
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
 \caption{Clinical columns removed during pre-processing, with the
 rationale for each exclusion.}
@@ -805,38 +803,46 @@ transformation: \texttt{CN\_CLUSTER}, \texttt{FRACTION\_GENOME\_ALTERED},
 
 Two fundamentally different types of categorical variables appear in this
 dataset, and they call for different encoding strategies:
-
-\textbf{Ordinal variables} carry a natural rank ordering among their
-categories: the categories are not merely distinct names but lie on a
-meaningful scale. For these variables, integer codes were assigned to
-\textit{preserve the natural clinical ordering}, so that the numerical
-distance between codes reflects the conceptual distance between categories.
-For example, \texttt{NODES} (lymph node involvement) follows the TNM
-classification N0 $<$ N1 $<$ N2 $<$ N3 in order of increasing severity, and
-was encoded accordingly as $\{0, 1, 2, 3\}$. Similarly, \texttt{TUMOR\_STAGE}
-was encoded as T1$\to$1, T2$\to$2, T3$\to$3, T4$\to$4 to preserve the
-size-based ordering.
-
-\textbf{Nominal variables} have categories that are qualitatively distinct but
-carry no inherent ordering. For binary nominal variables (such as
-\texttt{METASTASIS\_CODED} (Negative/Positive), \texttt{NODE\_CODED},
-\texttt{METASTASIS} (M0/M1), and \texttt{OS\_STATUS} (0:LIVING/1:DECEASED))
-standard 0/1 integer encoding was applied, since with only two categories
-the choice of which value maps to 0 or 1 is arbitrary and carries no
-structural implication. For multi-valued nominal variables with no meaningful
-ordering, a judgment call was required. \texttt{ER\_STATUS} and
-\texttt{PR\_STATUS}, for instance, each take four values
-(Negative, Positive, Performed but Not Available, Indeterminate), and
-\texttt{HER2\_STATUS} takes three (Negative, Equivocal, Positive). These were
-encoded with manual integer mappings. It should be noted that for
-\texttt{HER2\_STATUS}, there is a partial clinical ordering
-(Negative $<$ Equivocal $<$ Positive), and the encoding 0/1/2 was chosen to
-reflect this.
+\begin{itemize}
+    \item \textbf{Ordinal variables} carry a natural rank ordering among their
+        categories: the categories are not merely distinct names but lie on a
+        meaningful scale. For these variables, integer codes were assigned to
+        \textit{preserve the natural clinical ordering}, so that the numerical
+        distance between codes reflects the conceptual distance between categories.
+        For example, \texttt{NODES} (lymph node involvement) follows the TNM
+        classification N0 $<$ N1 $<$ N2 $<$ N3 in order of increasing severity, and
+        was encoded accordingly as $\{0, 1, 2, 3\}$. Similarly, \texttt{TUMOR\_STAGE}
+        was encoded as T1$\to$1, T2$\to$2, T3$\to$3, T4$\to$4 to preserve the
+        size-based ordering.
+    \item \textbf{Nominal variables} have categories that are qualitatively distinct but
+        carry no inherent ordering. For binary nominal variables (such as
+        \texttt{METASTASIS\_CODED} (Negative/Positive), \texttt{NODE\_CODED},
+        \texttt{METASTASIS} (M0/M1), and \texttt{OS\_STATUS} (0:LIVING/1:DECEASED))
+        standard 0/1 integer encoding was applied, since with only two categories
+        the choice of which value maps to 0 or 1 is arbitrary and carries no
+        structural implication. For multi-valued nominal variables with no meaningful
+        ordering, a judgment call was required. \texttt{ER\_STATUS} and
+        \texttt{PR\_STATUS}, for instance, each take four values
+        (Negative, Positive, Performed but Not Available, Indeterminate), and
+        \texttt{HER2\_STATUS} takes three (Negative, Equivocal, Positive). These were
+        encoded with manual integer mappings. It should be noted that for
+        \texttt{HER2\_STATUS}, there is a partial clinical ordering
+        (Negative $<$ Equivocal $<$ Positive), and the encoding 0/1/2 was chosen to
+        reflect this.
+\end{itemize}
 
 The complete encoding scheme for all 11 categorical features is listed in
-Table~\ref{tab:encoding_scheme}.
+Table~\ref{tab:encoding_scheme}. We can see that the target variable \texttt{PAM50\_SUBTYPE} was 
+encoded at this stage with the following mapping:
+Basal-like$\to$0, HER2-enriched$\to$1, Luminal~A$\to$2, Luminal~B$\to$3.
+Normal-like samples received no mapping and were thus excluded from the
+supervised modelling cohort, as noted in Section~\ref{subsec:missing_values}.
+Upon completion of the encoding step, the dataset had the shape of \textbf{244
+samples} described by \textbf{462 features} distributed in 20 clinical variables 
+and 442
+miRNA expression values - all represented as real numbers now.
 
-\begin{table}[h!]
+\begin{table}[t]
 \centering
 \caption{Encoding scheme for the 11 categorical clinical features. Ordinal
 features are highlighted; the ordering of the integer codes reflects the
@@ -889,14 +895,6 @@ natural clinical ranking.}
 \end{tabular}
 \end{table}
 
-The target variable \texttt{PAM50\_SUBTYPE} was also encoded at this stage:
-Basal-like$\to$0, HER2-enriched$\to$1, Luminal~A$\to$2, Luminal~B$\to$3.
-Normal-like samples received no mapping and were thus excluded from the
-supervised modelling cohort, as noted in Section~\ref{subsec:missing_values}.
-Upon completion of the encoding step, the dataset had the shape of \textbf{244
-samples} described by \textbf{462 features} distributed in 20 clinical variables 
-and 442
-miRNA expression values - all represented as real numbers now.
 
 % ---------------------------------------------------------------
 \subsection{Train/Test Split and Prevention of Data Leakage}
@@ -922,7 +920,7 @@ imbalance documented in Section~\ref{subsec:working_cohort}. The resulting class
 distributions, which demonstrate the consistency of this split, are shown in 
 Figure~\ref{fig:subtype_histogram_sub}.
 
-\begin{figure}[!ht]
+\begin{figure}[t]
     \centering
     % --- LADO ESQUERDO: TABELA ---
     \begin{minipage}[c]{0.52\textwidth}
@@ -1055,17 +1053,8 @@ standardisation, algorithms sensitive to feature magnitude, such as
 distance-based methods and gradient-based optimisers, would disproportionately
 weight high-magnitude features irrespective of their actual predictive value.
 
-\todo{Rever depois isto tendo em conta a descrição que vai ser feita na parte de supervised learning (sobre cross validation)}
-This protocol was applied consistently at every cross-validation fold used in
-the experiments described in Chapter~\ref{chap:supervised}. At each fold, a
-fresh scaler was fitted on the training partition of that fold and applied to
-both partitions, ensuring that no information from any held-out partition ever
-influenced the feature statistics used during training. This discipline is the
-procedural guarantee that all reported performance metrics are reliable,
-unbiased estimates of out-of-sample generalisation.
-
 % ================================================================
-\section{Supervised Learning Framework}
+\section{Discriminative Subtyping}
 \label{sec:supervised}
 % ================================================================
 
@@ -1499,7 +1488,7 @@ unbiased estimates of out-of-sample generalisation.
 % \subsubsection*{Separability Analysis}
 
 % A critical observation that links the classification results to the feature importance
-% findings is the pronounced asymmetry in how well each subtype is characterised by its
+% findings is the pronounced asymmetry in how well each subtype is characterized by its
 % top features. Table~\ref{tab:feature_importances} reveals that the top 20 features
 % account for approximately 98.7\% of total gain for Basal-like, but only 58.4\% for
 % Luminal~A and 51.4\% for Luminal~B. This concentration of gain in a small number of
@@ -1585,12 +1574,8 @@ unbiased estimates of out-of-sample generalisation.
 %         using Machine Learning
 % ============================================================
 
-\section{Unsupervised Approach}
+\section{Group-Based Subtyping}
 \label{sec:unsupervised}
-
-% ----------------------------------------------------------
-\subsection{Motivation and Framing}
-\label{sec:unsupervised:motivation}
 
 The previous section addressed the problem of breast cancer subtype classification through
 a supervised learning lens: labelled samples were used to train models that learn an explicit
@@ -1599,7 +1584,7 @@ for clinical classification tasks, it rests on a fundamental assumption that the
 reliable, complete, and the only relevant structure in the data.
 
 This section sets those labels aside, thus transforming the core question we ask:
-\textit{does the miRNA expression data itself, without any guidance from clinical annotations,
+\textbf{does the miRNA expression data itself, without any guidance from clinical annotations,
 organise into groups that reflect the known biological subtypes?} If such structure exists, it
 suggests that the subtype-discriminating signal is intrinsic to the transcriptomic landscape and
 not merely an artefact of how patients were clinically classified. Moreover, for any cluster
@@ -1607,43 +1592,43 @@ that aligns strongly with a known subtype, we can identify which miRNAs drive th
 and complement the analysis of the supervised models.
 
 % ----------------------------------------------------------
-\subsection{Background: Unsupervised Learning and K-Means}
-\label{sec:unsupervised:background}
+% \subsection{Background: Unsupervised Learning and K-Means}
+% \label{sec:unsupervised:background}
 
-Unsupervised learning refers to a family of methods that operate on unlabelled data, seeking
-to discover latent structure without explicit supervision \cite{hastie2009elements}. The
-prototypical task is \textit{clustering}: partitioning a dataset into groups such that samples
-within a group are more similar to each other than to samples in other groups. Unlike supervised
-classification, there is no ground truth to optimise against during training; evaluation relies
-either on internal geometric measures or on post-hoc comparison with external labels when
-available.
+% Unsupervised learning refers to a family of methods that operate on unlabelled data, seeking
+% to discover latent structure without explicit supervision \cite{hastie2009elements}. The
+% prototypical task is \textit{clustering}: partitioning a dataset into groups such that samples
+% within a group are more similar to each other than to samples in other groups. Unlike supervised
+% classification, there is no ground truth to optimise against during training; evaluation relies
+% either on internal geometric measures or on post-hoc comparison with external labels when
+% available.
 
-K-Means is among the oldest and most widely used clustering algorithms. Originally
-introduced by \citeauthor{macqueen1967some} \cite{macqueen1967some}, it partitions $n$ samples
-into $K$ clusters by iteratively minimising the within-cluster sum of squared Euclidean
-distances (inertia):
+% K-Means is among the most widely used clustering algorithms. Originally
+% introduced by \citeauthor{macqueen1967some} \cite{macqueen1967some}, it partitions $n$ samples
+% into $K$ clusters by iteratively minimising the within-cluster sum of squared Euclidean
+% distances (inertia):
 
-\begin{equation}
-    \mathcal{L} = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k}
-    \left\| \mathbf{x}_i - \boldsymbol{\mu}_k \right\|^2
-    \label{eq:kmeans_objective}
-\end{equation}
+% \begin{equation}
+%     \mathcal{L} = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k}
+%     \left\| \mathbf{x}_i - \boldsymbol{\mu}_k \right\|^2
+%     \label{eq:kmeans_objective}
+% \end{equation}
 
-\noindent where $C_k$ denotes the set of samples assigned to cluster $k$ and
-$\boldsymbol{\mu}_k$ is the centroid of that cluster. The algorithm alternates between two
-steps: \\
+% \noindent where $C_k$ denotes the set of samples assigned to cluster $k$ and
+% $\boldsymbol{\mu}_k$ is the centroid of that cluster. The algorithm alternates between two
+% steps: \\
 
-\begin{enumerate}
-    \item assigning each sample to its nearest centroid;
-    \item recomputing each centroid as the mean of its assigned samples
-\end{enumerate}
+% \begin{enumerate}
+%     \item assigning each sample to its nearest centroid;
+%     \item recomputing each centroid as the mean of its assigned samples
+% \end{enumerate}
 
-Unsupervised learning methods have been applied to genomic and transcriptomic cancer data since
-the early studies of molecular classification. Notably, hierarchical clustering on gene
-expression microarray data was used to identify intrinsic breast cancer subtypes in the landmark
-work of \citeauthor{perou2000molecular} \cite{perou2000molecular}, demonstrating that
-transcriptomic profiles alone, without clinical labels, can recover biologically meaningful
-tumour classes.
+% Unsupervised learning methods have been applied to genomic and transcriptomic cancer data since
+% the early studies of molecular classification. Notably, hierarchical clustering on gene
+% expression microarray data was used to identify intrinsic breast cancer subtypes in the landmark
+% work of \citeauthor{perou2000molecular} \cite{perou2000molecular}, demonstrating that
+% transcriptomic profiles alone, without clinical labels, can recover biologically meaningful
+% tumour classes.
 
 % ----------------------------------------------------------
 \subsection{Why This Approach Is Non-Conventional}
@@ -1697,7 +1682,7 @@ feature to zero mean and unit variance prior to clustering.
 No correlation-based redundancy removal was applied. Although correlated features may inflate
 the weight of certain directions in Euclidean space, removing
 them based on pairwise correlation would risk discarding biologically relevant miRNAs which, 
-in our case, we cannot afford that. This would mean that a miRNA identified as a discriminative 
+in our case, we cannot afford. This would mean that a miRNA identified as a discriminative 
 feature in the supervised analysis could be
 silently removed as a correlated redundant, breaking the cross-comparison between the two
 approaches. Retaining the full feature space ensures that the post-hoc feature importance
@@ -1705,7 +1690,7 @@ analysis (Section~\ref{sec_unsupervised_importance}) operates on the same miRNA 
 the supervised section, enabling a direct comparison of which miRNAs are flagged by each
 paradigm. The presence of correlated features is acknowledged as a methodological constraint.
 
-\subsubsection{Choice of K}
+\subsubsection{Number of clusters}
 
 The number of clusters $K$ was set to 4, corresponding to the four known PAM50 breast cancer
 subtypes (Basal-Like, HER2-Enriched, Luminal A, and Luminal B) - after all, we are interested in 
@@ -1719,7 +1704,7 @@ Consequently, neither curve provides
 unambiguous data-driven support for $K = 4$, reinforcing that the choice must be grounded in
 domain knowledge.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth]{miRNA_only_k_selection.png}
     \caption{Elbow method (inertia vs.\ $K$, left) and mean silhouette score vs.\ $K$ (right)
@@ -1739,14 +1724,24 @@ methods would be scientifically interesting in itself (suggesting Luminal A and 
 indistinguishable from miRNA expression) but would not serve the cross-comparison objective
 of this section.
 
-\subsubsection{Model Training}
+\subsubsection{Model Fitting}
+K-Means was fitted using the K-Means++ initialisation strategy, which selects initial
+centroids with probability proportional to their squared distance from already-chosen
+centroids. Compared to purely random initialisation, this approach reduces the risk of
+converging to poor local minima and generally accelerates convergence, making it
+particularly advantageous in high-dimensional spaces where the inertia landscape contains
+numerous local optima.
 
-K-Means was trained with $n\_init = 10$ random restarts and a fixed random seed
-(\texttt{random\_state} $= 42$) to ensure reproducibility. The best solution across all
-restarts (lowest inertia) was retained. The per-sample silhouette plot for the final model
-is shown in Figure~\ref{fig:kmeans_silhouette}.
+To further mitigate sensitivity to initialisation, $n\_init = 10$ independent random
+restarts were performed, each starting from a different K-Means++ initialised set of
+centroids. The solution yielding the lowest inertia across all restarts was retained as
+the final model. Convergence within each restart was determined by scikit-learn's default
+stopping criteria: a centroid shift tolerance of $10^{-4}$ between successive iterations,
+with a maximum of 300 iterations permitted if the tolerance threshold is not reached.
+A fixed random seed (\texttt{random\_state} $= 42$) was set throughout to ensure full
+reproducibility of both the initialisation and the restart sequence.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
         \includegraphics[width=0.85\textwidth]{miRNA_only_silhouette_plot.png}
     \caption{Per-sample silhouette plot for $K = 4$ on the miRNA-only condition.
@@ -1757,77 +1752,23 @@ is shown in Figure~\ref{fig:kmeans_silhouette}.
 \end{figure}
 
 % ----------------------------------------------------------
-\subsection{Evaluation Metrics}
-\label{sec:unsupervised:metrics}
 
-Four complementary metrics were computed to evaluate the quality of the clustering solution.
-The first is \textit{internal} (does not use labels); the remaining three are \textit{external}
-(compare cluster assignments against the ground-truth PAM50 labels post-hoc).
-
-\paragraph{Silhouette Score.}
-The silhouette coefficient \cite{rousseeuw1987silhouettes} for a sample $i$ is defined as:
-
-\begin{equation}
-    s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
-    \label{eq:silhouette}
-\end{equation}
-
-\noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other samples
-in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest neighbouring cluster.
-Values close to $+1$ indicate that the sample is well matched to its own cluster and poorly
-matched to neighbouring clusters; values near $0$ indicate overlap; negative values indicate
-potential misassignment. The overall silhouette score is the mean over all samples.
-
-\paragraph{Purity.}
-Cluster purity measures, for each cluster, the proportion of samples belonging to the most
-frequent true class within that cluster. The overall purity is the weighted average across
-clusters:
-
-\begin{equation}
-    \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
-    \label{eq:purity}
-\end{equation}
-
-\noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total number of
-samples. Purity ranges from 0 to 1, with higher values indicating better alignment between
-clusters and true classes.
-
-\paragraph{Adjusted Rand Index (ARI).}
-The Rand Index counts the fraction of sample pairs for which the clustering and the
-ground-truth labelling agree (both in the same group or both in different groups). The
-\textit{Adjusted} Rand Index \cite{hubert1985comparing} corrects for chance agreement:
-
-\begin{equation}
-    \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) - \mathbb{E}[\text{RI}]}
-    \label{eq:ari}
-\end{equation}
-
-\noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better than
-random; negative values are possible and indicate systematic disagreement.
-
-\paragraph{Adjusted Mutual Information (AMI).}
-AMI \cite{vinh2010information} measures the information shared between the cluster assignments
-and the true labels, normalised and adjusted for chance:
-
-\begin{equation}
-    \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) - \mathbb{E}[I(U;V)]}
-    \label{eq:ami}
-\end{equation}
-
-\noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the true
-labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
-AMI $= 0$ is random.
-
-% ----------------------------------------------------------
-\subsection{Results}
+\subsection{Clustering Analysis and Evaluation}
 \label{sec:unsupervised:results}
+ 
+\subsubsection{Cluster Quality Metrics}
 
-\subsubsection{Overall Performance}
+The K-Means algorithm was evaluated under two experimental conditions - miRNA expression
+features alone (442 features) and miRNA expression combined with clinical covariates (462
+features) - both fitted on the small cohort of $n = 244$ samples with $K = 4$ clusters, in
+correspondence with the four PAM50 breast cancer subtypes. The central question that 
+we aim to answer is whether
+the unsupervised algorithm, operating without any label information, is capable 
+group patient samples with the same biological subtype, and whether the
+addition of clinical data strengthens or weakens that correspondence.
+Table~\ref{tab:kmeans_summary} summarises the four evaluation metrics across both conditions.
 
-Table~\ref{tab:kmeans_summary} reports the four evaluation metrics for both experimental
-conditions - with miRNA only and with miRNA \textit{plus} clinical features. 
-
-\begin{table}[h]
+\begin{table}[t]
 \centering
 \caption{K-Means performance summary for $K = 4$ on the small cohort ($n = 244$).}
 \label{tab:kmeans_summary}
@@ -1861,7 +1802,7 @@ metrics. This suggests that the addition of clinical features does not improve, 
 degrade the cluster structure relative to miRNA data alone, supporting the hypothesis that
 miRNA expression is the primary source of subtype-discriminating signal in this cohort.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.75\textwidth]{miRNA_only_purity_heatmap.png}
     \caption{Cluster $\times$ Subtype purity heatmap for the miRNA-only condition.
@@ -1871,10 +1812,17 @@ miRNA expression is the primary source of subtype-discriminating signal in this 
 
 \subsubsection{Cluster Composition}
 
+While the aggregate metrics in Table~\ref{tab:kmeans_summary} provide a global picture of
+clustering quality, they do not reveal which subtypes were correctly isolated and which were
+conflated. Inspecting the internal composition of each cluster is therefore essential: it
+allows us to identify which PAM50 subtypes produce a geometrically coherent signal in miRNA
+expression space, which are fragmented across multiple clusters, and which are systematically
+confused with one another. These per-cluster observations directly complement the supervised
+analysis, where subtype-level classification performance varied considerably across classes.
 Table~\ref{tab:kmeans_cluster_composition} and Figure~\ref{fig:kmeans_pie_charts} detail
 the subtype composition of each cluster under the miRNA-only condition.
 
-\begin{table}[htbp]
+\begin{table}[t]
 \centering
 \caption{Subtype composition of each cluster (miRNA-only condition, $n = 244$).
 The dominant subtype and its proportion within the cluster are highlighted in bold.}
@@ -1968,16 +1916,36 @@ feature lists.
 % ----------------------------------------------------------
 \subsubsection{Quantitative Metrics}
 
+Having defined the experimental conditions and fitted the model, the first question to answer
+is whether K-Means, operating without any label information, produces a partition that
+corresponds to the known PAM50 subtype structure. To assess this, four complementary metrics
+are reported: Silhouette score, which measures the internal geometric quality of the clusters
+independently of any labels; and Purity, ARI, and AMI, which are external metrics that
+quantify the degree of alignment between the discovered partition and the ground-truth subtype
+assignments. Together, these metrics allow us to evaluate not only how well-defined the
+clusters are in miRNA expression space, but also how much biologically meaningful structure
+the algorithm was able to recover without supervision. A secondary question addressed here is
+whether the addition of clinical covariates to the miRNA features strengthens or weakens that
+alignment, which has direct implications for understanding where the subtype-discriminating
+signal in this cohort resides.
+
 Table~\ref{tab:kmeans_summary} shows that the miRNA-only condition outperforms miRNA + clinical
 across all four evaluation metrics. The differences are modest in absolute terms but consistent
 in direction:
 
-\begin{itemize}
-    \item \textbf{Silhouette:} $0.069$ vs.\ $0.068$ \quad ($\Delta = -0.001$, $-1.4\%$)
-    \item \textbf{Purity:} $0.611$ vs.\ $0.598$ \quad ($\Delta = -0.013$, $-2.1\%$)
-    \item \textbf{ARI:} $0.203$ vs.\ $0.192$ \quad ($\Delta = -0.011$, $-5.4\%$)
-    \item \textbf{AMI:} $0.258$ vs.\ $0.222$ \quad ($\Delta = -0.036$, $-14.0\%$)
-\end{itemize}
+\begin{table}[t]
+    \centering
+    \caption{Comparison of clustering performance between miRNA-only and miRNA + Clinical features.}
+    \label{tab:kmeans_summary}
+    \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Metric} & \textbf{miRNA Only} & \textbf{miRNA + Clin.} & \textbf{$\Delta$} & \textbf{\% Change} \\ \midrule
+    Silhouette      & 0.069               & 0.068                  & $-0.001$          & $-1.4\%$           \\
+    Purity          & 0.611               & 0.598                  & $-0.013$          & $-2.1\%$           \\
+    ARI             & 0.203               & 0.192                  & $-0.011$          & $-5.4\%$           \\
+    AMI             & 0.258               & 0.222                  & $-0.036$          & $-14.0\%$          \\ \bottomrule
+    \end{tabular}
+\end{table}
 
 The AMI drop is the largest in relative terms ($\approx 14\%$), indicating that the information
 shared between the discovered partition and the ground-truth labels decreases noticeably when
@@ -1995,10 +1963,15 @@ alone.
 % ----------------------------------------------------------
 \subsubsection{Cluster Composition and Subtype Alignment}
 
-Table~\ref{tab:kmeans_both_composition} presents the cluster compositions for both conditions
-side by side, annotated with their dominant subtype.
+The aggregate metrics in Table~\ref{tab:kmeans_summary} indicate that both conditions recover
+a broadly similar partition, but they do not reveal which subtypes drive that alignment and
+which are systematically confused. Inspecting the internal composition of each cluster answers
+that question, and allows us to determine whether the marginal performance drop observed when
+clinical features are added is distributed uniformly across subtypes or concentrated in
+specific classes. Table~\ref{tab:kmeans_both_composition} presents the cluster compositions
+for both conditions side by side, annotated with their dominant subtype.
 
-\begin{table}[htbp]
+\begin{table}[t]
 \centering
 \caption{Cluster composition for both experimental conditions ($K = 4$, $n = 244$).
 Each cell reports the raw count of samples of that subtype in that cluster.
@@ -2071,7 +2044,7 @@ we computed the complete $4 \times 4$ pairwise overlap matrix between the top-20
 of every cluster pair across the two conditions.
 Table~\ref{tab:kmeans_overlap_matrix} presents the full matrix.
 
-\begin{table}[htbp]
+\begin{table}[t]
 \centering
 \caption{Top-20 feature overlap between every pair of clusters across conditions.
 Each cell reports the number of features shared between the top-20 list of the miRNA-only
@@ -2083,10 +2056,10 @@ is given in parentheses.}
  & \textbf{clin-C0} & \textbf{clin-C1} & \textbf{clin-C2} & \textbf{clin-C3} \\
  & \small{Lum.\ A (69.4\%)} & \small{Lum.\ B (41.5\%)} & \small{Lum.\ A (64.2\%)} & \small{Basal (68.0\%)} \\
 \hline
-\textbf{miRNA-C0} \small{Lum.\ A (66.2\%)}   &  0 &  0 &  8 &  9 \\
-\textbf{miRNA-C1} \small{Basal (72.3\%)}      &  9 & 16 &  0 &  0 \\
-\textbf{miRNA-C2} \small{Lum.\ A (63.6\%)}   & \textbf{17} &  8 &  0 &  0 \\
-\textbf{miRNA-C3} \small{Lum.\ B (41.3\%)}   &  0 &  0 & \textbf{16} &  0 \\
+\makecell[l]{\textbf{miRNA-C0} \\ \small{Lum.\ A (66.2\%)}}  &  0 &  0 &  8 &  9 \\
+\makecell[l]{\textbf{miRNA-C1} \\ \small{Basal (72.3\%)}}    &  9 & 16 &  0 &  0 \\
+\makecell[l]{\textbf{miRNA-C2} \\ \small{Lum.\ A (63.6\%)}}  & \textbf{17} &  8 &  0 &  0 \\
+\makecell[l]{\textbf{miRNA-C3} \\ \small{Lum.\ B (41.3\%)}}  &  0 &  0 & \textbf{16} &  0 \\
 \hline
 \end{tabular}
 \end{table}
@@ -2097,7 +2070,7 @@ Three findings stand out.
 The single highest overlap in the entire matrix is miRNA-C2 vs.\ clin-C0 (17/20), both
 dominated by Luminal A. This pair shares a consistent set of miRNAs including MIR-18A/18A*,
 MIR-17/17*, MIR-505/505, MIR-505/3P, MIR-577/577, MIR-19A/19A, and MIR-19B-1/19B - several
-of which belong to the miR-17-92 polycistronic cluster, a well-characterised oncogenic miRNA
+of which belong to the miR-17-92 polycistronic cluster, a well-characterized oncogenic miRNA
 family \cite{olive2010mir17}. This is the only cluster pair across the two conditions that is
 both biologically consistent (same dominant subtype) and feature-stable (17/20 shared). It
 suggests that the miR-17-92-driven Luminal A signal is the most robust structure in this
@@ -2109,7 +2082,7 @@ The most striking result is that the two Basal-Like clusters (miRNA-C1 (72.3\% p
 clin-C3 (68.0\% purity)) share \textbf{zero features} in their respective top-20 lists
 (overlap $= 0$, Table~\ref{tab:kmeans_overlap_matrix}). Despite recovering the same 34
 Basal-Like samples, the centroid of each cluster points in a completely different direction in
-feature space. In the miRNA-only condition, the Basal cluster is characterised by
+feature space. In the miRNA-only condition, the Basal cluster is characterized by
 MIR-197/197, MIR-324/5P, MIR-186/186*, MIR-146B/5P, and MIR-339/5P. In the
 miRNA + clinical condition, the top features of the Basal cluster are MIR-199B/5P,
 MIR-199A-2/5P, MIR-199A-1/5P, MIR-199-S/5P, and MIR-145/145, which is a completely different
@@ -2136,27 +2109,6 @@ miRNA + clinical both quantitatively and interpretively. The former produces bet
 metrics, a cleaner Basal-Like cluster, and feature signatures that are more biologically
 meaningful. The analysis in Section~\ref{sec_unsupervised_importance} therefore focuses
 exclusively on the miRNA-only condition.
-
-\subsubsection{Method}
-
-For each cluster, the most discriminative features were identified using the standardised
-centroid z-score method. After fitting K-Means on the standardised feature matrix
-$\tilde{X} \in \mathbb{R}^{n \times p}$, the centroid of cluster $k$ is denoted
-$\boldsymbol{\mu}_k \in \mathbb{R}^p$. The global mean and standard deviation of each feature
-$j$ over the full dataset are $\bar{x}_j$ and $\sigma_j$, respectively. The importance of
-feature $j$ for cluster $k$ is defined as:
-
-\begin{equation}
-    z_{k,j} = \frac{\mu_{k,j} - \bar{x}_j}{\sigma_j + \epsilon}
-    \label{eq:centroid_zscore}
-\end{equation}
-
-\noindent where $\epsilon$ is a small constant for numerical stability. Features are ranked
-within each cluster by $|z_{k,j}|$: a high absolute z-score indicates that the cluster's
-centroid deviates strongly from the global average for that feature, marking it as
-characteristic of that cluster's miRNA expression profile. This method is the canonical
-interpretation of K-Means centroids, as the centroid is the mathematical definition of the
-cluster \cite{hastie2009elements}.
 
 \subsubsection{Top Features per Cluster}
 \label{sec_unsupervised_importance}
@@ -2202,23 +2154,44 @@ cluster \cite{hastie2009elements}.
     \label{fig:kmeans_top_features}
 \end{figure}
 
-Table~\ref{tab:kmeans_top5} summarises the five most important features for each cluster.
+Knowing that each cluster aligns to a dominant PAM50 subtype is only part of the story.
+Now, looking back to our hypothesis, we can connect this approach by asking which 
+miRNAs define each cluster's centroid, or, which
+features deviate most strongly from the global dataset average within each group. These are
+the miRNAs that the unsupervised algorithm implicitly used to separate the data, and
+identifying them serves two purposes: it provides a biologically interpretable signature for
+each cluster, and it allows a direct cross-comparison with the discriminative features
+identified in the supervised section, revealing whether both paradigms converge on the same
+miRNAs or highlight complementary aspects of subtype biology.
+
+To rank features, each miRNA is scored by how much its average expression within a cluster
+deviates from its global average across the entire dataset, measured in units of standard
+deviation. A miRNA that is consistently overexpressed or underexpressed in a given cluster
+relative to the rest of the cohort receives a high absolute score, marking it as
+characteristic of that cluster. This is the canonical way to interpret K-Means centroids,
+since the centroid is simply the average expression profile of the cluster
+\cite{hastie2009elements}.
+
+Table~\ref{tab:top5_mirna} summarises the five most important features for each cluster.
 Full rankings for all 442 features are available in the supplementary material.
 
-\begin{table}[htbp]
+\begin{table}[t]
 \centering
-\caption{Top 5 miRNA features per cluster by absolute centroid z-score (miRNA-only condition).
-The dominant PAM50 subtype of each cluster is indicated in parentheses.}
-\label{tab:kmeans_top5}
-\begin{tabular}{llll}
+\caption{Top 5 miRNA features per cluster by absolute centroid z-score (miRNA-only
+condition). The dominant PAM50 subtype of each cluster is indicated in parentheses.}
+\label{tab:top5_mirna}
+\begin{tabular}{cccc}
 \hline
-\textbf{Cluster 0 (Lum.\ A, 65\%)} & \textbf{Cluster 1 (Lum.\ A, 68\%)} & \textbf{Cluster 2 (Basal, 71\%)} & \textbf{Cluster 3 (Lum.\ B, 41\%)} \\
+\makecell{\textbf{Cluster 0} \\ \small{Lum.\ A (65\%)}} &
+\makecell{\textbf{Cluster 1} \\ \small{Lum.\ A (68\%)}} &
+\makecell{\textbf{Cluster 2} \\ \small{Basal (71\%)}} &
+\makecell{\textbf{Cluster 3} \\ \small{Lum.\ B (41\%)}} \\
 \hline
-MIR-151/3P    & MIR-197/197   & MIR-18A/18A*  & MIR-3677/3P  \\
-MIR-151A/3P   & MIR-324/5P    & MIR-577/577   & MIR-142/5P   \\
-MIR-199B/5P   & MIR-186/186*  & MIR-505/505   & MIR-33B/33B* \\
-MIR-199A-1/5P & MIR-146B/5P   & MIR-505/3P    & MIR-3607/3P  \\
-MIR-199A-2/5P & MIR-339/5P    & MIR-17/17*    & MIR-326/326  \\
+MIR-151/3P    & MIR-197/197  & MIR-18A/18A* & MIR-3677/3P  \\
+MIR-151A/3P   & MIR-324/5P   & MIR-577/577  & MIR-142/5P   \\
+MIR-199B/5P   & MIR-186/186* & MIR-505/505  & MIR-33B/33B* \\
+MIR-199A-1/5P & MIR-146B/5P  & MIR-505/3P   & MIR-3607/3P  \\
+MIR-199A-2/5P & MIR-339/5P   & MIR-17/17*   & MIR-326/326  \\
 \hline
 \end{tabular}
 \end{table}
@@ -2229,7 +2202,7 @@ all clusters). Cluster 1 (Luminal A, 68.3\%) also shows notably high z-scores wi
 MIR-197/197 at $1.09$, suggesting a strong and distinct centroid for this subgroup.
 Peculiarly, the two Luminal A clusters (0 and 1) share \textbf{zero features} in their
 respective top-20 rankings: Cluster 0 is dominated by MIR-151 and MIR-199 family members,
-while Cluster 1 is characterised by MIR-197, MIR-24 and MIR-500 family members. 
+while Cluster 1 is composed by MIR-197, MIR-24 and MIR-500 family members. 
 This complete divergence in feature signatures reinforces the interpretation that
 the two Luminal A clusters represent genuinely distinct biological subgroups rather than an
 arbitrary split of the same population. Cluster 3, dominated by Luminal B but substantially

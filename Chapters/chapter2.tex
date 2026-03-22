@@ -7,6 +7,7 @@
 \typeout{NT FILE chapter2.tex}%
 
 \chapter{Background and Related Work}
+\label{chap:background}
 
 This chapter will provide the necessary background to understand the biological
 context related to this work, as well as the work that has been already made in
@@ -1337,6 +1338,265 @@ expression profiles, not only to detect cancer, but also to support more
 specific tasks such as tumor subtype stratification, with real potential for
 clinical translation.
 
+% \subsection{Background: Unsupervised Learning and K-Means}
+% \label{sec:unsupervised:background}
+
+% Unsupervised learning refers to a family of methods that operate on unlabelled data, seeking
+% to discover latent structure without explicit supervision \cite{hastie2009elements}. The
+% prototypical task is \textit{clustering}: partitioning a dataset into groups such that samples
+% within a group are more similar to each other than to samples in other groups. Unlike supervised
+% classification, there is no ground truth to optimise against during training; evaluation relies
+% either on internal geometric measures or on post-hoc comparison with external labels when
+% available.
+
+% K-Means is among the most widely used clustering algorithms. Originally
+% introduced by \citeauthor{macqueen1967some} \cite{macqueen1967some}, it partitions $n$ samples
+% into $K$ clusters by iteratively minimising the within-cluster sum of squared Euclidean
+% distances (inertia):
+
+% \begin{equation}
+%     \mathcal{L} = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k}
+%     \left\| \mathbf{x}_i - \boldsymbol{\mu}_k \right\|^2
+%     \label{eq:kmeans_objective}
+% \end{equation}
+
+% \noindent where $C_k$ denotes the set of samples assigned to cluster $k$ and
+% $\boldsymbol{\mu}_k$ is the centroid of that cluster. The algorithm alternates between two
+% steps: \\
+
+% \begin{enumerate}
+%     \item assigning each sample to its nearest centroid;
+%     \item recomputing each centroid as the mean of its assigned samples.
+% \end{enumerate}
+
+% \noindent Because the objective in Equation~\ref{eq:kmeans_objective} is non-convex, the
+% solution depends on the choice of initial centroids. To mitigate convergence to poor local
+% minima, the K-Means\texttt{++} initialisation strategy \cite{arthur2007kmeans} selects initial
+% centroids with probability proportional to their squared distance from already-chosen centroids,
+% yielding both faster convergence and consistently better solutions in practice.
+
+% Unsupervised learning methods have been applied to genomic and transcriptomic cancer data since
+% the early studies of molecular classification \cite{perou2000molecular, eisen1998cluster}.
+% Notably, hierarchical clustering on gene expression microarray data was used to identify
+% intrinsic breast cancer subtypes in the landmark work of \citeauthor{perou2000molecular}
+% \cite{perou2000molecular}, demonstrating that transcriptomic profiles alone, without clinical
+% labels, can recover biologically meaningful tumour classes.
+
+% % ----------------------------------------------------------
+% \subsection{Evaluation Metrics}
+% \label{sec:unsupervised:metrics}
+% \paragraph{Evaluation Metrics for Clustering} Evaluating clustering solutions is inherently 
+% challenging due to the absence of ground-truth labels. In the context of this work, where the goal 
+% is to recover known breast cancer subtypes from transcriptomic data, we have access to true 
+% class labels that can be used for external validation. However, since the clustering 
+% algorithm does not use these labels during model fitting, we also consider internal metrics 
+% that assess the geometric quality of the clusters without reference to the true classes.
+
+% Four complementary metrics were computed to evaluate the quality of the clustering solution.
+% The first is \textit{internal} (does not use labels); the remaining three are \textit{external}
+% (compare cluster assignments against the ground-truth PAM50 labels post-hoc).
+
+% \paragraph{Silhouette Score.}
+% The silhouette coefficient \cite{rousseeuw1987silhouettes} for a sample $i$ is defined as:
+
+% \begin{equation}
+%     s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
+%     \label{eq:silhouette}
+% \end{equation}
+
+% \noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other samples
+% in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest neighbouring cluster.
+% Values close to $+1$ indicate that the sample is well matched to its own cluster and poorly
+% matched to neighbouring clusters; values near $0$ indicate overlap; negative values indicate
+% potential misassignment. The overall silhouette score is the mean over all samples.
+
+% \paragraph{Purity.}
+% Cluster purity measures, for each cluster, the proportion of samples belonging to the most
+% frequent true class within that cluster. The overall purity is the weighted average across
+% clusters:
+
+% \begin{equation}
+%     \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
+%     \label{eq:purity}
+% \end{equation}
+
+% \noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total number of
+% samples. Purity ranges from 0 to 1, with higher values indicating better alignment between
+% clusters and true classes.
+
+% \paragraph{Adjusted Rand Index (ARI).}
+% The Rand Index counts the fraction of sample pairs for which the clustering and the
+% ground-truth labelling agree (both in the same group or both in different groups). The
+% \textit{Adjusted} Rand Index \cite{hubert1985comparing} corrects for chance agreement:
+
+% \begin{equation}
+%     \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) - \mathbb{E}[\text{RI}]}
+%     \label{eq:ari}
+% \end{equation}
+
+% \noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better than
+% random; negative values are possible and indicate systematic disagreement.
+
+% \paragraph{Adjusted Mutual Information (AMI).}
+% AMI \cite{vinh2010information} measures the information shared between the cluster assignments
+% and the true labels, normalised and adjusted for chance:
+
+% \begin{equation}
+%     \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) - \mathbb{E}[I(U;V)]}
+%     \label{eq:ami}
+% \end{equation}
+
+% \noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the true
+% labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
+% AMI $= 0$ is random.
+
+\subsection{Unsupervised Learning in Breast Cancer Subtype Discovery}
+\label{sec:background:unsupervised}
+The studies discussed in the preceding sections establish that machine learning can
+extract meaningful signal from high-dimensional biological data, both for the general
+task of cancer classification and for the more specific problem of identifying miRNA
+expression patterns associated with disease subtypes. However, the approaches examined
+so far share a common assumption: the availability of reliable class labels that supervise
+the learning process. This raises a natural question: \textbf{to what extent does the structure
+implied by those labels reflect genuine, data-intrinsic organisation, rather than the
+boundaries imposed by the labelling scheme itself?} Unsupervised learning offers a
+complementary perspective by letting the data speak without prior annotation, potentially
+revealing subgroup structure that supervised methods, constrained to reproduce known
+categories, may overlook. In the context of mapping miRNA expression profiles to breast
+cancer subtypes, this distinction is particularly relevant: if miRNA signatures carry
+sufficient biological information to drive meaningful clustering, unsupervised methods
+should recover groupings that are at once statistically coherent and clinically
+interpretable. The following subsection reviews the foundations of this approach and
+examines how it has been applied to breast cancer subtype discovery.
+
+This branch of Machine Learning refers to a family of methods that operate on unlabelled data,
+seeking to discover latent structure without explicit supervision
+\cite{hastie2009elements}. The prototypical task is \textit{clustering}: partitioning a
+dataset into groups such that samples within a group are more similar to each other than
+to samples in other groups. Unlike supervised classification, there is no ground truth to
+optimise against during training; evaluation relies either on internal geometric measures
+or on post-hoc comparison with external labels when available. Unsupervised learning
+has been applied to cancer genomics since the early studies of molecular classification
+\cite{perou2000molecular, eisen1998cluster}, where hierarchical clustering on gene
+expression microarray data demonstrated that transcriptomic profiles alone, without
+clinical labels, can recover biologically meaningful tumour classes. More broadly, with
+the increasing availability of clinical and molecular patient data, unsupervised methods
+have gained prominence as tools for \textit{phenomapping}: the delineation of
+therapeutically homogeneous patient subclasses within heterogeneous diseases
+\cite{shah2015phenomapping}.
+
+A representative example of this paradigm is the work of \citeauthor{ferro2021phenomapping}
+\cite{ferro2021phenomapping}, who applied unsupervised clustering to a cohort of 712
+women with primary breast cancer (PBC) to identify clinically meaningful patient
+subgroups from biological prognostic parameters. The study is motivated by the high
+heterogeneity of PBC at the clinical, histopathological, and molecular levels, which
+complicates patient management when similar clinical presentations may conceal
+distinct underlying disease profiles. The authors frame this as a patient similarity
+problem and argue that unsupervised learning offers a principled approach to uncovering
+hidden structures in such complex, high-dimensional data.
+
+The input feature set comprised five continuous quantitative variables: patient age,
+oestrogen receptor (ER) levels, progesterone receptor (PgR) levels, pS2 protein levels,
+and cathepsin D levels. The restriction to continuous variables was imposed by the
+requirements of the algorithms under consideration; tumour size was excluded due to an
+elevated proportion of missing values (49\%). Rather than committing to a single method,
+the authors compared four clustering algorithms: K-Means \cite{hartigan1979kmeans},
+self-organising maps (SOM) \cite{kohonen2001som}, hierarchical agglomerative clustering
+(HAC) \cite{gordon1999classification}, and Gaussian mixture models (GMM)
+\cite{scrucca2016mclust}; so as to assess whether the identified structure was robust
+across methodological choices.
+
+Since no external reference partition was available in this historical dataset, model
+selection and evaluation were conducted entirely through internal validation. Evaluating
+clustering solutions is inherently challenging due to the absence of ground-truth labels,
+and the literature distinguishes between \textit{internal} metrics, which assess the
+geometric quality of the clusters without any reference labels, and \textit{external}
+metrics, which compare cluster assignments against a known partition post-hoc. The
+internal metric used throughout this line of work is the \textbf{silhouette score}
+\cite{rousseeuw1987silhouettes}, defined for each sample $i$ as:
+
+\begin{equation}
+    s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
+    \label{eq:silhouette}
+\end{equation}
+
+\noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other
+samples in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest
+neighbouring cluster. Values close to $+1$ indicate that the sample is well matched to
+its own cluster and poorly matched to neighbouring clusters; values near $0$ indicate
+overlap; and negative values suggest potential misassignment. The overall silhouette
+score is the mean over all samples. In \citeauthor{ferro2021phenomapping}'s study,
+the authors combined the silhouette width with two additional internal indices, 
+over a range of $k = 2$ to $18$ clusters,
+selecting the optimal partition via a rank aggregation procedure. All methods converged
+on $k = 2$; HAC achieved the highest scores across all three measures, whereas the GMM
+performed the poorest. Inter-algorithm agreement was further quantified using Meil{\u a}'s
+Variation of Information \cite{meila2007comparing}, which revealed strong pairwise
+similarity among K-Means, SOM, and HAC, while the GMM diverged from the remaining
+methods.
+
+When ground-truth labels are available for post-hoc validation, a richer set of
+external metrics can be brought to bear. \textbf{Cluster purity} measures, for each
+cluster, the proportion of samples belonging to the most frequent true class within that
+cluster, aggregated as a weighted average across all clusters:
+
+\begin{equation}
+    \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
+    \label{eq:purity}
+\end{equation}
+
+\noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total
+number of samples. Purity ranges from 0 to 1, with higher values indicating better
+alignment between clusters and true classes. However, purity alone does not penalise
+trivial solutions in which every sample is placed in its own cluster; it is therefore
+complemented by agreement-based measures. The \textbf{Adjusted Rand Index} (ARI)
+\cite{hubert1985comparing} counts the fraction of sample pairs for which the clustering
+and the ground-truth labelling agree, correcting for the agreement expected by chance:
+
+\begin{equation}
+    \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) -
+    \mathbb{E}[\text{RI}]}
+    \label{eq:ari}
+\end{equation}
+
+\noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better
+than random; negative values indicate systematic disagreement. Similarly, the
+\textbf{Adjusted Mutual Information} (AMI) \cite{vinh2010information} quantifies the
+information shared between the cluster assignments and the true labels, normalised and
+adjusted for chance:
+
+\begin{equation}
+    \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) -
+    \mathbb{E}[I(U;V)]}
+    \label{eq:ami}
+\end{equation}
+
+\noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the
+true labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
+AMI $= 0$ is random. Together, purity, ARI, and AMI provide a complementary view of
+how well an unsupervised partition recovers a known reference labelling.
+
+The two clusters identified by HAC exhibited a clear clinical differentiation. The
+first cluster comprised younger patients with lower levels of ER, PgR, and cathepsin D;
+the second cluster consisted of older, predominantly postmenopausal women with elevated
+hormone receptor levels and higher cathepsin D values. Variable importance analysis,
+carried out separately for each algorithm using method-specific procedures, consistently
+ranked age, ER, and PgR as the three most influential features in defining the partition.
+These findings are consistent with established biological evidence linking ER and PgR
+positivity with age and menopausal status in breast tumours, reinforcing the validity of
+the identified subgroups beyond the statistical criteria used for selection.
+
+This study highlights several methodological considerations relevant to the
+application of unsupervised learning in a clinical oncology setting. First, the choice of
+clustering algorithm substantially affects both the quality and the interpretability of the
+resulting partition, underscoring the importance of systematic comparison rather than
+reliance on a single method. Second, the cluster validity problem - the principled
+selection of both the algorithm and the number of clusters - requires explicit attention
+through internal validation indices, which are often overlooked in practice. Third,
+post-hoc variable importance assessment provides an interpretable link between the
+statistical partition and the underlying biology, bridging the gap between data-driven
+discovery and domain knowledge.
+
 \subsection{Comparison with thesis approach}
 
 The analysis of the studies presented throughout this chapter allows us not
@@ -1401,6 +1661,26 @@ careful feature selection and predictive modeling, to internal statistical
 validation and model performance analysis. This systematic approach ensures
 alignment with best practices in the literature and maximizes the translational
 potential of the results obtained.
+
+Moving beyond the supervised paradigm, the studies reviewed in this chapter also motivate
+the adoption of an \textbf{unsupervised learning approach} as a complementary axis of
+investigation. While the supervised methods discussed above are effective at building
+classifiers when reliable labels are available, they do not allow us to question whether
+the data itself organises around those labels in a meaningful way. As demonstrated by
+\textcite{ferro2021phenomapping}, unsupervised clustering can reveal intrinsic patient
+subgroup structure that is both statistically robust and biologically interpretable,
+without ever consulting class annotations during training. Transposing this rationale
+to the context of this thesis, a natural question arises: if \gls{mirna} expression
+profiles carry sufficient discriminative signal to support supervised classification,
+do they also encode an intrinsic structure that clustering algorithms can recover
+independently? Exploring this question from the right perspective, it provides an
+independent validation of the biological relevance of the miRNA features selected
+during the supervised pipeline, and if the same features drive both a good classifier
+and a meaningful clustering, the evidence for their discriminative power is substantially
+strengthened. This unsupervised component will therefore
+be designed not as an alternative to the supervised approach, but as a structural
+complement to it, deepening the understanding of how miRNA expression relates to the
+heterogeneity of breast cancer subtypes.
 
 In short, the literature review allows us to consolidate a solid methodological
 basis, anchored in studies that have demonstrated the effectiveness of machine
