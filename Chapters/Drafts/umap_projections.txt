@@ -1,0 +1,19 @@
+\subsubsection{UMAP Projection}
+Figure~\ref{fig:kmeans_umap} shows the UMAP \cite{mcinnes2018umap} projection of both cluster
+assignments and ground-truth labels onto the same two-dimensional embedding. UMAP is used here
+purely as a visualisation tool and it was not involved in the clustering itself. The juxtaposition
+of the two panels allows visual assessment of the degree to which the K-Means partition
+corresponds to the known subtype structure. A clear separation in the right panel (ground truth)
+that aligns with a separation in the left panel (K-Means) provides geometric confirmation of
+the purity values reported in Table~\ref{tab:kmeans_cluster_composition}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{miRNA_only_umap_2d.png}
+    \caption{UMAP projection of the miRNA-only standardised feature space ($n = 244$).
+    \textit{Left:} samples coloured by K-Means cluster assignment.
+    \textit{Right:} same projection coloured by ground-truth PAM50 subtype.
+    Correspondence between left and right panels reveals where clustering recovers
+    biological structure.}
+    \label{fig:kmeans_umap}
+\end{figure}

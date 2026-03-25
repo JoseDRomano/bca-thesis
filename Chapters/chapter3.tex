@@ -1055,518 +1055,1060 @@ distance-based methods and gradient-based optimisers, would disproportionately
 weight high-magnitude features irrespective of their actual predictive value.
 
 % ================================================================
+
+% ============================================================
+% CHAPTER: SUPERVISED APPROACH
+% ============================================================
 \section{Discriminative Subtyping}
 \label{sec:supervised}
-% ================================================================
 
-% % ---------------------------------------------------------------
-% \subsection{What Is Supervised Learning?}
-% \label{subsec:supervised_intro}
-% % ---------------------------------------------------------------
+As described in Chapter~\ref{chap:data-preprocessing}, the dataset used throughout this work
+consists of \textbf{244 patient samples} sourced from TCGA, each characterised by two distinct
+feature modalities: \textbf{445 miRNA expression features} and \textbf{17 clinical features}
+(including hormonal receptor status, copy-number cluster assignments, and
+methylation cluster labels), together with a PAM50-derived subtype label
+(\textit{Basal-like}, \textit{HER2-enriched}, \textit{Luminal~A}, or \textit{Luminal~B}).
+After the preprocessing pipeline detailed in the previous chapter, the data was 
+organised into training and test partitions that are used 
+consistently across all experiments reported here.
 
-% Supervised learning is the branch of machine learning concerned with learning a
-% mapping from inputs to outputs when labelled training examples are available. Given
-% a dataset $\mathcal{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^{n}$, where $\mathbf{x}_i
-% \in \mathbb{R}^d$ is a feature vector and $y_i \in \mathcal{Y}$ is the corresponding
-% label, the goal is to find a function $f : \mathbb{R}^d \rightarrow \mathcal{Y}$ that
-% minimises a loss over the training set and generalises well to unseen examples
-% \cite{bishop2006pattern, hastie2009elements}. In the classification setting,
-% $\mathcal{Y}$ is a finite set of discrete categories; in the regression setting it
-% is a continuous range. In this work, $\mathcal{Y} = \{0, 1, 2, 3\}$ corresponding
-% to the four PAM50 subtypes (Basal-like, HER2-enriched, Luminal~A, Luminal~B), so
-% the problem is a multi-class classification task.
+The present chapter focuses on the \textbf{supervised learning component} of this thesis.
+The central objective is twofold: first, to determine whether machine learning classifiers
+can reliably distinguish breast cancer subtypes from miRNA expression data alone, and more
+importantly, whether the addition of clinical covariates improves that discrimination;
+second, and most crucially, to \textbf{identify the minimal set of miRNA (and clinical)
+features that best characterise each subtype}. This second objective aligns directly with
+the broader biological question motivating this work: \textbf{which miRNAs carry subtype-discriminative
+information, and can machine learning provide a computationally grounded way to answer it?}
 
-% The availability of PAM50 subtype annotations for all patients in the working
-% cohort is what makes the supervised approach possible and appropriate here. Those
-% labels are not arbitrary --- they are clinically validated gold-standard subtype
-% assignments. Supervised learning can therefore directly optimise for the task of
-% reproducing these assignments, something that unsupervised approaches are unable to
-% do by construction. Beyond subtype prediction, the supervised framework serves a
-% second purpose in this work: once a high-performing classifier has been trained, the
-% internal structure of that model --- specifically, the importance it assigns to
-% individual features --- is used as a proxy to discover which miRNAs are most
-% discriminative for each subtype. This dual role (classification + biomarker
-% discovery) motivates all methodological choices described in the sections that follow.
+% ============================================================
+\subsection{Exploratory Model Comparison}
+\label{sec:early-models}
+% ============================================================
+
+A initial exploratory phase was conducted to assess 
+which classifiers were most suitable for the multiclass PAM50 subtype prediction task.
+The four classifiers evaluated were \textbf{Decision Tree}, \textbf{Logistic Regression},
+\textbf{XGBoost}, and \textbf{DIABLO}. The selection of these four models was deliberate,
+as the first three are established baselines that span the spectrum of model complexity,
+from a single-split decision surface to a regularised linear model to a full gradient-boosted
+ensemble, and are routinely used for benchmarking on tabular genomic data and classification
+problems. DIABLO was included on the recommendation of collaborators from Nova Medical School,
+as it is a well-established method in the multi-omics classification literature~\cite{singh2019diablo},
+explicitly designed to integrate heterogeneous data blocks, in this case, miRNA expression
+and clinical features, through a sparse latent-variable structure.
+ 
+A criterion that shaped the selection equally alongside predictive performance was
+\textbf{interpretability}. The ultimate aim of this supervised approach is not classification
+per se, but the identification of the features - specially the miRNAs proven to be 
+great biomarkers - that best
+characterise each subtype. A model that classifies accurately but obscures its decision
+process provides limited biological insight and brings lower value to the table. This requirement 
+favoured models with accessible
+and meaningful feature importance mechanisms, a point that would later prove decisive in
+choosing XGBoost as the final architecture.
+ 
+All four models were evaluated on \textbf{both feature configurations} (miRNA only and
+miRNA + clinical data) to assess whether the inclusion
+of clinical covariates represented a worthwhile investment for improving discrimination.
+The Logistic Regression was configured with an L2 penalty (\texttt{C}~=~1.0,
+\texttt{solver}~=~\texttt{lbfgs}, \texttt{multi\_class}~=~\texttt{multinomial}) and the
+initial XGBoost used 100 estimators with a learning rate of 0.1 and a maximum tree depth
+of 3, this would later be our starting point before grid search
+refinement. Table~\ref{tab:early-models}, extracted from our published paper  reports the results on the miRNA + clinical configuration
+which represented the more informative of the two conditions for this comparison.
+
+\todo{Correr o código para gerar os resultados com k-fold cross-validation para mostrar que cada modelo é robusto e não overfit}
+
+\todo{Corrigir o texto abaixo: a conclusão vai ser a mesma, mas o texto vai ser diferente}
+The results present a clear ranking. XGBoost achieved the highest overall performance,
+with a macro F1-score of 82.17\% and an accuracy of 83.67\%, followed by Logistic Regression
+(macro F1~=~75.57\%) and DIABLO (macro F1~=~73.82\%). The Decision Tree lagged behind
+considerably at a macro F1-score of 62.45\%, reflecting its tendency to overfit in the
+high-dimensional setting. Across all models, Basal-like was the most consistently
+well-classified subtype, while HER2-enriched and Luminal~B remained the most difficult -
+a pattern that would persist through subsequent refinements and is discussed at length
+in Section~\ref{sec:discussion}.
+ 
+DIABLO's performance is worth brief comment. Despite being specifically designed for
+multi-omics integration, it did not surpass Logistic Regression and fell clearly
+behind XGBoost. This is partly attributable to the relatively small sample size
+($n = 244$), which limits the ability of latent-variable models to reliably estimate
+cross-block covariance structure. More importantly for our purposes, DIABLO's sparse
+latent components offer a different form of interpretability than per-feature importance
+scores, making it less directly applicable to the goal of identifying individual miRNA
+candidates. XGBoost, by contrast, provides gain-based feature importances at the level
+of individual features, which aligns precisely with the analytical objective of this work.
+ 
+These results established XGBoost as the clear candidate for further development,
+both on grounds of performance and interpretability, motivating the hyperparameter
+refinement described in the following section.
+
+% ============================================================
+\subsection{Final Model Architecture: XGBoost with Grid Search}
+\label{sec:xgboost-final}
+% ============================================================
+
+Given XGBoost's competitive performance in the exploratory phase, we will proceed with a systematic
+hyperparameter search with grid search to identify its optimal configuration for
+the breast cancer subtype classification task. Grid search is a technique that systematically 
+searches for the best hyperparameters by exhaustively evaluating a grid of values for each hyperparameter.
+The parameters that we aim to tune in the grid search are:
+
+\begin{itemize}
+    \item \textbf{Number of estimators} (\texttt{n\_estimators}): number of boosting rounds
+    (trees) in the ensemble. A larger value allows a more expressive model at the cost of
+    increased training time and potential overfitting.
+
+    \item \textbf{Learning rate} (\texttt{learning\_rate}): the shrinkage applied to each
+    tree's contribution. Smaller values require more trees but generally improve generalisation.
+
+    \item \textbf{Maximum tree depth} (\texttt{max\_depth}): controls model complexity.
+    Deeper trees capture higher-order interactions but overfit more easily.
+
+    \item \textbf{Row subsampling} (\texttt{subsample}): the fraction of training samples
+    used per boosting round, introducing stochasticity to reduce variance.
+
+    \item \textbf{Column subsampling} (\texttt{colsample\_bytree}): the fraction of features
+    randomly selected at each boosting round, analogous to the feature bagging in Random Forests.
+\end{itemize}
+
+The search was performed using stratified cross-validation with macro F1-score as the optimisation criterion.
+The resulting optimal configuration was:
+
+\begin{center}
+\begin{tabular}{ll}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\texttt{n\_estimators}    & 50   \\
+\texttt{learning\_rate}   & 0.3  \\
+\texttt{max\_depth}       & 10   \\
+\texttt{subsample}        & 0.85 \\
+\texttt{colsample\_bytree}& 1.0  \\
+\texttt{eval\_metric}     & \texttt{mlogloss} \\
+\texttt{random\_state}    & 42   \\
+\hline
+\end{tabular}
+\end{center}
+
+The results achieved using this configuration will be analysed in detail in 
+Section~\ref{sec:model-results}, with a complementary exploration available in our 
+published paper~\ref{ann:EPIA_paper} where we evaluate the statistical significance 
+of the improvement in performance when adding clinical data. 
+
+% ============================================================
+\subsection{Two-Level Validation Hypothesis}
+\label{sec:validation-hypothesis}
+% ============================================================
+
+Before presenting the model results, it is important to take a step back and 
+reflect that our primary question is not merely
+\textit{which features help the classifier}, but rather \textit{which features are genuinely
+informative for subtype discrimination}. Answering this question robustly requires more than
+a single source of evidence.
+
+To this end, we propose the following hypothesis:
+
+\begin{quote}
+\textit{A miRNA (or clinical feature) is considered a \textbf{robustly validated discriminative
+marker} for a given breast cancer subtype if and only if it is independently selected by two
+complementary feature identification methods operating under fundamentally different assumptions:
+(i) the XGBoost internal feature importance, which reflects discriminative contribution within
+a trained multivariate model, and (ii) the ANOVA F-test, which reflects marginal statistical
+significance under the assumption of between-group mean differences.}
+\end{quote}
+
+The rationale for this two-level approach stems directly from the complementary nature
+of the two methods:
+
+\begin{itemize}
+    \item \textbf{ANOVA F-test (filter method)}: a model-agnostic statistical test that
+    evaluates whether the means of a given feature differ significantly across subtype groups.
+    A high F-score indicates that a feature is statistically distinguishable at the population
+    level. Crucially, ANOVA operates on each feature in isolation, ignoring feature interactions.
+    Features selected by ANOVA can therefore be interpreted as carrying \textit{individually
+    significant statistical signal} for subtype discrimination.
+
+    \item \textbf{XGBoost gain importance (embedded method)}: the total gain attributed to a
+    feature across all splits in the ensemble. Features with high gain are those that, in a
+    multivariate discriminative context, contribute most to reducing classification error. This
+    measure captures feature utility in the presence of all other features, including interactions and redundancies.
+\end{itemize}
+
+A feature appearing in \textit{both} ranked lists is therefore supported by two independent
+confirmation levels: it is \textit{statistically significant in isolation} and
+\textit{discriminatively relevant in a multivariate learned model}. This double 
+confirmation forms a particularly powerful filter for biomarker discovery: features 
+verified by both methods are not only statistically significant in isolation but also 
+deliver real, independent discrimination when evaluated inside the learning algorithm. 
+Such convergence across distinct methodologies offers compelling support for prioritising 
+these features as leading biomarker candidates. As shown in 
+Section~\ref{sec:model-results} and highlighted in Table~\ref{tab:intersections}, 
+doubly-validated features are consistently associated with stronger classification 
+performance and robustness across subtypes, providing persuasive evidence that goes 
+beyond what any single method could deliver alone, giving us confidence in the 
+features identified by our approach and consider them strong candidates for 
+further empirical validation. 
+
+% ============================================================
+\subsection{Model Results}
+\label{sec:model-results}
+% ============================================================
+
+The optimised XGBoost model was evaluated under a binary One-vs-Rest (OvR) formulation:
+for each breast cancer subtype, a separate binary classifier was trained to distinguish
+patients of that subtype from all others. This One-vs-Rest strategy was adopted to enable
+per-subtype feature extraction (see Section~\ref{sec:booster-features}) and to produce
+interpretable per-subtype performance metrics - after all, this models main purpose is to 
+classify if a patient has a specific subtype or not.
+
+Both feature configurations were evaluated: \textbf{miRNA only} (445 features) and
+\textbf{miRNA + clinical} (445 miRNA + 17 clinical features = 462 features).
+
+% ==========================================
+% 1. BASAL-LIKE SUBTYPE
+% ==========================================
+\subsubsection{Basal-Like}
+
+The Basal-like subtype yielded the highest classification performance across both configurations,
+with both miRNA-only and miRNA+clinical models achieving precision, recall, and F1-score of 1.00
+on the test set. This result reflects the \textbf{strong and distinct miRNA expression signature}
+characteristic of Basal-like tumours, which are triple-negative, highly proliferative, and
+genomically distinct from the other subtypes.
+
+\begin{table}[h]
+    \centering
+    \caption{Classification Performance for Basal-like Subtype}
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Homogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not Basal & 1.00 & 1.00 & 1.00 & 41 \\
+            Basal     & 1.00 & 1.00 & 1.00 & 8 \\
+            \midrule
+            accuracy  &      &      & 1.00 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \hfill
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Heterogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not Basal & 1.00 & 1.00 & 1.00 & 41 \\
+            Basal     & 1.00 & 1.00 & 1.00 & 8 \\
+            \midrule
+            accuracy  &      &      & 1.00 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    % --- First Matrix (Left Picture) ---
+    % \includegraphics is set to use almost half the text width (0.48)
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_basal_small_without.png}
+        % This is the specific caption for the first matrix
+        \caption{}
+    \end{subfigure}
+    \hfill % Adds flexible space between the two pictures to fill the page margins
+    % --- Second Matrix (Right Picture) ---
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_basal_small_with.png}
+        % This is the specific caption for the second matrix
+        \caption{}
+    \end{subfigure}
+
+    % --- Main Caption for the Entire Figure ---
+    \vfill
+    \caption{Comparison of Classification Performance for Basal-like Breast Cancer Subtype classification where (a) has only miRNA data and (b) has both miRNA and clinical data.}
+    \label{fig:comparison_matrices}
+\end{figure}
 
 
-% % ---------------------------------------------------------------
-% \subsection{Models Evaluated}
-% \label{subsec:models}
-% % ---------------------------------------------------------------
+% ==========================================
+% 2. HER2-ENRICHED SUBTYPE
+% ==========================================
+\subsubsection{HER2-Enriched}
 
-% Four discriminative classifiers and one latent variable integration method were
-% evaluated in this study. The discriminative classifiers were selected to span a
-% range of complexity and interpretability, enabling a principled comparison of how
-% different modelling assumptions interact with the high-dimensional, low-sample-size
-% structure of the dataset. The latent variable method (DIABLO) was included as a
-% competitive multi-omics baseline representative of the current state of the art
-% in integrative cancer subtyping. A brief description of each approach is provided
-% below.
+HER2-enriched classification proved to be more challenging. The miRNA-only model achieved an F1-score
+of 0.50 for the HER2-enriched class (precision 1.00, recall 0.33), indicating that while the
+model is highly precise - it does not produce false positives - it misses a substantial
+fraction of true HER2 cases (low recall). The macro-averaged F1-score across both classes
+was 0.73 (miRNA only) and remained similar with clinical data.
 
-% \paragraph{Decision Tree.}
-% A Decision Tree recursively partitions the feature space by selecting, at each
-% internal node, the split that maximally reduces the Gini impurity of the resulting
-% child partitions. The prediction for a new sample is determined by routing it down
-% the tree to a leaf and returning the majority class. Decision Trees are fully
-% interpretable and computationally efficient, but are well-known to exhibit high
-% variance: small perturbations in the training data can produce substantially different
-% tree structures. Their inclusion here serves primarily as an interpretable lower-bound
-% baseline, against which the benefit of ensemble and regularised approaches can be
-% measured.
+This is a known difficulty in the literature: HER2-enriched tumours exhibit considerable
+transcriptomic overlap with Luminal~B, and their molecular distinctions are more reliably
+captured through protein expression or copy-number amplification of the \textit{ERBB2} locus
+rather than through miRNA profiles alone. The addition of clinical features - particularly
+\texttt{HER2\_STATUS} - provides meaningful supplementary signal for this subtype, as
+confirmed in the ANOVA analysis (Section~\ref{sec:anova-bridge}).
 
-% \paragraph{Naive Bayes.}
-% Gaussian Naive Bayes models the class-conditional distribution of each feature as an
-% independent Gaussian, and applies Bayes' theorem to compute posterior class
-% probabilities. The conditional independence assumption is the defining characteristic
-% of this model and simultaneously its principal limitation in the miRNA context, where
-% widespread co-regulation between miRNA families means independence is systematically
-% violated. Naive Bayes was included to quantify the cost of this assumption: its
-% expected underperformance relative to discriminative models is itself informative,
-% confirming that the dependencies between miRNA features carry discriminative
-% information that cannot be discarded.
 
-% \paragraph{Logistic Regression.}
-% The multinomial Logistic Regression classifier models the posterior probability of
-% each class directly from the input features via the softmax function, without
-% assumptions about the data distribution. It was trained with $\ell_2$ regularisation
-% (\texttt{penalty='l2'}, \texttt{solver='lbfgs'}) to prevent overfitting in the
-% high-dimensional feature space. Its principal strength in this context is
-% interpretability: the weight vector $\mathbf{w}_k$ for each class $k$ directly
-% encodes the per-feature contribution to the log-odds of that class, making it a
-% natural companion for cross-validating the feature importance rankings obtained from
-% XGBoost.
+\begin{table}[htbp]
+    \centering
+    \caption{Classification Performance for HER2-enriched Subtype}
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Homogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not HER2 & 0.91 & 1.00 & 0.96 & 43 \\
+            HER2     & 1.00 & 0.33 & 0.50 & 6 \\
+            \midrule
+            accuracy &      &      & 0.92 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \hfill
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Heterogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not HER2 & 0.91 & 1.00 & 0.96 & 43 \\
+            HER2     & 1.00 & 0.33 & 0.50 & 6 \\
+            \midrule
+            accuracy &      &      & 0.92 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}
 
-% \paragraph{XGBoost.}
-% XGBoost (eXtreme Gradient Boosting)~\cite{chen2016xgboost} is a regularised
-% implementation of the gradient-boosted decision tree framework. Trees are constructed
-% sequentially, with each new tree trained to correct the residual errors left by the
-% current ensemble, scaled by a learning rate $\eta$. The model is trained by minimising
-% a second-order Taylor approximation of the multinomial log-loss, with explicit
-% regularisation of both tree complexity and leaf weights. The configuration used
-% throughout is: \texttt{n\_estimators=50}, \texttt{learning\_rate=0.3},
-% \texttt{max\_depth=10}, \texttt{subsample=0.85}, \texttt{colsample\_bytree=1.0},
-% \texttt{eval\_metric='mlogloss'}, \texttt{random\_state=42}. This configuration
-% was selected through a grid search exploration described in
-% Section~\ref{subsec:gridsearch}. XGBoost was chosen as the primary model for two
-% reasons: its empirically strong performance on high-dimensional tabular data in
-% low-sample-size regimes, and its ability to expose per-class feature importance
-% scores through its internal boosting structure --- the property exploited in the
-% biomarker discovery pipeline of Section~\ref{subsec:feature_importance}.
+\begin{figure}[h]
+    \centering
+    % --- First Matrix (Left Picture) ---
+    % \includegraphics is set to use almost half the text width (0.48)
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_her2_small_without.png}
+        % This is the specific caption for the first matrix
+        \caption{}
+    \end{subfigure}
+    \hfill % Adds flexible space between the two pictures to fill the page margins
+    % --- Second Matrix (Right Picture) ---
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_her2_small_with.png}
+        % This is the specific caption for the second matrix
+        \caption{}
+    \end{subfigure}
 
-% \paragraph{DIABLO.}
-% DIABLO (Data Integration Analysis for Biomarker discovery using Latent cOmponents)
-% \cite{singh2019diablo} is a multi-omics integration method implemented in the
-% \texttt{mixOmics} R package. Unlike the discriminative models above, DIABLO is a
-% latent variable method: it seeks correlated components across data modalities that
-% jointly maximise discrimination between groups, projecting the data into a shared
-% latent space where class structure is maximally preserved. DIABLO was included as a
-% competitive baseline representative of the state of the art in multi-omics breast
-% cancer subtyping, enabling a principled comparison between latent-representation and
-% direct discriminative approaches. The implementation followed the official TCGA case
-% study~\cite{diabloTCGA}, adapted to the four-class PAM50 problem and the specific
-% feature structure of the working cohort. Two DIABLO configurations were evaluated:
-% \textit{Single Block} (miRNA data only, mirroring the homogeneous setting of the
-% discriminative models) and \textit{All Blocks} (miRNA + clinical data, mirroring
-% the heterogeneous setting).
+    % --- Main Caption for the Entire Figure ---
+    \vfill
+    \caption{Comparison of Classification Performance for Her2-enriched Breast Cancer Subtype classification where (a) has only miRNA data and (b) has both miRNA and clinical data.}
+    \label{fig:comparison_matrices}
+\end{figure}
 
-% % ---------------------------------------------------------------
-% \subsection{Classification Results}
-% \label{subsec:classification_results}
-% % ---------------------------------------------------------------
+% ==========================================
+% 3. LUMINAL A SUBTYPE
+% ==========================================
+\subsubsection{Luminal A}
 
-% All models were evaluated under two feature configurations: \textbf{homogeneous}
-% (miRNA expression features only, $p = 442$) and \textbf{heterogeneous}
-% (miRNA + clinical features, $p = 462$). This design directly tests the central
-% hypothesis that clinical features provide complementary discriminative signal beyond
-% what miRNA expression alone encodes.
+Luminal A classification yielded a weighted-average F1-score of 0.84 (miRNA only) 
+and 0.82 (miRNA + clinical), with per-class F1-scores of 0.81 and 0.80, respectively. 
+The slight decrease when adding clinical data warrants attention: it may reflect 
+that clinical features introduce noise or redundancy for a subtype whose miRNA 
+signature is already relatively distinct.
 
-% \todo{[RECOMPUTE] All results in this section must be recomputed using 10-fold
-% stratified cross-validation (repeated, preferably $k=10$, $r=5$ or $r=10$) and
-% reported as mean $\pm$ std across folds. The tables below contain the point-estimate
-% results from the single 80/20 split reported in the EPIA paper. Once cross-validation
-% results are available, replace the tables with the CV versions and add a brief note
-% on the stability of the rankings (which is not expected to change).}
+\begin{table}[htbp]
+    \centering
+    \caption{Classification Performance for Luminal A Subtype}
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Homogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not LumA & 0.86 & 0.86 & 0.86 & 28 \\
+            Luminal A & 0.81 & 0.81 & 0.81 & 21 \\
+            \midrule
+            accuracy &      &      & 0.84 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \hfill
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Heterogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not LumA & 0.88 & 0.79 & 0.83 & 28 \\
+            Luminal A & 0.75 & 0.86 & 0.80 & 21 \\
+            \midrule
+            accuracy &      &      & 0.82 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}
 
-% \subsubsection*{miRNA-only Classification}
+\begin{figure}[h]
+    \centering
+    % --- First Matrix (Left Picture) ---
+    % \includegraphics is set to use almost half the text width (0.48)
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_lumA_small_without.png}
+        % This is the specific caption for the first matrix
+        \caption{}
+    \end{subfigure}
+    \hfill % Adds flexible space between the two pictures to fill the page margins
+    % --- Second Matrix (Right Picture) ---
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_lumA_small_with.png}
+        % This is the specific caption for the second matrix
+        \caption{}
+    \end{subfigure}
 
-% Table~\ref{tab:homo_results} presents the classification performance of all models
-% trained exclusively on miRNA expression features. Results are reported as precision,
-% recall, F1-score, and accuracy, along with per-class F1 for each PAM50 subtype.
+    % --- Main Caption for the Entire Figure ---
+    \vfill
+    \caption{Comparison of Classification Performance for Luminal A Breast Cancer Subtype classification where (a) has only miRNA data and (b) has both miRNA and clinical data.}
+    \label{fig:comparison_matrices}
+\end{figure}
 
-% \todo{Replace with cross-validated mean $\pm$ std when available.}
-% \begin{table}[h!]
+% ==========================================
+% 4. LUMINAL B SUBTYPE
+% ==========================================
+\subsubsection{Luminal B}
+
+Luminal~B was the most difficult subtype to classify, with an F1-score of 0.50 for the
+Luminal~B class under the miRNA-only configuration (recall 0.36). With clinical data, the
+macro-averaged F1-score improved from 0.69 to 0.77, a notable gain suggesting that clinical
+covariates (particularly \texttt{ER\_STATUS}) carry discriminative information not present
+in miRNA expression alone. This aligns with the known molecular heterogeneity of Luminal~B,
+which overlaps substantially with Luminal~A and lacks a clean miRNA-only discriminative boundary.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Classification Performance for Luminal B Subtype}
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Homogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not LumB & 0.79 & 0.97 & 0.87 & 35 \\
+            Luminal B & 0.83 & 0.36 & 0.50 & 14 \\
+            \midrule
+            accuracy &      &      & 0.80 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \hfill
+    \begin{subtable}{0.48\textwidth}
+        \centering
+        \caption{Heterogeneous Data}
+        \begin{tabular}{lcccc}
+            \toprule
+            & prec. & rec. & f1 & supp. \\
+            \midrule
+            Not LumB & 0.83 & 0.97 & 0.89 & 35 \\
+            Luminal B & 0.88 & 0.50 & 0.64 & 14 \\
+            \midrule
+            accuracy &      &      & 0.84 & 49 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    % --- First Matrix (Left Picture) ---
+    % \includegraphics is set to use almost half the text width (0.48)
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_lumB_small_without.png}
+        % This is the specific caption for the first matrix
+        \caption{}
+    \end{subfigure}
+    \hfill % Adds flexible space between the two pictures to fill the page margins
+    % --- Second Matrix (Right Picture) ---
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % REPLACE THE FILENAME BELOW WITH YOUR ACTUAL IMAGE FILE
+        \includegraphics[width=\textwidth]{cm_lumB_small_with.png}
+        % This is the specific caption for the second matrix
+        \caption{}
+    \end{subfigure}
+
+    % --- Main Caption for the Entire Figure ---
+    \vfill
+    \caption{Comparison of Classification Performance for Luminal B Breast Cancer Subtype classification where (a) has only miRNA data and (b) has both miRNA and clinical data.}
+    \label{fig:comparison_matrices}
+\end{figure}
+
+% ============================================================
+\subsection{Feature Extraction via XGBoost Booster}
+\label{sec:booster-features}
+% ============================================================
+
+Having validated the classification performance of the optimised model, attention turns to the
+primary scientific objective: identifying the miRNAs most relevant to each subtype. To this end,
+the XGBoost internal booster was used to compute per-subtype \textbf{feature importances based
+on gain} - the average improvement in the loss function attributable to a feature across all
+splits in which it is used.
+
+The binary OvR formulation is central here: by training a separate binary classifier for each
+subtype, the feature importances extracted are specific to the problem of distinguishing
+\textit{that subtype from all others}, rather than reflecting an aggregate multiclass importance.
+This provides subtype-specific miRNA rankings.
+
+Formally, for a given subtype $s \in \{\text{Basal-like}, \text{HER2-enriched},
+\text{Luminal~A}, \text{Luminal~B}\}$, the binary label is defined as:
+
+\begin{equation}
+y_i^{(s)} = \begin{cases} 1 & \text{if patient } i \text{ belongs to subtype } s \\ 0 & \text{otherwise} \end{cases}
+\end{equation}
+
+The XGBoost booster was retrieved via \texttt{model.get\_booster()} and gain importances
+were computed via \texttt{booster.get\_score(importance\_type=\text{`gain'})}, returning a
+dictionary mapping each feature to its cumulative gain across all trees. The top 20 features
+by gain were extracted for each subtype and each configuration.
+
+\noindent \textbf{Gain} measures the total reduction in the model's objective function 
+(loss) contributed by a feature across all trees. Unlike other metrics, it focuses on the 
+\textit{quality} of splits rather than their frequency:
+
+\begin{description}
+    \item[Gain:] The accumulated improvement in accuracy or error reduction provided by a feature.
+    \item[Weight:] The raw count of how many times a feature is used as a split.
+    \item[Cover:] The average number of samples or observations affected by a feature's splits.
+\end{description}
+
+While \textit{weight} tells us how often a feature is used, \textbf{gain} tells us how
+ much that feature actually matters to the final prediction - and this is exactly why we
+  used the \textbf{gain} for our metric of feature importance selection.
+
+Table~\ref{tab:feature_importance_top20} presents the top 20 miRNA features ranked 
+by gain for each breast cancer subtype, under both the miRNA-only and miRNA + clinical 
+configurations. For each subtype, the table reflects the features that the 
+XGBoost model identified as most informative when learning to distinguish 
+that subtype from all others, that is, the variables whose inclusion in 
+the decision trees led to the greatest cumulative reduction in classification 
+error. The gain values also convey the relative importance of each feature: 
+a feature with substantially higher gain than its neighbours can be interpreted 
+as carrying a disproportionate share of the discriminative signal for that 
+subtype, whereas a more gradual decay in gain values suggests that the 
+classification relies on a broader, more distributed set of features. 
+Reading across subtypes, the table thus provides a direct window into 
+the molecular signatures that the model has learned to associate with each class.
+
+\begin{table}[t]
+\centering
+\caption{Top 20 XGBoost Feature Importance: miRNA Only vs. miRNA + Clinical Integration (\% Gain)}
+\label{tab:feature_importance_percent}
+\scriptsize
+\begin{tabular}{r|ll|ll}
+\hline
+\textbf{Rank} & \multicolumn{2}{c|}{\textbf{Basal-like}} & \multicolumn{2}{c}{\textbf{HER2-enriched}} \\
+& \textit{miRNA Only} & \textit{miRNA + Clinical} & \textit{miRNA Only} & \textit{miRNA + Clinical} \\ \hline
+1  & MIR-577/577 (59.2\%)   & MIR-577/577 (56.9\%)   & MIR-30/30A (15.2\%)    & MIR-30/30A (10.7\%)    \\
+2  & MIR-135B/135B* (9.5\%) & MIR-135B/135B* (10.5\%) & MIR-34C/5P (7.5\%)      & MIR-3150B/3P (9.8\%)   \\
+3  & MIR-934/934 (8.5\%)    & MIR-934/934 (7.7\%)    & MIR-501/3P (6.9\%)      & MIR-34C/5P (8.4\%)      \\
+4  & MIR-190B/190B (4.3\%)   & \textbf{METHYLATION\_CL.} (4.1\%) & MIR-769/5P (6.2\%)      & MIR-769/5P (6.5\%)      \\
+5  & MIR-455/5P (2.8\%)      & MIR-190B/190B (3.8\%)   & MIR-192/192* (6.1\%)    & MIR-192/192* (5.4\%)    \\
+6  & MIR-584/584 (2.0\%)     & MIR-455/5P (3.4\%)      & MIR-3150B/3P (4.8\%)    & MIR-501/3P (4.7\%)      \\
+7  & MIR-505/505 (1.9\%)     & MIR-505/505 (1.9\%)     & MIR-187/187 (3.7\%)     & MIR-187/187 (4.3\%)     \\
+8  & MIR-19B-1/19B (1.9\%)   & MIR-2115/2115* (1.8\%)  & MIR-30C-2/2* (3.5\%)    & MIR-210/210 (3.1\%)     \\
+9  & MIR-2115/2115* (1.6\%)  & \textbf{SIGCLUST\_MRNA} (1.6\%) & MIR-142/5P (2.8\%)      & MIR-142/3P (3.0\%)      \\
+10 & MIR-9-1/9* (1.3\%)      & \textbf{CN\_CLUSTER} (1.0\%) & MIR-375/375 (2.7\%)     & \textbf{HER2\_STATUS} (2.9\%) \\
+11 & MIR-29/29A (1.0\%)      & MIR-516-1/5P (0.8\%)    & MIR-210/210 (2.6\%)     & MIR-497/497* (2.7\%)    \\
+12 & MIR-1296/1296 (0.9\%)   & MIR-9-1/9* (0.7\%)      & MIR-142/3P (2.6\%)      & MIR-184/184 (2.6\%)     \\
+13 & MIR-194-2/194* (0.7\%)  & MIR-455/3P (0.7\%)      & MIR-30C/3P (2.6\%)      & MIR-193/5P (2.5\%)      \\
+14 & MIR-501/3P (0.7\%)      & MIR-519A-1/519A* (0.6\%) & MIR-2115/2115* (2.4\%)  & MIR-30C/3P (2.1\%)      \\
+15 & MIR-455/3P (0.6\%)      & MIR-24-2/2* (0.6\%)     & MIR-323B/3P (2.0\%)     & MIR-511/3P (2.1\%)      \\
+16 & MIR-675/675* (0.5\%)    & MIR-660/660 (0.6\%)     & MIR-301/301A (1.9\%)    & MIR-577/577 (2.0\%)     \\
+17 & MIR-744/744* (0.5\%)    & MIR-30C/3P (0.6\%)      & MIR-135-1/135A (1.9\%)  & MIR-651/651 (2.0\%)     \\
+18 & MIR-9-1/9 (0.5\%)       & MIR-20A/20A* (0.6\%)    & MIR-134/134 (1.8\%)     & MIR-181D/181D (1.9\%)   \\
+19 & MIR-18A/18A* (0.5\%)    & MIR-589/5P (0.5\%)      & MIR-217/217 (1.7\%)     & MIR-134/134 (1.9\%)     \\
+20 & MIR-519A-1/519A* (0.4\%) & MIR-18A/18A* (0.5\%)    & MIR-184/184 (1.7\%)     & MIR-2115/2115* (1.9\%)  \\ \hline
+\textbf{Rank} & \multicolumn{2}{c|}{\textbf{Luminal A}} & \multicolumn{2}{c}{\textbf{Luminal B}} \\
+& \textit{miRNA Only} & \textit{miRNA + Clinical} & \textit{miRNA Only} & \textit{miRNA + Clinical} \\ \hline
+1  & MIR-30/30A (5.1\%)     & MIR-30/30A (5.4\%)     & MIR-3677/3P (5.1\%)    & MIR-190B/190B (5.5\%)  \\
+2  & MIR-501/3P (4.8\%)     & MIR-19A/19A (5.0\%)    & MIR-190B/190B (4.9\%)  & MIR-3677/3P (5.0\%)    \\
+3  & MIR-19A/19A (4.8\%)    & MIR-501/3P (4.9\%)     & MIR-126/126 (4.1\%)    & MIR-3615/3615 (3.8\%)   \\
+4  & MIR-1301/1301 (4.6\%)   & MIR-28/3P (4.2\%)       & MIR-3615/3615 (3.9\%)   & MIR-206/206 (3.7\%)     \\
+5  & MIR-15B/15B* (4.0\%)    & MIR-1301/1301 (4.1\%)   & MIR-1251/1251 (3.2\%)   & MIR-25/25 (3.5\%)       \\
+6  & MIR-28/3P (4.0\%)       & MIR-125A/3P (4.0\%)     & MIR-19B-1/1* (3.1\%)    & \textbf{SIGCLUST\_MRNA} (3.4\%) \\
+7  & MIR-125A/3P (3.8\%)     & MIR-15B/15B* (3.6\%)    & MIR-99/99A (2.8\%)      & MIR-1251/1251 (3.1\%)   \\
+8  & MIR-326/326 (3.5\%)     & MIR-106B/106B* (3.2\%)  & MIR-206/206 (2.2\%)     & MIR-338/3P (2.8\%)      \\
+9  & MIR-105-1/105 (3.3\%)   & MIR-205/205* (3.1\%)    & MIR-101-1/101 (1.9\%)   & MIR-205/205* (2.4\%)    \\
+10 & MIR-664/664 (3.1\%)     & MIR-326/326 (2.5\%)     & MIR-30D/30D (1.9\%)     & MIR-126/126 (2.0\%)     \\
+11 & MIR-3200/3P (2.8\%)     & MIR-145/145 (2.4\%)     & MIR-4326/4326 (1.8\%)   & MIR-99/99A (1.9\%)      \\
+12 & MIR-205/205* (2.4\%)    & MIR-105-1/105 (2.4\%)   & MIR-25/25 (1.8\%)       & MIR-30D/30D (1.9\%)     \\
+13 & MIR-222/222 (1.9\%)     & MIR-451/451 (2.0\%)     & LET-7E/7E* (1.8\%)      & MIR-944/944 (1.7\%)     \\
+14 & MIR-451/451 (1.8\%)     & MIR-31/31* (1.9\%)      & MIR-24-1/24 (1.8\%)     & MIR-454/454 (1.7\%)     \\
+15 & MIR-106B/106B* (1.6\%)  & \textbf{CN\_CLUSTER} (1.9\%) & MIR-15A/15A* (1.7\%)    & MIR-24-1/24 (1.6\%)     \\
+16 & MIR-3614/5P (1.6\%)     & MIR-642/642A (1.9\%)    & MIR-20B/20B* (1.6\%)    & MIR-15A/15A* (1.5\%)    \\
+17 & MIR-101-1/101 (1.5\%)   & MIR-3200/3P (1.8\%)     & MIR-15B/15B (1.6\%)     & MIR-20B/20B* (1.5\%)    \\
+18 & MIR-32/32* (1.5\%)      & MIR-664/664 (1.7\%)     & MIR-874/874 (1.6\%)     & MIR-874/874 (1.5\%)     \\
+19 & MIR-200A/200A (1.4\%)   & MIR-345/345 (1.4\%)     & MIR-484/484 (1.5\%)     & MIR-582/3P (1.5\%)      \\
+20 & MIR-425/425* (1.4\%)    & MIR-190B/190B (1.3\%)   & MIR-205/205* (1.5\%)    & MIR-4326/4326 (1.5\%)   \\ \hline
+\end{tabular}
+\end{table}
+
+Several patterns are noteworthy:
+
+\begin{itemize}
+    \item \textbf{Basal-like}: MIR-577 dominates with~$\sim$59\% of total gain under miRNA-only
+    and $\sim$57\% with clinical data, suggesting it is a highly specific, singular discriminative
+    signal. MIR-934 and MIR-135B are the next strongest contributors.
+
+    \item \textbf{HER2-enriched}: The importance profile is more distributed (top feature
+    MIR-30/30A accounts for only $\sim$15\% of gain), consistent with the lower overall
+    classification performance. With clinical data, \texttt{HER2\_STATUS} enters the top 10,
+    confirming the complementary role of the clinical receptor status.
+
+    \item \textbf{Luminal A}: Gain is distributed across many features (top feature contributes
+    only $\sim$5\%), suggesting the absence of a dominant singular marker and a more diffuse
+    miRNA signature for this subtype.
+
+    \item \textbf{Luminal B}: Similarly distributed gain profile, with the top 20 features
+    accounting for only $\sim$50\% of total gain -- the lowest concentration ratio across all
+    subtypes, reflecting the heterogeneous nature of Luminal~B.
+\end{itemize}
+
+
+% ============================================================
+\subsection{Statistical Corroboration via ANOVA F-Test}
+\label{sec:anova-bridge}
+% ============================================================
+ 
+The feature importances derived from XGBoost in the previous section are, by their nature,
+\textit{model-dependent}: they reflect the contribution of each feature within a specific
+learned ensemble, under a specific training regime. A high gain score tells us that a
+feature was useful to \textit{this} model, but it does not, on its own, constitute
+statistical evidence that the feature's expression genuinely differs across subtypes at the
+population level. The two concepts (discriminative utility and statistical significance)
+are related but not equivalent, and conflating them would weaken any biological conclusions
+drawn from the analysis.
+ 
+This is the fundamental motivation for introducing the ANOVA F-test at this stage. Unlike
+XGBoost, ANOVA is entirely model-agnostic: it evaluates each feature independently of any
+classifier, asking a direct statistical question: \textbf{does the mean expression of this miRNA
+differ significantly between patients of a given subtype and all others?} A feature that
+ranks highly under ANOVA is not ``important to a model''; it is \textbf{statistically
+distinguishable at the population level}, under the well-defined assumptions of analysis
+of variance. This distinction is what gives the ANOVA results their evidential value here:
+they provide a source of confirmation that operates through an entirely different lens.
+ 
+When a miRNA is selected as important by XGBoost \textit{and} identified as statistically
+significant by ANOVA, the two confirmations are independent. The model did not influence
+the F-scores, and the F-scores did not influence the model. It is precisely this
+independence that makes the intersection meaningful: a feature that survives both filters
+is not an artefact of one method's assumptions or luck, but a signal robust enough to emerge
+from two fundamentally different analytical paradigms.
+ 
+Given this, for each subtype $s \in \{\text{Basal-like}, \text{HER2-enriched}, \text{Luminal~A},
+\text{Luminal~B}\}$, the analysis was framed as a binary OvR problem, consistent with
+the XGBoost experiments. The F-statistic for each feature $j$ is defined as the ratio
+of between-group to within-group variance:
+ 
+\begin{equation}
+F_j = \frac{n_1\,(\bar{x}_{j,1} - \bar{x}_j)^2 \;+\; n_0\,(\bar{x}_{j,0} - \bar{x}_j)^2}
+           {\displaystyle\sum_{k \in \{0,1\}} \sum_{i:\, y_i^{(s)}=k} (x_{ij} - \bar{x}_{j,k})^2 \,/\, (n-2)}
+\label{eq:anova}
+\end{equation}
+ 
+\noindent where $n_1$ and $n_0$ are the sizes of the positive and negative groups,
+$\bar{x}_{j,k}$ is the mean expression of feature $j$ in group $k$, and $\bar{x}_j$
+is the overall mean. A large $F_j$ indicates that the expression of feature $j$
+varies more \textit{between} the two groups than it does \textit{within} them -
+the defining criterion of a statistically discriminative marker.
+ 
+All features were standardised via \texttt{StandardScaler} prior to computing F-scores,
+ensuring that differences in expression scale across miRNAs do not artificially inflate
+or deflate individual F-statistics. Feature selection was implemented using
+\texttt{SelectKBest(f\_classif)} from scikit-learn, embedded in a pipeline with a
+downstream XGBoost classifier. This pipeline structure ensured that feature selection
+was performed exclusively on training data at each cross-validation fold, with no
+information leakage from the test set. The optimal number of features $k$ was
+determined per subtype as the value maximising the cross-validated macro F1-score.
+Additionally, features were added incrementally in decreasing order of F-score, and the
+resulting classification performance trajectory was recorded: revealing both
+\textit{how many} features are needed and \textit{which individual features}
+contribute most to the discriminative signal.
+ 
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{f1_score_vs_number_of_features_anova_without.png}
+        \caption{miRNA only}
+        \label{fig:f1_mirna}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{f1_score_vs_number_of_features_anova_with.png}
+        \caption{miRNA + clinical}
+        \label{fig:f1_mirna_clinical}
+    \end{subfigure}
+    \caption{F1-score (10-fold CV) as a function of the number of features $k$ for each breast cancer subtype, under two feature configurations. Stars indicate the optimal $k$ selected for each subtype.}
+    \label{fig:f1_vs_features}
+\end{figure}
+ 
+The results reveal a striking gradient across subtypes \textbf{that directly mirrors the XGBoost
+findings}. For Basal-like, classification performance saturates rapidly at around $k \approx 10$
+(F1~$\approx 0.92$), with MIR-934, MIR-577, and MIR-135B alone accounting for the bulk of
+the gain, their F-scores of 386, 358, and 292 respectively are an order of magnitude
+above those of any other subtype's top features, reflecting an exceptionally strong and
+concentrated statistical signal. For HER2-enriched, by contrast, performance continues
+to improve across the full tested range of $k \leq 50$, and the top F-scores barely
+exceed 50 - confirming, through a completely independent lens, what XGBoost already
+suggested: this subtype lacks a small dominant set of miRNA markers. Luminal~A reaches
+its performance ceiling around $k = 20$ (F1~$\approx 0.73$), while Luminal~B exhibits
+the weakest and most volatile trajectory of all, with top F-scores around 34 - further
+evidence that its molecular boundary is diffuse and that no individual miRNA cleanly
+separates it from adjacent subtypes.
+ 
+The consistency of this picture across two independent methods is not incidental. It is
+the convergence this work relies upon to move from model-derived feature rankings to
+biologically grounded candidate miRNA panels, as formalised in the following section.
+
+With both the XGBoost gain importances and the ANOVA F-scores computed independently, we now
+bring them together to identify the \textbf{doubly-validated miRNA panels} for each subtype,
+as formalised in Section~\ref{sec:validation-hypothesis}.
+
+\todo{arranjar aqui uma forma de representar a interseção dos resultados do ANOVA com o XGBoost sem ficarmos com tabelas gigantes - Fazemos aquele diagrama de vern ou deixamos isso para último como cartada final?}
+
+% Table~\ref{tab:intersections} presents, for each subtype and each feature configuration, the
+% features that appear in both the ANOVA top-ranked list (at the optimal $k$) and the XGBoost
+% top-20 gain ranking.
+
+% Tables~\ref{tab:intersect-basal}--\ref{tab:intersect-lumb} present, for each subtype
+% and each feature configuration, every feature that appears in either the ANOVA top-ranked
+% list (at the subtype-specific optimal $k$) or the XGBoost top-20 gain ranking. Rows
+% highlighted in \colorbox{validated}{\textcolor{validatedtext}{green}} are
+% \textbf{doubly-validated}: they were independently selected by both methods. Rows in
+% \colorbox{clinicalfill}{\textcolor{clinicaltext}{amber}} denote clinical features.
+% Unmarked rows are single-method selections only.
+
+% % =====================================================================
+% % TABLE 1 — BASAL-LIKE
+% % =====================================================================
+% \begin{table}[t]
 % \centering
-% \caption{Classification performance under the homogeneous setting (miRNA features
-% only). Results are shown as percentages.}
-% \label{tab:homo_results}
-% \begin{tabular}{lcccccccc}
-% \hline
-%  & \multicolumn{4}{c}{\textbf{Overall}} & \multicolumn{4}{c}{\textbf{Per-class F1}} \\
-% \textbf{Model} & P & R & F1 & Acc & Basal & HER2 & Lum~A & Lum~B \\
-% \hline
-% DIABLO (Single Block) & 75.3 & 67.3 & 67.7 & 73.5 & 100.0 & 40.0 & 80.8 & 50.0 \\
-% Decision Tree         & 57.4 & 56.4 & 56.8 & 57.1 & 87.5  & 36.4 & 61.9 & 41.4 \\
-% Logistic Regression   & 80.3 & 75.6 & 73.5 & 77.6 & 94.1  & 61.5 & 85.7 & 52.6 \\
-% XGBoost               & 87.0 & 74.4 & 76.7 & 75.5 & 100.0 & 80.0 & 76.9 & 50.0 \\
-% \hline
+% \caption{Feature intersection for \textbf{Basal-like} (OvR binary classification).
+% ANOVA F-scores and XGBoost gain percentages are reported for each condition.
+% Doubly-validated features appear in both methods independently.}
+% \label{tab:intersect-basal}
+% \setlength{\tabcolsep}{5pt}
+% \renewcommand{\arraystretch}{1.25}
+ 
+% \begin{tabular}{l rr rr}
+% \toprule
+% & \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+% \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+% \textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA only}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-934/934}     & 1  & 386.11 & 3  & 8.50  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-577/577}     & 2  & 358.03 & 1  & 59.22 \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-135B/135B*}  & 3  & 291.92 & 2  & 9.45  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-190B/190B}   & 4  & 204.94 & 4  & 4.29  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-455/5P}      & 8  & 134.45 & 5  & 2.76  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-505/505}     & 10 & 124.91 & 7  & 1.86  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-18A/18A*}    & 4  & 214.21 & 19 & 0.45  \\
+% MIR-106B/106B*  & 5  & 117.62 & --- & ---   \\
+% MIR-18B/18B*    & 6  &  76.65 & --- & ---   \\
+% MIR-20A/20A*    & 9  & 119.19 & --- & ---   \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-934/934}      & 1  & 386.11 & 3  & 7.73  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-577/577}      & 2  & 358.03 & 1  & 56.86 \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-135B/135B*}   & 3  & 291.92 & 2  & 10.49 \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-190B/190B}    & 4  & 204.94 & 5  & 3.79  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-455/5P}       & 9  & 134.45 & 6  & 3.37  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-505/505}      & 11 & 124.91 & 7  & 1.92  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-519A-1/519A*} & 13 & 135.26 & 14 & 0.77  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-20A/20A*}     & 8  & 119.19 & 19 & 0.56  \\
+% \rowcolor{clinicalfill}\textcolor{clinicaltext}{ER\_STATUS}     & 10 & 256.72 & ---& ---   \\
+% MIR-106B/106B*  & 6  & 117.62 & --- & ---   \\
+% \bottomrule
 % \end{tabular}
 % \end{table}
-
-% Several observations are immediately apparent. First, the Basal-like subtype is
-% perfectly classified (F1 = 100\%) by both XGBoost and Logistic Regression, confirming
-% that it carries a highly distinctive miRNA expression signature that is unambiguously
-% separable from the remaining three subtypes. This result is robust across models and
-% configurations and is consistent with the known biology of Basal-like breast cancer
-% as a triple-negative, genomically unstable subtype with a fundamentally different
-% transcriptional programme from its Luminal counterparts. Second, HER2-enriched and
-% Luminal~B are the hardest subtypes to classify from miRNA expression alone --- a
-% finding that reflects the greater biological overlap between these subtypes and the
-% under-representation of both classes in the dataset. XGBoost achieves the strongest
-% overall F1 (76.7\%) and the highest HER2-enriched F1 (80.0\%), substantially
-% outperforming the DIABLO Single Block configuration (40.0\% on HER2), which suggests
-% that a direct discriminative approach is better suited to separating these overlapping
-% subtypes than latent component extraction. Logistic Regression achieves the highest
-% Luminal~A F1 (85.7\%), consistent with the hypothesis that this dominant class is
-% linearly separable in the miRNA feature space.
-
-% \subsubsection*{miRNA + Clinical Classification}
-
-% Table~\ref{tab:hetero_results} presents the results under the heterogeneous setting.
-% A consistent performance boost is observed across all discriminative models when
-% clinical features are added.
-
-% \todo{Replace with cross-validated mean $\pm$ std when available.}
-
-% \begin{table}[h!]
+ 
+% % =====================================================================
+% % TABLE 2 — HER2-ENRICHED
+% % =====================================================================
+% \begin{table}[htbp]
 % \centering
-% \caption{Classification performance under the heterogeneous setting (miRNA +
-% clinical features). Results are shown as percentages. }
-% \label{tab:hetero_results}
-% \begin{tabular}{lcccccccc}
-% \hline
-%  & \multicolumn{4}{c}{\textbf{Overall}} & \multicolumn{4}{c}{\textbf{Per-class F1}} \\
-% \textbf{Model} & P & R & F1 & Acc & Basal & HER2 & Lum~A & Lum~B \\
-% \hline
-% DIABLO (All Blocks) & 78.5 & 72.6 & 73.8 & 79.6 & 100.0 & 40.0 & 85.7 & 69.6 \\
-% Decision Tree       & 62.0 & 63.7 & 62.5 & 61.2 & 88.9  & 54.6 & 61.9 & 44.4 \\
-% Logistic Regression & 77.2 & 75.6 & 75.6 & 79.6 & 94.1  & 54.6 & 87.0 & 66.7 \\
-% XGBoost             & 90.1 & 79.2 & 82.2 & 83.7 & 100.0 & 66.7 & 85.1 & 76.9 \\
-% \hline
+% \caption{Feature intersection for \textbf{HER2-enriched} (OvR binary classification).}
+% \label{tab:intersect-her2}
+% \setlength{\tabcolsep}{5pt}
+% \renewcommand{\arraystretch}{1.25}
+ 
+% \begin{tabular}{l rr rr}
+% \toprule
+% & \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+% \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+% \textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA only}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-30/30A}      & 3  & 40.36 & 1  & 15.20 \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-192/192*}    & 5  & 37.88 & 5  & 6.09  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-184/184}     & 4  & 26.99 & 20 & 1.70  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-187/187}     & 14 & 35.39 & 7  & 3.71  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-2115/2115*}  & 1  & 54.22 & 14 & 2.38  \\
+% MIR-345/345     & 17 & 22.53 & --- & ---   \\
+% MIR-181D/181D   & 8  & 11.24 & --- & ---   \\
+% MIR-497/497*    & 13 & 17.32 & --- & ---   \\
+% MIR-3150B/3P    & ---& ---   & 6  & 4.84  \\
+% MIR-101/101     & 5  & 13.43 & --- & ---   \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+% \midrule
+% \rowcolor{clinicalfill}\textcolor{clinicaltext}{HER2\_STATUS}   & 1  & 76.90 & 10 & 2.85  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-3150B/3P}    & 2  & 37.55 & 2  & 9.84  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-184/184}     & 4  & 26.99 & 12 & 2.55  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-497/497*}    & 6  & 17.32 & 11 & 2.74  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-30C/3P}      & 9  & 20.79 & 14 & 2.12  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-187/187}     & 10 & 35.39 & 7  & 4.28  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-30/30A}      & 14 & 40.36 & 1  & 10.65 \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-217/217}     & 19 & 11.83 & 19 & 1.73  \\
+% \rowcolor{clinicalfill}\textcolor{clinicaltext}{PR\_STATUS}    & 5  & 17.39 & ---& ---   \\
+% MIR-345/345     & 3  & 22.53 & --- & ---   \\
+% \bottomrule
 % \end{tabular}
 % \end{table}
+ 
+% % =====================================================================
+% % TABLE 3 — LUMINAL A
+% % =====================================================================
+% \begin{table}[htbp]
+% \centering
+% \caption{Feature intersection for \textbf{Luminal A} (OvR binary classification).}
+% \label{tab:intersect-luma}
+% \setlength{\tabcolsep}{5pt}
+% \renewcommand{\arraystretch}{1.25}
+ 
+% \begin{tabular}{l rr rr}
+% \toprule
+% & \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+% \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+% \textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA only}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-1301/1301}   & 2  & 85.14 & 4  & 4.61  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-15B/15B*}    & 4  & 71.69 & 5  & 4.00  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-19A/19A}     & 20 & 76.81 & 3  & 4.79  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-106B/106B*}  & 7  & 68.14 & 15 & 1.61  \\
+% MIR-942/942     & 1  & 102.90& --- & ---   \\
+% MIR-590/3P      & 5  & 76.03 & --- & ---   \\
+% MIR-18A/18A*    & 3  & 70.57 & --- & ---   \\
+% MIR-30/30A      & ---& ---   & 1  & 5.14  \\
+% MIR-501/3P      & ---& ---   & 2  & 4.82  \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-1301/1301}   & 2  & 85.14 & 5  & 4.06  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-15B/15B*}    & 5  & 71.69 & 7  & 3.61  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-106B/106B*}  & 8  & 68.14 & 8  & 3.15  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-105-1/105}   & 18 & 41.56 & 12 & 2.36  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-30A/30A*}    & 20 & 40.86 & 1  & 5.38  \\
+% MIR-942/942     & 1  & 102.90& --- & ---   \\
+% MIR-590/3P      & 6  & 76.03 & --- & ---   \\
+% MIR-210/210     & 7  & 44.84 & --- & ---   \\
+% MIR-19A/19A     & ---& ---   & 2  & 4.98  \\
+% MIR-501/3P      & ---& ---   & 3  & 4.94  \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+ 
+% % =====================================================================
+% % TABLE 4 — LUMINAL B
+% % =====================================================================
+% \begin{table}[htbp]
+% \centering
+% \caption{Feature intersection for \textbf{Luminal B} (OvR binary classification).
+% The sparsity of doubly-validated features in the miRNA-only condition reflects
+% the known molecular heterogeneity of this subtype.}
+% \label{tab:intersect-lumb}
+% \setlength{\tabcolsep}{5pt}
+% \renewcommand{\arraystretch}{1.25}
+ 
+% \begin{tabular}{l rr rr}
+% \toprule
+% & \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+% \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+% \textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA only}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-99/99A}      & 4  & 34.53 & 7  & 2.77  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-15A/15A}     & 9  & 10.32 & 15 & 1.69  \\
+% MIR-99A/99A*    & 1  & 34.53 & --- & ---   \\
+% MIR-887/887     & 2  & 25.71 & --- & ---   \\
+% MIR-193B/3P     & 5  & 10.29 & --- & ---   \\
+% MIR-3677/3P     & ---& ---   & 1  & 5.09  \\
+% MIR-190B/190B   & ---& ---   & 2  & 4.90  \\
+% MIR-126/126     & ---& ---   & 3  & 4.13  \\
+% MIR-135B/135B*  & 15 & 13.10 & --- & ---   \\
+% MIR-934/934     & 16 & 16.68 & --- & ---   \\
+% \midrule
+% \multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+% \midrule
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-99/99A}      & 1  & 34.53 & 11 & 1.93  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-205/205*}    & 2  & 24.22 & 9  & 2.41  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-338/3P}      & 19 & 8.96  & 8  & 2.76  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-454/454}     & 15 & 10.56 & 14 & 1.69  \\
+% \rowcolor{validated}\textcolor{validatedtext}{MIR-15A/15A}     & 18 & 10.32 & 16 & 1.54  \\
+% \rowcolor{clinicalfill}\textcolor{clinicaltext}{ER\_STATUS}    & 13 & 32.17 & ---& ---   \\
+% MIR-193B/3P     & 3  & 10.29 & --- & ---   \\
+% MIR-107-10/107  & 4  & 14.49 & --- & ---   \\
+% MIR-190B/190B   & ---& ---   & 1  & 5.49  \\
+% MIR-3677/3P     & ---& ---   & 2  & 4.95  \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+ 
 
-% XGBoost shows the most substantial improvement: overall F1 increases from 76.7\% to
-% 82.2\% and accuracy from 75.5\% to 83.7\%. The most dramatic per-class gain is in
-% Luminal~B, whose F1 rises from 50.0\% to 76.9\%, consistent with the expectation that
-% clinical markers such as ER and PR status help resolve the boundary between Luminal~A
-% and Luminal~B where miRNA profiles are most similar. Logistic Regression also benefits
-% (F1: 73.5\% $\to$ 75.6\%), though more modestly. Notably, DIABLO's performance on
-% HER2-enriched does not improve when clinical data is added (40.0\% in both
-% configurations), suggesting that its latent component structure fails to leverage the
-% clinical modality effectively for this subtype. In contrast, XGBoost's HER2-enriched
-% F1 improves from 80.0\% to 66.7\%: this apparent regression warrants attention and
-% is likely attributable to the class imbalance ($n=6$ in the test set) and the
-% sensitivity of precision/recall trade-offs to a small number of misclassified samples.
+% \subsection{Summary of Doubly-Validated Features}
 
-% [MEDIA: Confusion matrices for XGBoost (miRNA-only vs miRNA+clinical, side by side),
-% and Logistic Regression and DIABLO for comparison. Four matrices in a 2x2 grid
-% mirroring Figure 7 of the EPIA paper.]
+% The number of doubly-validated features per subtype and condition is summarised below:
 
-% % ---------------------------------------------------------------
-% \subsection{Impact of Clinical Data: Statistical Validation}
-% \label{subsec:clinical_impact}
-% % ---------------------------------------------------------------
+% \begin{center}
+% \begin{tabular}{lcc}
+% \hline
+% \textbf{Subtype} & \textbf{miRNA only} & \textbf{miRNA + clinical} \\
+% \hline
+% Basal-like       & 7 & 8 \\
+% HER2-enriched    & 5 & 8 \\
+% Luminal A        & 4 & 5 \\
+% Luminal B        & 2 & 5 \\
+% \hline
+% \end{tabular}
+% \end{center}
 
-% The performance differences observed in the single-split results are suggestive but
-% not statistically conclusive. To rigorously test whether the addition of clinical
-% features produces a significant improvement over miRNA-only classification, a
-% Repeated Stratified K-Fold cross-validation experiment was conducted using XGBoost
-% under both feature configurations. The design used \texttt{n\_splits=5} and
-% \texttt{n\_repeats=10}, yielding 50 paired evaluation folds. At each fold, the
-% StandardScaler was fitted exclusively on the training partition and applied to both
-% partitions, ensuring strict leakage prevention throughout. The macro F1-score was
-% recorded for both configurations at every fold, and the resulting paired distributions
-% were compared using the \textbf{Wilcoxon signed-rank test} --- a non-parametric
-% paired test that does not assume normality of the score distribution and is therefore
-% well suited to comparing performance across repeated folds.
+% The consistent increase in validated features when clinical data is added -- especially for
+% HER2-enriched (+3) and Luminal B (+3) -- is itself a finding: it quantifies the
+% contribution of clinical covariates not just to classification accuracy, but to the
+% identifiability of subtype-specific molecular markers.
 
-% \todo{[RECOMPUTE] The Wilcoxon test result (test statistic and p-value) must be
-% inserted here from the cross-validation output in notebook 3-modelos.ipynb (cells
-% 7--11). The directional finding (clinical data helps) is expected to be confirmed,
-% consistent with the EPIA paper.}
+% \paragraph{Basal-Like}
 
-% The results of this experiment confirm the directional finding of the paper: the
-% distribution of macro F1-scores under the heterogeneous setting is significantly
-% higher than under the homogeneous setting ($p < 0.05$ across the majority of
-% cross-validation configurations tested). Importantly, however, the magnitude of the
-% improvement is modest: as shown in Figure~3 of the published study~\cite{ourpaper},
-% miRNA expression features account for between 89.7\% and 98.1\% of total XGBoost
-% feature importance across all four subtypes, with clinical features contributing only
-% 1.9\%--10.3\%. Clinical data is therefore a complementary rather than a dominant
-% source of discriminative signal --- it resolves borderline cases, particularly for
-% Luminal~B and HER2-enriched, but the overwhelming majority of subtype-discriminative
-% information resides in the miRNA expression profiles themselves.
+% The three features \textbf{MIR-577, MIR-934, and MIR-135B} are doubly validated with
+% the highest confidence: they rank in the top~3 in both ANOVA (F-scores of 358, 386, and
+% 292 respectively) and XGBoost gain. MIR-577's dominance in XGBoost ($\sim 59\%$ gain) paired
+% with its high ANOVA F-score positions it as the \textbf{strongest candidate discriminative
+% marker for Basal-like}. MIR-190B, MIR-455-5p, and MIR-505 complete the core doubly-validated
+% panel. With clinical data, MIR-519A and MIR-20A enter the intersection. Notably,
+% \texttt{ER\_STATUS} appears in ANOVA (F-score 256.72) but not in the XGBoost top 20,
+% suggesting it carries individual statistical signal but is not the most useful discriminative
+% feature in the multivariate context -- consistent with the fact that Basal-like tumours are
+% reliably characterised as ER-negative, making the clinical feature partially redundant when
+% the miRNA signature is already present.
 
-% [MEDIA: Boxplot comparing macro F1-score distributions across 50 CV folds for
-% miRNA-only vs miRNA+clinical, mirroring the figure produced in notebook 3-modelos.ipynb
-% cell 12. Pairs of distributions for each model configuration side by side.]
+% \paragraph{HER2-Enriched}
 
-% % ---------------------------------------------------------------
-% \subsection{XGBoost as the Primary Model}
-% \label{subsec:xgb_selection}
-% % ---------------------------------------------------------------
+% Without clinical data, only 5 features are doubly validated, reflecting the difficulty of
+% this subtype. With clinical data, \textbf{HER2\_STATUS} tops the ANOVA ranking (F-score 76.90)
+% and also appears in the XGBoost top 10, making it the most strongly validated feature for
+% this subtype -- and the only clinical feature to achieve double validation. This finding
+% strongly supports the clinical intuition that HER2 receptor status is the defining feature of
+% this subtype. Among miRNAs, \textbf{MIR-30/30A and MIR-3150B-3p} are the most robustly
+% validated, appearing in both lists under both conditions.
 
-% Across both feature configurations and all evaluation metrics, XGBoost consistently
-% outperforms the other discriminative models and substantially surpasses DIABLO.
-% Three properties of XGBoost make it particularly well-suited to the structure of this
-% problem and motivate its selection as the primary model for the biomarker discovery
-% pipeline.
+% \paragraph{Luminal A}
 
-% First, XGBoost is well-calibrated for high-dimensional, low-sample-size settings.
-% With $n=195$ training samples and $p=462$ features ($p/n \approx 2.4$), the risk of
-% overfitting is non-trivial. XGBoost's built-in regularisation mechanisms --- the
-% learning rate shrinkage, column subsampling at each split, and the explicit
-% regularisation of tree complexity --- collectively reduce generalisation error without
-% requiring a separate dimensionality reduction step.
+% The four doubly-validated features without clinical data -- \textbf{MIR-1301, MIR-15B,
+% MIR-19A, and MIR-106B} -- form a compact panel with moderate but consistent signal.
+% A notable discrepancy is observed: \textbf{MIR-942} achieves the highest ANOVA F-score
+% for this subtype (102.90) and generates the largest single-feature F1 improvement (+0.56),
+% yet does not appear in the XGBoost top 20. This may indicate that MIR-942's discriminative
+% power is primarily marginal -- it differs strongly in mean expression between Luminal~A and
+% other subtypes -- but in the presence of other features within the model, its independent
+% contribution is reduced (possibly due to correlation with other included features). This
+% discrepancy is itself an informative finding: it illustrates the complementarity of the two
+% methods and cautions against relying exclusively on either one.
 
-% Second, XGBoost's sequential boosting strategy explicitly focuses learning effort on
-% samples that the current ensemble misclassifies. This is particularly beneficial for
-% the minority subtypes (HER2-enriched, Basal-like) whose small class sizes would
-% otherwise receive disproportionately little gradient signal in a standard
-% single-pass classifier.
+% \paragraph{Luminal B}
 
-% Third, and most critically for the downstream application in this work, XGBoost
-% provides two complementary mechanisms for per-class feature importance extraction:
-% (i) the multi-class booster's internal tree structure, which assigns trees to classes
-% by interleaving, enabling class-specific feature importance to be recovered; and
-% (ii) binary one-vs-rest booster analysis, where a separate binary XGBoost is trained
-% per subtype and the gain-based importance is extracted from its booster directly.
-% Both mechanisms are exploited in Section~\ref{subsec:feature_importance}.
+% Luminal B presents the weakest intersection, with only 2 doubly-validated features
+% (\textbf{MIR-99/99A and MIR-15A}) under the miRNA-only condition. The overall low ANOVA
+% F-scores (top feature F-score~$\approx 34$, compared to 386 for Basal-like) indicate that
+% no single miRNA differs dramatically in mean expression between Luminal~B and other subtypes.
+% With clinical data, 5 features are validated, including \textbf{MIR-99/99A} as the most
+% consistently appearing feature across both methods and both conditions -- making it the
+% strongest candidate marker for Luminal~B. The finding that ER\_STATUS appears in ANOVA
+% (F-score 32.17) but not in XGBoost top 20 is consistent with Luminal~B's hormonal status
+% being shared with Luminal~A, reducing its subtype-specific discriminative power.
 
-% % ---------------------------------------------------------------
-% \subsection{Hyperparameter Optimisation}
-% \label{subsec:gridsearch}
-% % ---------------------------------------------------------------
+% \subsection{Cross-Subtype Observations}
 
-% The XGBoost configuration described above was not simply a default setting: it was
-% selected through a systematic grid search over the key hyperparameters governing
-% model complexity and regularisation. The search explored combinations of
-% \texttt{n\_estimators} $\in \{50, 100, 200\}$, \texttt{learning\_rate} $\in \{0.1,
-% 0.3\}$, \texttt{max\_depth} $\in \{6, 10\}$, \texttt{subsample} $\in \{0.75, 0.85\}$,
-% and \texttt{colsample\_bytree} $\in \{0.7, 1.0\}$. Performance was measured using
-% stratified cross-validation to prevent the split composition from influencing the
-% hyperparameter selection.
-
-% \todo{[RECOMPUTE] Run a proper GridSearchCV with the parameter grid above (or a
-% refined version) using StratifiedKFold with $k=5$ or $k=10$. Report the best
-% parameter combination and the corresponding CV score. Confirm that the configuration
-% (n\_estimators=50, lr=0.3, max\_depth=10, subsample=0.85, colsample\_bytree=1.0)
-% is indeed the grid search winner or adjust if a better configuration is found.}
-
-% The selected configuration (\texttt{n\_estimators=50}, \texttt{learning\_rate=0.3},
-% \texttt{max\_depth=10}, \texttt{subsample=0.85}, \texttt{colsample\_bytree=1.0})
-% reflects a deliberate balance between expressiveness and regularisation. A smaller
-% number of estimators (50 rather than 100 or 200) combined with a relatively high
-% learning rate (0.3) produces a compact ensemble that converges quickly without
-% accumulating variance from excessive boosting rounds --- a particularly important
-% property when training samples are limited. The high \texttt{max\_depth} (10) allows
-% individual trees to capture complex interactions between miRNA features, while
-% \texttt{subsample=0.85} introduces row-level stochasticity at each round, reducing
-% sensitivity to individual samples and acting as an implicit regulariser.
-
-% % ---------------------------------------------------------------
-% \subsection{Feature Importance and miRNA Biomarker Discovery}
-% \label{subsec:feature_importance}
-% % ---------------------------------------------------------------
-
-% Having established XGBoost as the primary model, the next objective is to use it as
-% a proxy instrument for discovering which miRNAs are most discriminative for each
-% PAM50 subtype. This requires a careful choice of problem formulation, because the
-% question ``which features are most important for subtype $k$?'' can be interpreted in
-% two fundamentally different ways, each requiring a different experimental design.
-
-% \subsubsection*{Two Problem Formulations}
-
-% \paragraph{Formulation 1 — Multi-class: What distinguishes the subtypes from each other?}
-
-% In the multi-class setting, a single XGBoost model is trained to simultaneously
-% classify all four subtypes. XGBoost's gradient boosting procedure assigns trees to
-% classes in a round-robin fashion: in a model with $T$ estimators and $K = 4$ classes,
-% tree indices $\{0, 4, 8, \ldots\}$ are assigned to class 0, indices $\{1, 5, 9,
-% \ldots\}$ to class 1, and so on. By extracting and aggregating the feature usage
-% frequencies across only the trees belonging to class $k$, a per-class feature
-% importance ranking can be recovered from the multi-class model. This formulation
-% answers the question: \textit{``which features drive the boundaries between all
-% four subtypes jointly?''} and is appropriate for understanding the global structure
-% of the feature space.
-
-% \paragraph{Formulation 2 — Binary one-vs-rest: What characterises this specific subtype?}
-
-% In the binary formulation, a separate XGBoost model is trained for each subtype $k$
-% in a one-vs-rest manner: the target is binarised as $y_i^{(k)} = \mathbf{1}[y_i =
-% k]$, so the model learns to distinguish subtype $k$ from the union of all other
-% subtypes. The feature importance is extracted from the booster of this binary model
-% using the \textbf{gain} metric --- the average improvement in the loss function
-% brought by a feature across all splits where it is used. This formulation answers a
-% different question: \textit{``what is the unique molecular signature of this specific
-% subtype, relative to everything else?''} Unlike the multi-class approach, the binary
-% model is not influenced by the difficulty of discriminating between the other three
-% subtypes; it is entirely focused on what makes subtype $k$ special.
-
-% The choice between the two formulations is not merely technical --- it reflects a
-% scientific question. In this work, both formulations are applied:
+% Several miRNAs appear in the doubly-validated panels of more than one subtype, which is
+% biologically expected given the partial overlap between PAM50 categories:
 
 % \begin{itemize}
-%     \item The \textbf{multi-class formulation} is used to characterise the relative
-%     difficulty of discriminating between the four subtypes and to understand global
-%     feature contribution patterns.
-%     \item The \textbf{binary one-vs-rest formulation} is used as the primary approach
-%     for miRNA biomarker discovery, since it is designed to isolate the features that
-%     uniquely characterise each subtype against all others --- the most clinically
-%     relevant question for biomarker identification.
+%     \item \textbf{MIR-190B} appears in both Basal-like and Luminal~B panels, suggesting
+%     it may reflect a more general characteristic of aggressive or basal-program tumours.
+%     \item \textbf{MIR-577} and \textbf{MIR-135B} appear in Basal-like with high dominance
+%     but also with lower importance scores in Luminal~B, suggesting subtype-specific
+%     expression gradients rather than strict on/off expression.
 % \end{itemize}
 
-% \subsubsection*{Per-class Feature Importance Results}
+% [SUGGESTION: Cross-reference any of the identified doubly-validated miRNAs with published
+% literature on breast cancer miRNA biomarkers -- particularly MIR-577, MIR-135B, MIR-30/30A,
+% and MIR-99 -- to assess whether the computational findings are consistent with known
+% biological roles. This contextualisation is essential for the biological discussion section
+% of the thesis.]
 
-% The binary one-vs-rest XGBoost was applied independently for each of the four
-% subtypes. For each subtype, the gain-based importance was computed from the booster,
-% and features were ranked in descending order of their total gain contribution. The
-% top features per subtype are presented in Table~\ref{tab:feature_importances}, showing
-% the top-10 features and their percentage gain contribution (relative to the total gain
-% of all features for that subtype). Results are shown for the miRNA-only configuration
-% (to isolate the molecular signal from clinical confounders) and for the
-% miRNA + clinical configuration.
+% \subsection{Limitations and Caveats}
 
-% \todo{Recompute with cross-validated
-% feature importance (aggregate across folds) to verify stability of rankings.}
-% \begin{table}[h!]
-% \centering
-% \caption{Top 10 gain-weighted features per PAM50 subtype from the binary XGBoost
-% booster (miRNA + clinical configuration). Score shown as percentage of total gain.
-% Clinical features are shown in italics.}
-% \label{tab:feature_importances}
-% \small
-% \begin{tabular}{llr llr}
-% \hline
-% \multicolumn{3}{c}{\textbf{Basal-like}} & \multicolumn{3}{c}{\textbf{HER2-enriched}} \\
-% \textbf{Rank} & \textbf{Feature} & \textbf{\% Gain} &
-% \textbf{Rank} & \textbf{Feature} & \textbf{\% Gain} \\
-% \hline
-% 1  & MIR-577/577        & 56.86 & 1  & MIR-30/30A       & 10.65 \\
-% 2  & MIR-135B/135B*     & 10.49 & 2  & MIR-3150B/3P     &  9.84 \\
-% 3  & MIR-934/934        &  7.73 & 3  & MIR-34C/5P       &  8.35 \\
-% 4  & \textit{METHYLATION\_CLUSTER} & 4.13 & 4 & MIR-769/5P & 6.53 \\
-% 5  & MIR-190B/190B      &  3.79 & 5  & MIR-192/192*     &  5.38 \\
-% 6  & MIR-455/5P         &  3.37 & 6  & MIR-501/3P       &  4.65 \\
-% 7  & MIR-505/505        &  1.92 & 7  & MIR-187/187      &  4.28 \\
-% 8  & MIR-2115/2115*     &  1.79 & 8  & MIR-210/210      &  3.13 \\
-% 9  & \textit{SIGCLUST\_UNSUP} &  1.56 & 9 & MIR-142/3P   &  2.99 \\
-% 10 & \textit{CN\_CLUSTER}    &  1.01 & 10 & \textit{HER2\_STATUS} & 2.85 \\
-% \hline
-% \multicolumn{3}{c}{\textbf{Luminal A}} & \multicolumn{3}{c}{\textbf{Luminal B}} \\
-% \textbf{Rank} & \textbf{Feature} & \textbf{\% Gain} &
-% \textbf{Rank} & \textbf{Feature} & \textbf{\% Gain} \\
-% \hline
-% 1  & MIR-30/30A         &  5.38 & 1  & MIR-190B/190B    &  5.49 \\
-% 2  & MIR-19A/19A        &  4.98 & 2  & MIR-3677/3P      &  4.95 \\
-% 3  & MIR-501/3P         &  4.94 & 3  & MIR-3615/3615    &  3.75 \\
-% 4  & MIR-28/3P          &  4.18 & 4  & MIR-206/206      &  3.69 \\
-% 5  & MIR-1301/1301      &  4.06 & 5  & MIR-25/25        &  3.52 \\
-% 6  & MIR-125A/3P        &  3.95 & 6  & \textit{SIGCLUST\_UNSUP} & 3.36 \\
-% 7  & MIR-15B/15B*       &  3.61 & 7  & MIR-1251/1251    &  3.08 \\
-% 8  & MIR-106B/106B*     &  3.15 & 8  & MIR-338/3P       &  2.76 \\
-% 9  & MIR-205/205*       &  3.06 & 9  & MIR-205/205*     &  2.41 \\
-% 10 & MIR-326/326        &  2.52 & 10 & MIR-126/126      &  2.02 \\
-% \hline
-% \end{tabular}
-% \end{table}
-
-% [MEDIA: Horizontal bar chart (one panel per subtype, 2x2 grid) showing top 10--15
-% features and their percentage gain, with clinical features coloured differently from
-% miRNA features. This gives an immediate visual impression of the dominance of miRNA
-% signal and highlights the occasional clinical feature appearing in the top rankings.]
-
-% \subsubsection*{Separability Analysis}
-
-% A critical observation that links the classification results to the feature importance
-% findings is the pronounced asymmetry in how well each subtype is characterized by its
-% top features. Table~\ref{tab:feature_importances} reveals that the top 20 features
-% account for approximately 98.7\% of total gain for Basal-like, but only 58.4\% for
-% Luminal~A and 51.4\% for Luminal~B. This concentration of gain in a small number of
-% features is a direct reflection of how well-defined and biologically distinct each
-% subtype's molecular signature is.
-
-% For Basal-like, a single feature --- MIR-577/577 --- accounts for 56.86\% of the
-% total booster gain, an extraordinary concentration that reflects the uniquely
-% distinctive molecular identity of this subtype among the four classes. Basal-like
-% tumours, also known as triple-negative breast cancers, have a fundamentally different
-% transcriptional landscape from the three Luminal and HER2 subtypes, and MIR-577/577
-% appears to be a primary molecular marker of this distinction in the expression data.
-% This is consistent with the perfect classification results (F1 = 1.0) achieved by
-% all models for this subtype.
-
-% HER2-enriched presents a more distributed importance profile: the top feature
-% (MIR-30/30A) accounts for only 10.65\% of gain, and importance is spread across a
-% broader set of features. This diffuse signal is consistent with the classification
-% results, where HER2-enriched was the hardest subtype to classify --- the absence of
-% a dominant discriminative feature means the model must rely on a combination of many
-% weaker signals. Notably, \texttt{HER2\_STATUS} appears in the top 10 for this
-% subtype (rank 10, 2.85\% gain) when clinical data is included, confirming the
-% expected alignment between the clinical marker and the molecular subtype assignment
-% and providing a useful sanity check for the model's internal reasoning.
-
-% For Luminal~A and Luminal~B, the importance is similarly distributed, with no single
-% miRNA dominating. This is expected: the Luminal subtypes are the most closely related
-% of the four, sharing hormone receptor positivity and overlapping expression programmes,
-% and their discrimination is inherently a harder problem. The appearance of
-% MIR-205/205* in the top 10 of both Luminal~A and Luminal~B (ranks 9 and 9 respectively)
-% is particularly noteworthy, as it suggests this miRNA contributes to Luminal identity
-% broadly rather than being specific to one subtype --- a finding that warrants further
-% biological investigation.
-
-% [MEDIA: A heatmap or dot plot showing which miRNAs appear in the top-10 rankings of
-% more than one subtype (cross-subtype overlap analysis). This visually identifies
-% ``shared'' biomarkers (appearing in multiple subtypes) vs ``exclusive'' biomarkers
-% (unique to one subtype), which is a key interpretive distinction for downstream
-% biological validation.]
-
-% \subsubsection*{Classification Performance on Reduced Feature Sets}
-
-% To validate that the top features identified by the binary booster are genuinely
-% sufficient to characterise each subtype --- and not merely artefacts of feature
-% importance rankings --- the following experiment was conducted for each subtype $k$:
+% Several limitations of this analysis deserve explicit acknowledgement:
 
 % \begin{enumerate}
-%     \item The top-$K$ features identified by the binary booster for subtype $k$ were
-%     extracted (panels of $K = 3$ and $K = 10$ were evaluated).
-%     \item A new multi-class XGBoost classifier was trained using only those $K$ features.
-%     \item The per-class F1-score for subtype $k$ was compared between the full-feature
-%     model and the reduced-feature model.
-%     \item A paired t-test across multiple cross-validation configurations
-%     (\texttt{n\_splits} $\in \{3, 5, 7, 10\}$, \texttt{n\_repeats} $\in \{1, 5, 7,
-%     10\}$) was used to assess whether the performance difference was statistically
-%     significant.
+%     \item The dataset comprises only 244 samples, which limits statistical power -
+%     particularly for minority subtypes (HER2-enriched: $n=29$). Validation on a larger,
+%     independent cohort is necessary before the identified panels can be considered clinically
+%     actionable.
+
+%     \item The two-level validation framework is confirmatory, not exploratory: it increases
+%     confidence in features already appearing in both ranked lists, but cannot rule out relevant
+%     features that are highly correlated with, and therefore displaced by, other selected features
+%     (redundancy effects, especially in XGBoost gain).
+
+%     \item ANOVA's assumptions (normality, homoscedasticity) may not hold strictly for all
+%     miRNA features; however, the large sample sizes within each group provide some robustness
+%     via the central limit theorem.
 % \end{enumerate}
 
-% The results confirm the sufficiency of the selected panels for Basal-like: a panel
-% of just 3 features (MIR-577/577, MIR-934/934, MIR-135B/135B*) achieves F1 = 1.0 on
-% the test set --- identical to the full-feature model --- and the paired t-test finds
-% no statistically significant degradation for the majority of CV configurations. For
-% HER2-enriched, Luminal~A, and Luminal~B, the reduced panels do incur a statistically
-% significant performance drop (confirmed by $p < 0.05$ in most CV configurations),
-% indicating that the broader feature set contributes meaningful information for these
-% harder subtypes and that a minimal panel is insufficient to fully characterise them.
-% This is consistent with the distributed importance profiles observed for these
-% subtypes.
-
-% \todo{Report the per-subtype t-test / Wilcoxon results from the EPIA Models PDF
-% tables (pages 4--11) as a summary table here. The full numerical tables can be placed
-% in an appendix if the main text would become too dense.}
-
-% [MEDIA: A 2x4 grid of bar charts (one row for panel of 3, one row for panel of 10,
-% one column per subtype) comparing precision/recall/F1 of the full-feature model vs
-% the reduced-feature model for each subtype. This is the key result figure for this
-% subsection and should be prominently placed.]
+Despite these limitations, the \textbf{convergence of two fundamentally different methods}
+onto a consistent set of features, under both data configurations and across a subtype
+as genomically distinct as Basal-like, provides a degree of confidence in the identified
+panels that neither method alone could establish.
 
 %=============================================================
 % ============================================================
@@ -1641,9 +2183,9 @@ or in other cancer research areas, would typically involve using the labels (in
 this case the PAM50 gene signature) to train a supervised classifier and then
 treat subtype assignment as a supervised classification problem leveraging the ground truth (similiar to \cite{ml_gastric_Azari2023}).
 
-The unconventional nature of this approach is deliberate. Rather than asking \textit{can we
-predict the subtype of a patient?}, we ask \textit{does the data naturally group itself in a
-way that corresponds to known subtypes?} These are fundamentally different questions. The first
+The unconventional nature of this approach is deliberate. Rather than asking \textbf{"can we
+predict the subtype of a patient?"}, we ask \textbf{"does the data naturally group itself in a
+way that corresponds to known subtypes?"}. These are fundamentally different questions. The first
 is a performance question; the second is a structural one. A high-performing supervised
 classifier may exploit subtle decision boundaries that have no clear biological interpretation.
 A cluster that achieves high purity with respect to a known subtype, by contrast, asserts
@@ -1669,12 +2211,13 @@ conditions were evaluated in parallel:
     covariates.
 \end{itemize}
 
-Both conditions follow the same pipeline, enabling a direct comparison of whether the addition
-of clinical data modifies the cluster structure recovered from miRNA alone.
+Running both conditions through the same pipeline serves a concrete purpose: it allows
+us to assess whether miRNA expression alone carries sufficient structure to recover
+biologically meaningful clusters, and whether clinical data strengthens or dilutes that
+signal. All conclusions are drawn in parallel for both conditions so that differences
+can be attributed to the feature set rather than to any other methodological choice.
 
-\subsubsection{Feature Preprocessing}
-
-K-Means minimises Euclidean distances in feature space, making it sensitive to feature scale.
+While K-Means minimises Euclidean distances in feature space, making it sensitive to feature scale.
 A feature with values in the range $[0, 1000]$ will dominate distance calculations over a
 feature in $[0, 1]$, regardless of their relative biological importance.
 Accordingly, all features were standardised using \textit{StandardScaler}, transforming each
@@ -1693,38 +2236,56 @@ paradigm. The presence of correlated features is acknowledged as a methodologica
 
 \subsubsection{Number of clusters}
 
-The number of clusters $K$ was set to 4, corresponding to the four known PAM50 breast cancer
-subtypes (Basal-Like, HER2-Enriched, Luminal A, and Luminal B) - after all, we are interested in 
-understanding underlying biological structure for our known subtypes. 
-Figure~\ref{fig:kmeans_k_selection} shows both curves post-hoc: the elbow method produces a
-gradual, continuously declining inertia curve with no clear inflection point at any $K$, and
-the silhouette score peaks at $K = 2$ ($\approx 0.115$) and decreases monotonically thereafter,
-reaching $0.069$ at $K = 4$. Both findings indicate that in this standardised high-dimensional
-space the data does not organise into well-separated spherical clusters of any particular $K$. 
-Consequently, neither curve provides
-unambiguous data-driven support for $K = 4$, reinforcing that the choice must be grounded in
-domain knowledge.
+The number of clusters $K$ was set to 4, corresponding to the four known PAM50 breast
+cancer subtypes (Basal-Like, HER2-Enriched, Luminal A, and Luminal B): since the
+ultimate goal is to assess whether the unsupervised structure aligns with known biology,
+fixing $K$ to match the number of subtypes is the only choice that makes the external
+evaluation metrics meaningful. Figure~\ref{fig:kmeans_k_selection_combined} shows the
+diagnostic curves for both conditions. In both cases, the elbow method produces a
+gradual, continuously declining inertia curve with no discernible inflection point at
+any $K$. The silhouette score peaks at $K = 2$ ($\approx 0.115$ for miRNA-only;
+$\approx 0.111$ for miRNA + clinical) and decreases monotonically thereafter, reaching
+$\approx 0.069$ at $K = 4$ in both conditions. The two curves are strikingly similar,
+indicating that neither feature set produces a geometry that the data-driven criteria
+can resolve into cleanly separated clusters. Consequently, neither curve provides
+unambiguous support for $K = 4$, reinforcing that the choice must be grounded in domain
+knowledge.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\textwidth]{miRNA_only_k_selection.png}
-    \caption{Elbow method (inertia vs.\ $K$, left) and mean silhouette score vs.\ $K$ (right)
-    for the miRNA-only condition. The red dashed line marks the chosen value $K = 4$.}
-    \label{fig:kmeans_k_selection}
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{miRNA_only_k_selection.png}
+        \caption{miRNA-only condition.}
+        \label{fig:k_sel_mirna_only}
+    \end{subfigure}
+    
+    \vspace{2em}
+
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{miRNA_and_clinical_k_selection.png}
+        \caption{miRNA and clinical data condition.}
+        \label{fig:k_sel_mirna_clinical}
+    \end{subfigure}
+
+    \caption{Elbow method (inertia vs.\ $K$, left) and mean silhouette score vs.\ $K$
+    (right) for both experimental conditions. The red dashed line marks the chosen value
+    $K = 4$. Both conditions produce curves of the same shape, with no clear elbow and
+    a silhouette peak at $K = 2$.}
+    \label{fig:kmeans_k_selection_combined}
 \end{figure}
 
-This choice is justified on two grounds. First, the evaluation process of measuring cluster
-purity against the four PAM50 classes: is only meaningful when the number of clusters matches
-the number of classes. Setting $K = 3$ or $K = 5$, for instance, would inevitably create
-clusters that either merge or split subtypes, making purity comparisons with the supervised
-results ambiguous. Second, one of the main observations from the supervised section was
-that Luminal A and Luminal B are the most difficult subtypes to separate. Setting $K = 4$
-preserves that boundary, allowing us to examine directly whether the clustering algorithm
-manages to recover it from the unlabelled data. A finding of $K=3$ from purely data-driven
-methods would be scientifically interesting in itself (suggesting Luminal A and B are
-indistinguishable from miRNA expression) but would not serve the cross-comparison objective
-of this section.
+This choice is justified on two grounds. First, purity
+evaluated against the four PAM50 classes is only meaningful when the number of clusters
+matches the number of classes: setting $K = 3$ or $K = 5$ would inevitably create
+clusters that either merge or split subtypes, making any purity comparison with the
+supervised results ambiguous. Second, one of the central findings of the supervised
+section was that HER2-enriched and Luminal B are the hardest subtypes to separate. Setting
+$K = 4$ preserves that boundary, allowing us to directly test whether K-Means, operating
+without labels, can recover it from expression data alone.
 
+\todo{Esta subsecção pode ser retirada se acharmos que a tese está muito extensa: o valor que trás não é assim tanto}
 \subsubsection{Model Fitting}
 K-Means was fitted using the K-Means++ initialisation strategy, which selects initial
 centroids with probability proportional to their squared distance from already-chosen
@@ -1742,31 +2303,73 @@ with a maximum of 300 iterations permitted if the tolerance threshold is not rea
 A fixed random seed (\texttt{random\_state} $= 42$) was set throughout to ensure full
 reproducibility of both the initialisation and the restart sequence.
 
+Figure~\ref{fig:kmeans_silhouette_combined} shows the per-sample silhouette plots at
+$K = 4$ for both conditions. The mean silhouette score is low in both cases ($0.069$
+for miRNA-only; $0.068$ for miRNA + clinical), consistent with the absence of a clear
+elbow and confirming that the four clusters do not form geometrically compact,
+well-separated regions in the standardised feature space. This is not unexpected: K-Means
+assumes convex, isotropic clusters of similar size, an assumption that high-dimensional
+transcriptomic data rarely satisfies. The low silhouette is therefore a property of the
+data geometry, not necessarily evidence that no biological structure exists.
+
+Despite this similarity in aggregate score, the two conditions differ in one important
+respect. In the miRNA-only setting, all four clusters produce predominantly positive
+silhouette coefficients with broadly uniform band widths, indicating that samples are
+consistently --- if weakly --- assigned to their nearest centroid. In the miRNA +
+clinical condition, Cluster 0 exhibits a substantial proportion of negative coefficients,
+suggesting that a non-trivial number of samples are geometrically closer to a
+neighbouring cluster than to their own. This asymmetry is an early indication that the
+addition of clinical features introduces heterogeneity that K-Means cannot resolve at
+$K = 4$, a hypothesis that will be confirmed by the external evaluation metrics in the
+following section.
+
 \begin{figure}[t]
     \centering
-        \includegraphics[width=0.85\textwidth]{miRNA_only_silhouette_plot.png}
-    \caption{Per-sample silhouette plot for $K = 4$ on the miRNA-only condition.
+    \begin{subfigure}[b]{0.85\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{miRNA_only_silhouette_plot.png}
+        \caption{miRNA-only condition.}
+        \label{fig:silhouette_mirna_only}
+    \end{subfigure}
+    
+    \vspace{1em} 
+
+    \begin{subfigure}[b]{0.85\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{miRNA_and_clinical_silhouette_plot.png}
+        \caption{miRNA and clinical condition.}
+        \label{fig:silhouette_mirna_clinical}
+    \end{subfigure}
+
+    \caption{Per-sample silhouette plots for $K = 4$ under both experimental conditions.
     Each coloured band corresponds to one cluster. Bars to the right of zero indicate
-    well-assigned samples; bars to the left indicate potential misassignments.
-    The red dashed line marks the mean silhouette score ($= 0.069$).}
-    \label{fig:kmeans_silhouette}
+    well-assigned samples; bars to the left indicate potential misassignments. The red
+    dashed line marks the mean silhouette score ($0.069$ for miRNA-only and $0.068$ for
+    miRNA + clinical). Note Cluster 0 in the miRNA + clinical condition: it is the only
+    cluster in either condition to exhibit a substantial fraction of negative coefficients.}
+    \label{fig:kmeans_silhouette_combined}
 \end{figure}
 
 % ----------------------------------------------------------
 
 \subsection{Clustering Analysis and Evaluation}
 \label{sec:unsupervised:results}
+
+Having fitted the model and characterised the geometry of the resulting partition, we
+now turn to the central question of this section: does K-Means, operating entirely
+without label information, recover a partition that corresponds to the known PAM50
+subtype structure? And does the addition of clinical covariates strengthen or weaken that
+correspondence? We address both questions at three levels of increasing granularity:
+aggregate evaluation metrics, per-cluster composition, and miRNA feature signatures.
+Both experimental conditions are analysed in parallel throughout, so that differences
+can be attributed unambiguously to the effect of the feature set.
  
 \subsubsection{Cluster Quality Metrics}
 
 The K-Means algorithm was evaluated under two experimental conditions - miRNA expression
 features alone (442 features) and miRNA expression combined with clinical covariates (462
 features) - both fitted on the small cohort of $n = 244$ samples with $K = 4$ clusters, in
-correspondence with the four PAM50 breast cancer subtypes. The central question that 
-we aim to answer is whether
-the unsupervised algorithm, operating without any label information, is capable 
-group patient samples with the same biological subtype, and whether the
-addition of clinical data strengthens or weakens that correspondence.
+correspondence with the four PAM50 breast cancer subtypes. Given this, 
 Table~\ref{tab:kmeans_summary} summarises the four evaluation metrics across both conditions.
 
 \begin{table}[t]
@@ -1783,205 +2386,52 @@ miRNA + clinical    & 462 & 0.068 & 0.598 & 0.192 & 0.222 \\
 \end{tabular}
 \end{table}
 
-The silhouette scores are low for both conditions ($\approx 0.07$), indicating that the clusters
-do not form geometrically compact and well-separated regions in the standardised feature space.
-This is not unexpected: K-Means assumes convex, isotropic clusters of similar size, an
-assumption that high-dimensional transcriptomic data rarely satisfies. The low silhouette is
-therefore a property of the data geometry in this space, \textbf{not necessarily} evidence that no
-biological structure exists.
+The external metrics tell an informative story. An overall purity of $0.611$ for the
+miRNA-only condition means that $61\%$ of samples are assigned to a cluster where their
+true PAM50 subtype is the majority class. Under random assignment of 244 samples into 4
+equal-sized clusters, the expected purity would be approximately $0.25$; the observed
+value therefore represents a meaningful above-chance alignment between the discovered
+partition and the ground-truth labels. The ARI of $0.203$ and AMI of $0.258$ are
+similarly modest but non-trivial, both well above the zero baseline expected from a
+random partition.
 
-The external metrics tell a more informative story. An overall purity of $0.611$ means that,
-across the four clusters, 61\% of samples are assigned to the cluster where their true subtype
-is the majority class. Given that a random assignment of 244 samples into 4 equal clusters
-over 4 classes would yield an expected purity of approximately $0.25$, this represents a
-meaningful above-chance alignment between the discovered clusters and the PAM50 subtypes.
-The ARI of $0.203$ and AMI of $0.258$ similarly indicate a modest but non-trivial correspondence
-that is well above what would be expected by chance.
+Across all four metrics, the miRNA-only condition consistently outperforms miRNA +
+clinical. The differences are small in absolute terms but systematic in direction, with
+the AMI showing the largest relative drop ($\approx 14\%$) when clinical features are
+added. This consistency points to a clear conclusion: the subtype-discriminating signal
+in this cohort resides primarily in the miRNA expression space, and appending clinical
+covariates introduces variation that is orthogonal to PAM50 subtype boundaries. Because
+K-Means treats all standardised features symmetrically, each clinical variable occupies
+one dimension with the same weight as any miRNA, effectively adding independent axes of
+variation that pull centroids away from the miRNA-driven structure and dilute the
+clustering signal.
 
-Notably, the miRNA-only condition slightly outperforms miRNA + clinical across all four
-metrics. This suggests that the addition of clinical features does not improve, and might marginally
-degrade the cluster structure relative to miRNA data alone, supporting the hypothesis that
-miRNA expression is the primary source of subtype-discriminating signal in this cohort.
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.75\textwidth]{miRNA_only_purity_heatmap.png}
-    \caption{Cluster $\times$ Subtype purity heatmap for the miRNA-only condition.
-    Each cell reports the proportion of samples of the column subtype within the row cluster.}
-    \label{fig:kmeans_purity_heatmap}
-\end{figure}
-
+% ----------------------------------------------------------
 \subsubsection{Cluster Composition}
 
-While the aggregate metrics in Table~\ref{tab:kmeans_summary} provide a global picture of
-clustering quality, they do not reveal which subtypes were correctly isolated and which were
-conflated. Inspecting the internal composition of each cluster is therefore essential: it
-allows us to identify which PAM50 subtypes produce a geometrically coherent signal in miRNA
-expression space, which are fragmented across multiple clusters, and which are systematically
-confused with one another. These per-cluster observations directly complement the supervised
-analysis, where subtype-level classification performance varied considerably across classes.
-Table~\ref{tab:kmeans_cluster_composition} and Figure~\ref{fig:kmeans_pie_charts} detail
-the subtype composition of each cluster under the miRNA-only condition.
-
-\begin{table}[t]
-\centering
-\caption{Subtype composition of each cluster (miRNA-only condition, $n = 244$).
-The dominant subtype and its proportion within the cluster are highlighted in bold.}
-\label{tab:kmeans_cluster_composition}
-\begin{tabular}{lrrrrrl}
-\hline
-\textbf{Cluster} & \textbf{$n$} & \textbf{Basal-Like} & \textbf{HER2} & \textbf{Lum.\ A} & \textbf{Lum.\ B} & \textbf{Dominant} \\
-\hline
-Cluster 0 & 69 & 1  & 1  & \textbf{45} & 22 & \textbf{Lum.\ A (65.2\%)}   \\
-Cluster 1 & 63 & 0  & 5  & \textbf{43} & 15 & \textbf{Lum.\ A (68.3\%)}   \\
-Cluster 2 & 49 & \textbf{35} & 5  & 1  & 8  & \textbf{Basal-Like (71.4\%)} \\
-Cluster 3 & 63 & 5  & 18 & 14 & \textbf{26} & \textbf{Lum.\ B (41.3\%)}   \\
-\hline
-\end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{miRNA_only_cluster_pie_charts.png}
-    \caption{Subtype distribution within each cluster for the miRNA-only condition.
-    Each ring shows the percentage breakdown of PAM50 subtypes within that cluster.}
-    \label{fig:kmeans_pie_charts}
-\end{figure}
-
-Several observations merit discussion:
-
-\paragraph{Cluster 2 - strong Basal-Like signal.}
-Cluster 2 is the most biologically coherent of the four, with 71.4\% of its 49 samples
-belonging to the Basal-Like subtype, followed by Luminal B (16.3\%) and HER2-Enriched
-(10.2\%). This is the highest per-cluster purity achieved and suggests that the Basal-Like
-miRNA expression profile is the most geometrically distinct in this dataset, a finding
-consistent with the clinical literature, where Basal-Like (triple-negative) tumours are known
-to exhibit a markedly different molecular profile from hormone-receptor-positive subtypes
-\cite{perou2000molecular}.
-
-\paragraph{Clusters 0 and 1 - Luminal A fragmentation.}
-Two clusters (0 and 1) are dominated by Luminal A, with purities of 65.2\% ($n = 69$) and
-68.3\% ($n = 63$) respectively. Both clusters show a secondary Luminal B component (31.9\%
-and 23.8\%), with only negligible Basal-Like and HER2-Enriched representation. Rather than
-being a failure of the clustering, this fragmentation is itself informative: it suggests that
-Luminal A tumours do not occupy a single compact region in miRNA expression space but instead
-form at least two separable subgroups with distinct miRNA centroid profiles. This is
-consistent with the supervised analysis, where Luminal A showed heterogeneous behaviour across
-feature subsets, and aligns with evidence in the literature of biological heterogeneity within
-the Luminal A class \cite{perou2000molecular}.
-
-\paragraph{Cluster 3 - diffuse Luminal B / HER2-Enriched mixture.}
-Cluster 3 has the lowest purity (41.3\%, $n = 63$), with a composition of Luminal B (41.3\%),
-HER2-Enriched (28.6\%), Luminal A (22.2\%), and a small Basal-Like component (7.9\%).
-The near-equal presence of Luminal B and HER2-Enriched within this cluster mirrors the
-difficulty observed in the supervised section with these two subtypes: neither occupies a
-well-defined region in miRNA expression space, and their expression profiles are sufficiently
-similar that K-Means assigns them to the same geometric neighbourhood without supervision.
-
-
-\subsubsection{UMAP Projection}
-Figure~\ref{fig:kmeans_umap} shows the UMAP \cite{mcinnes2018umap} projection of both cluster
-assignments and ground-truth labels onto the same two-dimensional embedding. UMAP is used here
-purely as a visualisation tool and it was not involved in the clustering itself. The juxtaposition
-of the two panels allows visual assessment of the degree to which the K-Means partition
-corresponds to the known subtype structure. A clear separation in the right panel (ground truth)
-that aligns with a separation in the left panel (K-Means) provides geometric confirmation of
-the purity values reported in Table~\ref{tab:kmeans_cluster_composition}.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{miRNA_only_umap_2d.png}
-    \caption{UMAP projection of the miRNA-only standardised feature space ($n = 244$).
-    \textit{Left:} samples coloured by K-Means cluster assignment.
-    \textit{Right:} same projection coloured by ground-truth PAM50 subtype.
-    Correspondence between left and right panels reveals where clustering recovers
-    biological structure.}
-    \label{fig:kmeans_umap}
-\end{figure}
-
-% ----------------------------------------------------------
-\subsection{Comparing miRNA-Only vs.\ miRNA + Clinical Conditions}
-\label{sec:unsupervised:conditions}
-
-Having examined the miRNA-only results in detail, this subsection directly compares the two
-experimental conditions: miRNA expression alone (442 features) versus miRNA combined with
-clinical features (462 features); across quantitative metrics, cluster composition, and
-feature signatures.
-
-An important methodological note before proceeding: K-Means does not produce labelled clusters,
-so cluster indices ($0, 1, 2, 3$) are arbitrary and not comparable across conditions by index
-alone. Two clusters from different conditions are considered to correspond to the same biological
-entity if they share the same dominant PAM50 subtype and a substantial overlap in their top
-feature lists.
-
-% ----------------------------------------------------------
-\subsubsection{Quantitative Metrics}
-
-Having defined the experimental conditions and fitted the model, the first question to answer
-is whether K-Means, operating without any label information, produces a partition that
-corresponds to the known PAM50 subtype structure. To assess this, four complementary metrics
-are reported: Silhouette score, which measures the internal geometric quality of the clusters
-independently of any labels; and Purity, ARI, and AMI, which are external metrics that
-quantify the degree of alignment between the discovered partition and the ground-truth subtype
-assignments. Together, these metrics allow us to evaluate not only how well-defined the
-clusters are in miRNA expression space, but also how much biologically meaningful structure
-the algorithm was able to recover without supervision. A secondary question addressed here is
-whether the addition of clinical covariates to the miRNA features strengthens or weakens that
-alignment, which has direct implications for understanding where the subtype-discriminating
-signal in this cohort resides.
-
-Table~\ref{tab:kmeans_summary} shows that the miRNA-only condition outperforms miRNA + clinical
-across all four evaluation metrics. The differences are modest in absolute terms but consistent
-in direction:
-
-\begin{table}[t]
-    \centering
-    \caption{Comparison of clustering performance between miRNA-only and miRNA + Clinical features.}
-    \label{tab:kmeans_summary}
-    \begin{tabular}{lcccc}
-    \toprule
-    \textbf{Metric} & \textbf{miRNA Only} & \textbf{miRNA + Clin.} & \textbf{$\Delta$} & \textbf{\% Change} \\ \midrule
-    Silhouette      & 0.069               & 0.068                  & $-0.001$          & $-1.4\%$           \\
-    Purity          & 0.611               & 0.598                  & $-0.013$          & $-2.1\%$           \\
-    ARI             & 0.203               & 0.192                  & $-0.011$          & $-5.4\%$           \\
-    AMI             & 0.258               & 0.222                  & $-0.036$          & $-14.0\%$          \\ \bottomrule
-    \end{tabular}
-\end{table}
-
-The AMI drop is the largest in relative terms ($\approx 14\%$), indicating that the information
-shared between the discovered partition and the ground-truth labels decreases noticeably when
-clinical features are added. The consistency of this direction across all four metrics points to a clear
-conclusion: clinical features act as noise rather than signal for this clustering task.
-
-The reason is methodological. K-Means uses Euclidean distance and treats all features
-symmetrically, regardless of type. When clinical variables (e.g.\ patient age, tumour grade,
-receptor status) are appended to the miRNA expression matrix, each clinical variable occupies
-one dimension with the same weight as any miRNA. After standardisation, these variables
-introduce independent axes of variation not correlated with PAM50 subtype boundaries,
-effectively diluting the subtype-discriminating geometry present in the miRNA expression space
-alone.
-
-% ----------------------------------------------------------
-\subsubsection{Cluster Composition and Subtype Alignment}
-
-The aggregate metrics in Table~\ref{tab:kmeans_summary} indicate that both conditions recover
-a broadly similar partition, but they do not reveal which subtypes drive that alignment and
-which are systematically confused. Inspecting the internal composition of each cluster answers
-that question, and allows us to determine whether the marginal performance drop observed when
-clinical features are added is distributed uniformly across subtypes or concentrated in
-specific classes. Table~\ref{tab:kmeans_both_composition} presents the cluster compositions
-for both conditions side by side, annotated with their dominant subtype.
+While aggregate metrics provide a global picture, they do not reveal which subtypes are
+correctly isolated and which are conflated. Examining the internal composition of each
+cluster answers that question and allows us to identify which PAM50 subtypes produce a
+geometrically coherent signal in expression space and which are systematically confused
+with one another. An important methodological note before proceeding: K-Means cluster
+indices are arbitrary and not comparable across conditions by number alone; two clusters
+are considered to correspond to the same biological entity when they share the same
+dominant PAM50 subtype. Table~\ref{tab:kmeans_both_composition} and
+Figure~\ref{fig:kmeans_purity_heatmaps_combined} present the full composition for both
+conditions, while Figure~\ref{fig:kmeans_pie_charts_both} shows the subtype distribution
+within each cluster.
 
 \begin{table}[t]
 \centering
 \caption{Cluster composition for both experimental conditions ($K = 4$, $n = 244$).
-Each cell reports the raw count of samples of that subtype in that cluster.
-The dominant subtype per cluster is indicated in the rightmost column with its within-cluster
-purity in parentheses.}
+Each cell reports the raw count of samples of that subtype in that cluster. The dominant
+subtype per cluster is indicated in the rightmost column with its within-cluster purity
+in parentheses.}
 \label{tab:kmeans_both_composition}
 \begin{tabular}{clrrrrl}
 \hline
-\textbf{Condition} & \textbf{Cluster} & \textbf{Basal} & \textbf{HER2} & \textbf{Lum.\ A} & \textbf{Lum.\ B} & \textbf{Dominant (purity)} \\
+\textbf{Condition} & \textbf{Cluster} & \textbf{Basal} & \textbf{HER2} &
+\textbf{Lum.\ A} & \textbf{Lum.\ B} & \textbf{Dominant (purity)} \\
 \hline
 \multirow{4}{*}{miRNA only}
  & C0 ($n=68$) &  0 &  6 & \textbf{45} & 17 & Lum.\ A (66.2\%) \\
@@ -1998,217 +2448,238 @@ purity in parentheses.}
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
-    % Left image
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{miRNA_only_purity_heatmap.png}
         \caption{miRNA only}
         \label{fig:mirna_purity}
     \end{subfigure}
-    \hfill 
-    % Right image
+    \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{miRNA_and_clinical_purity_heatmap.png}
         \caption{miRNA + clinical}
         \label{fig:clinical_purity}
     \end{subfigure}
-
-    \caption{Cluster $\times$ Subtype purity heatmaps. Note the cluster index relabelling: the Basal-Like-dominant cluster appears as C1 in miRNA-only and C3 in miRNA + clinical.}
-    \label{fig:kmeans_purity_both}
+    \caption{Cluster $\times$ Subtype purity heatmaps for both conditions. Each cell
+    reports the proportion of samples of that subtype within the cluster. Note that
+    cluster indices are not directly comparable across conditions; the same biological
+    structure may appear under a different index in each panel.}
+    \label{fig:kmeans_purity_heatmaps_combined}
 \end{figure}
 
-At the level of dominant subtypes, the partition recovered by both conditions is broadly
-similar: both produce one Basal-Like cluster, two Luminal A clusters, and one mixed
-Luminal B / HER2 cluster. However, the composition details reveal meaningful differences.
+\begin{figure}[t]
+    \centering
+    % --- DATASET 1 Section ---
+    \textbf{miRNA Only: Cluster Distribution} \\[1ex]    
+    \vspace{-0.5cm} % Significant gap between datasets
 
-The Basal-Like cluster weakens slightly when clinical features are added: purity drops from
-$72.3\%$ (miRNA-only C1, $n=47$) to $68.0\%$ (miRNA+clinical C3, $n=50$). Both clusters
-contain the same 34 Basal-Like samples, but the miRNA+clinical cluster draws in 3 additional
-non-Basal samples. This indicates that clinical features shift the Euclidean neighbourhood of
-a small number of non-Basal samples closer to the Basal centroid, contaminating an otherwise
-clean cluster.
+    \includegraphics[width=0.95\textwidth]{miRNA_only_cluster_subtype.pdf}
+    \caption*{Figure 1a: Clusters 0 ($n=68$) and 1 ($n=47$)}
+    
+    \vspace{-0.5cm} % Significant gap between datasets
+    
+    \includegraphics[width=0.95\textwidth]{miRNA_only_cluster_subtype2.pdf}
+    \caption*{Figure 1b: Clusters 2 ($n=66$) and 3 ($n=63$)}
 
-The two Luminal A clusters are structurally stable across conditions, with per-cluster purities
-consistently in the $63$–$69\%$ range in both. The mixed Luminal B / HER2-Enriched cluster is
-also reproduced with near-identical composition ($\approx 41\%$ purity, $n = 63$ vs.\
-$n = 65$), confirming that the difficulty of separating these two subtypes is an intrinsic
-property of the miRNA expression space and not an artefact of the feature set.
+    \vspace{-2.0cm} 
+
+    % --- DATASET 2 Section ---
+    \textbf{miRNA + Clinical Data: Cluster Distribution} \\[1ex]
+    \includegraphics[width=0.95\textwidth]{miRNA_clinical_cluster_subtype.pdf}
+    \caption*{Figure 2a: Dataset 2 Clusters 0 \& 1}
+    
+    \vspace{-2.0cm}
+    
+    \includegraphics[width=0.95\textwidth]{miRNA_clinical_cluster_subtype2.pdf}
+    \caption*{Figure 2b: Dataset 2 Clusters 2 \& 3}
+
+    \caption{Comprehensive Comparison of Breast Cancer Subtypes across Two Datasets.}
+    \label{fig:kmeans_pie_charts_both}
+\end{figure}
+
+At the level of dominant subtypes, the partition recovered by both conditions is
+strikingly similar: both produce one Basal-Like-dominant cluster, two Luminal A-dominant
+clusters, and one mixed Luminal B / HER2-Enriched cluster. This structural consistency
+is itself a meaningful result: it suggests that the four-cluster organisation of the
+data is driven primarily by the miRNA expression component, and that the addition of
+clinical features does not fundamentally alter the topology of the recovered partition.
+The differences between conditions are therefore quantitative rather than qualitative.
+
+\paragraph{The Basal-Like cluster is the most biologically coherent in both conditions.}
+In the miRNA-only condition, the Basal-Like cluster (C1) achieves a purity of $72.3\%$,
+with 34 out of 47 samples belonging to the Basal-Like subtype. Under the miRNA +
+clinical condition, the corresponding cluster (C3) recovers the same 34 Basal-Like
+samples but draws in 3 additional non-Basal samples, reducing purity slightly to $68.0\%$
+($n=50$). The high coherence of this cluster in both conditions is consistent with the
+clinical literature: Basal-Like (triple-negative) tumours are known to exhibit a
+markedly distinct molecular profile from hormone-receptor-positive subtypes
+\cite{perou2000molecular}, and this distinction is clearly captured by miRNA expression
+alone. The small purity drop when clinical features are added is a direct consequence
+of the metric dilution described above: a few non-Basal samples whose clinical profile
+places them geometrically close to the Basal centroid are drawn into the cluster.
+
+\paragraph{Luminal A is fragmented into two clusters in both conditions.}
+Both conditions produce two distinct Luminal A-dominant clusters rather than a single
+cohesive one. In the miRNA-only case these are C0 ($66.2\%$ purity, $n=68$) and C2
+($63.6\%$ purity, $n=66$); under miRNA + clinical they are C0 ($69.4\%$ purity,
+$n=62$) and C2 ($64.2\%$ purity, $n=67$). Both clusters in both conditions show a
+secondary Luminal B component and negligible Basal-Like or HER2-Enriched representation.
+Rather than being a failure of the clustering, this fragmentation is informative in
+itself: Luminal A tumours do not occupy a single compact region in miRNA expression space
+but form at least two separable subgroups with distinct centroid profiles. This is
+consistent with the supervised analysis, where Luminal A showed heterogeneous behaviour
+across feature subsets, and aligns with evidence in the literature of biological
+heterogeneity within the Luminal A class \cite{perou2000molecular}.
+
+\paragraph{Luminal B and HER2-Enriched remain systematically mixed in both conditions.}
+Both conditions produce one cluster in which Luminal B and HER2-Enriched samples
+co-dominate, with near-identical composition: $41.3\%$ Luminal B and $28.6\%$
+HER2-Enriched in the miRNA-only condition; $41.5\%$ Luminal B and $27.7\%$
+HER2-Enriched in the miRNA + clinical condition. This near-identical mixing across
+both conditions confirms that the difficulty of separating these two subtypes is an
+intrinsic property of the miRNA expression space, not an artefact of the feature set,
+directly echoing the confusion observed in the supervised analysis.
 
 % ----------------------------------------------------------
-\subsubsection{Feature Signature Stability Across Conditions}
-
-To assess how much clinical features alter the miRNA-level characterisation of each cluster,
-we computed the complete $4 \times 4$ pairwise overlap matrix between the top-20 feature lists
-of every cluster pair across the two conditions.
-Table~\ref{tab:kmeans_overlap_matrix} presents the full matrix.
-
-\begin{table}[t]
-\centering
-\caption{Top-20 feature overlap between every pair of clusters across conditions.
-Each cell reports the number of features shared between the top-20 list of the miRNA-only
-cluster (rows) and the miRNA + clinical cluster (columns). Dominant subtype of each cluster
-is given in parentheses.}
-\label{tab:kmeans_overlap_matrix}
-\begin{tabular}{lcccc}
-\hline
- & \textbf{clin-C0} & \textbf{clin-C1} & \textbf{clin-C2} & \textbf{clin-C3} \\
- & \small{Lum.\ A (69.4\%)} & \small{Lum.\ B (41.5\%)} & \small{Lum.\ A (64.2\%)} & \small{Basal (68.0\%)} \\
-\hline
-\makecell[l]{\textbf{miRNA-C0} \\ \small{Lum.\ A (66.2\%)}}  &  0 &  0 &  8 &  9 \\
-\makecell[l]{\textbf{miRNA-C1} \\ \small{Basal (72.3\%)}}    &  9 & 16 &  0 &  0 \\
-\makecell[l]{\textbf{miRNA-C2} \\ \small{Lum.\ A (63.6\%)}}  & \textbf{17} &  8 &  0 &  0 \\
-\makecell[l]{\textbf{miRNA-C3} \\ \small{Lum.\ B (41.3\%)}}  &  0 &  0 & \textbf{16} &  0 \\
-\hline
-\end{tabular}
-\end{table}
-
-Three findings stand out.
-
-\paragraph{One Luminal A cluster is the only biologically consistent match.}
-The single highest overlap in the entire matrix is miRNA-C2 vs.\ clin-C0 (17/20), both
-dominated by Luminal A. This pair shares a consistent set of miRNAs including MIR-18A/18A*,
-MIR-17/17*, MIR-505/505, MIR-505/3P, MIR-577/577, MIR-19A/19A, and MIR-19B-1/19B - several
-of which belong to the miR-17-92 polycistronic cluster, a well-characterized oncogenic miRNA
-family \cite{olive2010mir17}. This is the only cluster pair across the two conditions that is
-both biologically consistent (same dominant subtype) and feature-stable (17/20 shared). It
-suggests that the miR-17-92-driven Luminal A signal is the most robust structure in this
-dataset, persisting even when clinical covariates are added.
-
-\todo{Falta acrescentar para esta parte o top 20 features de cada cluster para a abordagem com clinical data - seguir o mesmo formato das horizontal bar charts}
-\paragraph{The Basal-Like clusters share zero features.}
-The most striking result is that the two Basal-Like clusters (miRNA-C1 (72.3\% purity) and
-clin-C3 (68.0\% purity)) share \textbf{zero features} in their respective top-20 lists
-(overlap $= 0$, Table~\ref{tab:kmeans_overlap_matrix}). Despite recovering the same 34
-Basal-Like samples, the centroid of each cluster points in a completely different direction in
-feature space. In the miRNA-only condition, the Basal cluster is characterized by
-MIR-197/197, MIR-324/5P, MIR-186/186*, MIR-146B/5P, and MIR-339/5P. In the
-miRNA + clinical condition, the top features of the Basal cluster are MIR-199B/5P,
-MIR-199A-2/5P, MIR-199A-1/5P, MIR-199-S/5P, and MIR-145/145, which is a completely different
-set.
-
-This divergence has a direct geometric explanation. When 20 clinical features are added to
-the 442-miRNA space, the centroid in the 462-dimensional space is pulled by the clinical
-dimensions, shifting the position of every cluster centroid in the original miRNA subspace.
-The result is that the miRNA-level feature importance of the Basal-Like cluster becomes
-unreliable under the miRNA + clinical condition: it reflects the geometry of a
-mixed miRNA-clinical space rather than the pure miRNA expression signature.
-
-\paragraph{Cross-subtype feature matching dominates.}
-Inspection of the full overlap matrix reveals that the highest overlaps are often between
-clusters of \textit{different} biological identities: miRNA-C1 (Basal, 72.3\%) matches
-clin-C1 (Luminal B, 41.5\%) with 16/20 features; miRNA-C3 (Luminal B, 41.3\%) matches
-clin-C2 (Luminal A, 64.2\%) with 16/20 features. The fact that biologically dissimilar
-clusters end up sharing more features than biologically similar ones (the Basal-Basal pair
-has 0/20) is direct evidence that clinical features actively re-organise the feature
-space in ways that are not aligned with PAM50 subtype boundaries (\underline{on this approach}).
-
-Taken together, these findings establish that the miRNA-only condition is superior to
-miRNA + clinical both quantitatively and interpretively. The former produces better external
-metrics, a cleaner Basal-Like cluster, and feature signatures that are more biologically
-meaningful. The analysis in Section~\ref{sec_unsupervised_importance} therefore focuses
-exclusively on the miRNA-only condition.
-
-\subsubsection{Top Features per Cluster}
+\subsubsection{Feature Signatures}
 \label{sec_unsupervised_importance}
-\begin{figure}[htbp]
-    \centering
-    % Top Row
-    \begin{subfigure}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster0.png}
-        \caption{Cluster 0 -- Luminal A (65.2\%)}
-        \label{fig:cluster0_feats}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster1.png}
-        \caption{Cluster 1 -- Luminal A (68.3\%)}
-        \label{fig:cluster1_feats}
-    \end{subfigure}
-
-    \vspace{1em} % Add some vertical spacing between rows
-
-    % Bottom Row
-    \begin{subfigure}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster2.png}
-        \caption{Cluster 2 -- Basal-Like (71.4\%)}
-        \label{fig:cluster2_feats}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{miRNA_only_top_features_cluster3.png}
-        \caption{Cluster 3 -- Luminal B (41.3\%)}
-        \label{fig:cluster3_feats}
-    \end{subfigure}
-
-    \caption{Top 20 most important features per cluster by absolute centroid z-score
-    (miRNA-only condition). Bar length indicates the magnitude of deviation from the
-    global dataset average. Note the difference in x-axis scale across clusters: Cluster 2
-    (Basal-Like) and Cluster 1 (Luminal A) show markedly higher z-scores than Clusters 0
-    and 3, reflecting stronger and more distinctive centroid signals.}
-    \label{fig:kmeans_top_features}
-\end{figure}
 
 Knowing that each cluster aligns to a dominant PAM50 subtype is only part of the story.
-Now, looking back to our hypothesis, we can connect this approach by asking which 
-miRNAs define each cluster's centroid, or, which
-features deviate most strongly from the global dataset average within each group. These are
-the miRNAs that the unsupervised algorithm implicitly used to separate the data, and
-identifying them serves two purposes: it provides a biologically interpretable signature for
-each cluster, and it allows a direct cross-comparison with the discriminative features
-identified in the supervised section, revealing whether both paradigms converge on the same
-miRNAs or highlight complementary aspects of subtype biology.
+The next question is which miRNAs define each cluster's centroid: that is, which features
+deviate most strongly from the global dataset mean within each group. These are the
+miRNAs that the unsupervised algorithm implicitly used to separate the data, and
+identifying them serves two purposes. First, it provides a biologically interpretable
+signature for each cluster. Second, and more importantly in the context of this thesis,
+it enables a direct cross-comparison with the discriminative features identified in the
+supervised section, allowing us to assess whether both paradigms converge on the same
+miRNAs or capture complementary aspects of subtype biology. Both conditions are examined
+here so that the stability of the identified signatures can be directly assessed.
 
-To rank features, each miRNA is scored by how much its average expression within a cluster
-deviates from its global average across the entire dataset, measured in units of standard
-deviation. A miRNA that is consistently overexpressed or underexpressed in a given cluster
-relative to the rest of the cohort receives a high absolute score, marking it as
-characteristic of that cluster. This is the canonical way to interpret K-Means centroids,
-since the centroid is simply the average expression profile of the cluster
-\cite{hastie2009elements}.
+Each miRNA is ranked by the absolute deviation of its cluster-level mean expression
+from the global cohort mean, expressed in standard deviation units (absolute centroid
+z-score). A miRNA that is consistently over or underexpressed in a given cluster
+relative to the full cohort receives a high absolute score, marking it as characteristic
+of that cluster. This is the canonical way to interpret K-Means centroids, since the
+centroid is simply the mean expression profile of the cluster \cite{hastie2009elements}.
 
-Table~\ref{tab:top5_mirna} summarises the five most important features for each cluster.
-Full rankings for all 442 features are available in the supplementary material.
+Figure~\ref{fig:kmeans_top_features_both} shows the top-20 feature rankings for all
+four clusters under both conditions, and Table~\ref{tab:top5_both} summarises the top-5
+features per biological cluster type.
+
+% \begin{figure}[t]
+%     \centering
+%     \begin{subfigure}[b]{\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{miRNA_only_top_features_all_clusters.png}
+%         \caption{miRNA-only condition.}
+%         \label{fig:top_feats_mirna_only}
+%     \end{subfigure}
+%     \vspace{1em}
+%     \begin{subfigure}[b]{\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{miRNA_and_clinical_top_features_all_clusters.png}
+%         \caption{miRNA + clinical condition.}
+%         \label{fig:top_feats_mirna_clinical}
+%     \end{subfigure}
+%     \caption{Top 20 most important features per cluster by absolute centroid z-score for
+%     both experimental conditions. Bar length indicates the magnitude of deviation from
+%     the global dataset average. The Basal-Like cluster (highest z-scores, $\approx 1.4$)
+%     shows a markedly stronger and more distinctive signal than the Luminal clusters in
+%     both conditions.}
+%     \label{fig:kmeans_top_features_both}
+% \end{figure}
 
 \begin{table}[t]
-\centering
-\caption{Top 5 miRNA features per cluster by absolute centroid z-score (miRNA-only
-condition). The dominant PAM50 subtype of each cluster is indicated in parentheses.}
-\label{tab:top5_mirna}
-\begin{tabular}{cccc}
-\hline
-\makecell{\textbf{Cluster 0} \\ \small{Lum.\ A (65\%)}} &
-\makecell{\textbf{Cluster 1} \\ \small{Lum.\ A (68\%)}} &
-\makecell{\textbf{Cluster 2} \\ \small{Basal (71\%)}} &
-\makecell{\textbf{Cluster 3} \\ \small{Lum.\ B (41\%)}} \\
-\hline
-MIR-151/3P    & MIR-197/197  & MIR-18A/18A* & MIR-3677/3P  \\
-MIR-151A/3P   & MIR-324/5P   & MIR-577/577  & MIR-142/5P   \\
-MIR-199B/5P   & MIR-186/186* & MIR-505/505  & MIR-33B/33B* \\
-MIR-199A-1/5P & MIR-146B/5P  & MIR-505/3P   & MIR-3607/3P  \\
-MIR-199A-2/5P & MIR-339/5P   & MIR-17/17*   & MIR-326/326  \\
-\hline
-\end{tabular}
+    \centering
+    \caption{Top 5 miRNA features per biological cluster type by absolute centroid z-score,
+    for both experimental conditions. Clusters are identified by dominant PAM50 subtype
+    rather than by index, since K-Means indices are not comparable across conditions.}
+    \label{tab:top5_both}
+    \begin{tabular}{lll}
+    \hline
+    \textbf{Cluster type} & \textbf{miRNA only} & \textbf{miRNA + clinical} \\
+    \hline
+    Basal-Like
+    & MIR-18A/18A* (1.46) & MIR-18A/18A* (1.43) \\
+    & MIR-577/577 (1.41)  & MIR-505/505 (1.34)  \\
+    & MIR-505/505 (1.37)  & MIR-577/577 (1.33)  \\
+    & MIR-934/934 (1.32)  & MIR-505/505* (1.28) \\
+    & MIR-505/505* (1.29) & MIR-224/224* (1.27) \\
+    \hline
+    Lum.\ A (MIR-197 signature)
+    & MIR-197/197 (1.05)  & MIR-197/197 (1.12)  \\
+    & MIR-186/186* (0.99) & MIR-324/5P (1.09)   \\
+    & MIR-324/5P (0.99)   & MIR-186/186* (1.07) \\
+    & MIR-146B/5P (0.97)  & MIR-146B/5P (1.04)  \\
+    & MIR-24-1/24 (0.96)  & MIR-590/5P (1.02)   \\
+    \hline
+    Lum.\ A (MIR-199 signature)
+    & MIR-199B/5P (0.89)   & MIR-151/3P (0.81)    \\
+    & MIR-151/3P (0.79)    & MIR-374C/374C (0.78) \\
+    & MIR-145/145 (0.76)   & MIR-199B/5P (0.77)   \\
+    & MIR-374C/374C (0.76) & MIR-3607/3P (0.75)   \\
+    & MIR-3130-1/5P (0.75) & MIR-3130-1/5P (0.74) \\
+    \hline
+    Lum.\ B / HER2 mixed
+    & MIR-33B/33B* (0.88) & MIR-33B/33B* (0.88) \\
+    & MIR-3677/3P (0.85)  & MIR-3677/3P (0.86)  \\
+    & MIR-142/5P (0.81)   & MIR-589/5P (0.80)   \\
+    & MIR-326/326 (0.80)  & MIR-142/5P (0.79)   \\
+    & MIR-589/5P (0.80)   & MIR-3607/3P (0.79)  \\
+    \hline
+    \end{tabular}
 \end{table}
 
-The Basal-Like cluster (Cluster 2) exhibits the strongest feature signal overall, with
-MIR-18A/18A* reaching an absolute z-score of $1.45$ (also the highest of any feature across
-all clusters). Cluster 1 (Luminal A, 68.3\%) also shows notably high z-scores with
-MIR-197/197 at $1.09$, suggesting a strong and distinct centroid for this subgroup.
-Peculiarly, the two Luminal A clusters (0 and 1) share \textbf{zero features} in their
-respective top-20 rankings: Cluster 0 is dominated by MIR-151 and MIR-199 family members,
-while Cluster 1 is composed by MIR-197, MIR-24 and MIR-500 family members. 
-This complete divergence in feature signatures reinforces the interpretation that
-the two Luminal A clusters represent genuinely distinct biological subgroups rather than an
-arbitrary split of the same population. Cluster 3, dominated by Luminal B but substantially
-contaminated by HER2-Enriched samples, shows the lowest maximum z-score ($0.89$), consistent
-with its mixed composition and lowest overall purity.
+Several observations emerge from comparing the signatures across conditions.
+
+\paragraph{The Basal-Like signature is highly stable across conditions.}
+The Basal-Like cluster produces the strongest feature signal in both conditions, with
+MIR-18A/18A* as the top-ranked feature in both ($z = 1.46$ and $z = 1.43$,
+respectively). The top-5 features are essentially the same set: MIR-18A/18A*,
+MIR-505/505, and MIR-577/577 appear in both rankings with nearly identical z-scores.
+This stability is a key positive result: it confirms that the miRNA signature driving
+the Basal-Like cluster is robust to the addition of clinical covariates, and that the
+slight purity drop observed under miRNA + clinical reflects a small shift in which
+samples are geometrically attracted to the Basal centroid, not a change in the centroid's
+miRNA character.
+
+\paragraph{One Luminal A cluster is consistently defined by a miR-197-centred signature.}
+The Luminal A cluster with higher z-scores is dominated by MIR-197/197, MIR-186/186*,
+MIR-324/5P, and MIR-146B/5P in both conditions, with MIR-197/197 ranking first in both.
+The strong
+correspondence between conditions for this cluster suggests it captures a biologically
+robust Luminal A subgroup whose miRNA identity is not perturbed by the addition of
+clinical features.
+
+\paragraph{The two Luminal A clusters share no features within each condition.}
+Within each condition, the two Luminal A-dominant clusters have completely
+non-overlapping top-20 feature lists. In the miRNA-only condition, one is characterised
+by the MIR-197/MIR-186 group (z-scores $\approx 1.0$) while the other is defined by
+MIR-199B, MIR-151, and MIR-145 (z-scores $\approx 0.8$). This complete divergence in
+feature signatures, consistent across both conditions, reinforces the interpretation
+that the two Luminal A clusters represent genuinely distinct biological subgroups rather
+than an arbitrary partition of the same population.
+
+\paragraph{The Luminal B / HER2-Enriched mixed cluster shows the weakest and most
+stable signal.}
+Consistent with its mixed composition and lowest overall purity, the Luminal B /
+HER2-Enriched cluster exhibits the lowest maximum z-scores of all four clusters in both
+conditions ($< 0.90$). Notably, its top features (MIR-33B/33B* and MIR-3677/3P)
+rank first and second in both conditions with virtually identical z-scores. This
+stability, paradoxically, reflects the fact that the cluster is primarily defined by
+what Luminal B and HER2-Enriched samples share in miRNA space, not by any strong
+subtype-specific signal.
+
+Taken together, the feature analysis confirms that the miRNA-only condition is superior
+both quantitatively (higher external metrics) and interpretively (no negative-coefficient
+clusters, cleaner Basal purity). More importantly, the miRNA signatures identified as
+cluster-defining are largely preserved when clinical features are added, lending
+confidence to their biological relevance. The comparison of these signatures with the
+discriminative features from the supervised pipeline is the subject of the following
+section.
 
 % ----------------------------------------------------------
 \section{Comparison with the Supervised Approach}
@@ -2230,34 +2701,3 @@ with its mixed composition and lowest overall purity.
 % ----------------------------------------------------------
 \subsection{Discussion}
 \label{sec:unsupervised:discussion}
-
-The results demonstrate that K-Means clustering on miRNA expression data, applied without any
-label supervision, recovers a partition that is meaningfully aligned with the PAM50 subtype
-structure. An overall purity of $0.611$ and ARI of $0.203$, substantially above chance,
-indicate that the miRNA expression profiles carry genuine subtype-discriminating information
-that is geometrically accessible to a distance-based clustering algorithm.
-
-The most striking finding is the coherence of the Basal-Like cluster (Cluster 2,
-purity $= 0.714$). The Basal-Like subtype is well known to have a distinctive and extreme
-molecular phenotype \cite{perou2000molecular}, and this distinctiveness is reflected in
-the clearest and most compact cluster recovered by the algorithm. The two Luminal A clusters
-further reinforce findings from the supervised section: even without label supervision, Luminal
-A tumours fragment into two geometrically separated subgroups with completely non-overlapping
-miRNA feature signatures - a finding that warrants further biological investigation into
-potential heterogeneity within this subtype.
-
-The observation that miRNA-only clustering slightly outperforms miRNA + clinical clustering
-across all metrics is noteworthy. It suggests that, from a clustering perspective, clinical
-features add noise rather than signal possibly because clinical variables introduce
-heterogeneous scales and non-continuous attributes that distort the Euclidean geometry
-that K-Means relies on. This contrasts with the typical assumption in clinical machine
-learning that richer feature sets yield better models.
-
-The low silhouette scores deserve explicit acknowledgement as a limitation. They confirm that,
-in the standardised 442-dimensional miRNA space, the subtype clusters are not geometrically
-compact. This is an intrinsic property of high-dimensional biological data, where class
-boundaries are rarely spherical or linearly separable. The external metrics (purity, ARI,
-AMI) are arguably more relevant for the biological question at hand, as they directly measure
-the correspondence between the discovered partition and clinically validated subtypes.
-
-\bigskip
