@@ -23,6 +23,7 @@
 % ============================================================
 
 \chapter{Methodology and Pilot Study}
+\label{ch:pilot}
 
 Small introduction to the Chapter.
 
@@ -2470,6 +2471,7 @@ in parentheses.}
     \label{fig:kmeans_purity_heatmaps_combined}
 \end{figure}
 
+\todo{figura completamente caótica: como é que vou meter isto sem ocupar uma página inteira de modo a que se veja?}
 \begin{figure}[t]
     \centering
     % --- DATASET 1 Section ---
@@ -2569,28 +2571,47 @@ Figure~\ref{fig:kmeans_top_features_both} shows the top-20 feature rankings for 
 four clusters under both conditions, and Table~\ref{tab:top5_both} summarises the top-5
 features per biological cluster type.
 
-% \begin{figure}[t]
-%     \centering
-%     \begin{subfigure}[b]{\textwidth}
-%         \centering
-%         \includegraphics[width=\textwidth]{miRNA_only_top_features_all_clusters.png}
-%         \caption{miRNA-only condition.}
-%         \label{fig:top_feats_mirna_only}
-%     \end{subfigure}
-%     \vspace{1em}
-%     \begin{subfigure}[b]{\textwidth}
-%         \centering
-%         \includegraphics[width=\textwidth]{miRNA_and_clinical_top_features_all_clusters.png}
-%         \caption{miRNA + clinical condition.}
-%         \label{fig:top_feats_mirna_clinical}
-%     \end{subfigure}
-%     \caption{Top 20 most important features per cluster by absolute centroid z-score for
-%     both experimental conditions. Bar length indicates the magnitude of deviation from
-%     the global dataset average. The Basal-Like cluster (highest z-scores, $\approx 1.4$)
-%     shows a markedly stronger and more distinctive signal than the Luminal clusters in
-%     both conditions.}
-%     \label{fig:kmeans_top_features_both}
-% \end{figure}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c0_mirna.png}
+    \caption*{(a) Cluster 0}
+    \vspace{0.5em}
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c1_mirna.png}
+    \caption*{(b) Cluster 1}
+    \vspace{0.5em}
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c2_mirna.png}
+    \caption*{(c) Cluster 2}
+    \vspace{0.5em}
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c3_mirna.png}
+    \caption*{(d) Cluster 3}
+    \caption{
+        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA-only features, where
+        each panel shows the miRNAs most strongly characteristic of the cluster.
+        (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
+    }
+    \label{fig:sc_kmeans_top_features_mirna_only}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c0_clinical.png}
+    \caption*{(a) Cluster 0}
+    \vspace{0.5em}
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c1_clinical.png}
+    \caption*{(b) Cluster 1}
+    \vspace{0.5em}
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c2_clinical.png}
+    \caption*{(c) Cluster 2}
+    \vspace{0.5em}
+    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c3_clinical.png}
+    \caption*{(d) Cluster 3}
+    \caption{
+        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA and clinical features, where
+        each panel shows the features that most strongly characterize the cluster
+        (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
+    }
+    \label{fig:sc_kmeans_top_features_mirna_clinical}
+\end{figure}
 
 \begin{table}[t]
     \centering
@@ -2682,22 +2703,239 @@ discriminative features from the supervised pipeline is the subject of the follo
 section.
 
 % ----------------------------------------------------------
-\section{Comparison with the Supervised Approach}
+\section{Cross-Paradigm Validation: Converging on Subtype-Defining miRNAs}
 \label{sec:unsupervised:comparison}
 
-% [PLACEHOLDER — to be completed when supervised results are finalised]
-%
-% This paragraph will compare the top features identified per cluster with the feature
-% importances obtained in the supervised approach (e.g. Random Forest feature importance,
-% SHAP values, or recursive feature elimination rankings). In particular, it will examine:
-%   (1) whether the miRNAs that best characterise the Basal-Like cluster (Cluster 2:
-%       MIR-18A/18A*, MIR-577/577, MIR-18A/18A*) overlap with features most predictive
-%       of Basal-Like in the supervised classifier;
-%   (2) whether the divergent feature sets of Clusters 0 and 1 (both Luminal A, sharing
-%       zero top-20 features) correspond to distinct supervised importance profiles,
-%       suggesting true biological heterogeneity within that subtype;
-%   (3) whether the weakness of Cluster 3 (Luminal B / HER2, purity 41.3%) is reflected
-%       in correspondingly lower supervised performance for those two classes.
+The two analytical paradigms developed in this thesis - supervised classification via
+XGBoost and ANOVA, and unsupervised clustering via K-Means - were designed to be
+complementary rather than redundant. The supervised approach asks which miRNAs are
+discriminative when a model is explicitly trained to separate subtypes; the unsupervised
+approach asks which miRNAs define the geometry of the data when no labels are consulted.
+A feature that appears in both answers is therefore supported by two independent, 
+fundamentally different lines of evidence: it is statistically and informationally 
+relevant to a trained classifier, and it is also a structural anchor of the
+data's intrinsic organisation. This section formalises that cross-paradigm intersection
+and draws the biological conclusions that follow from it.
+
+For each subtype, the doubly-validated panel is defined as the set of miRNAs that appear
+in both the XGBoost top-20 gain importance ranking (miRNA-only condition) and the
+K-Means top-20 centroid z-score ranking for the cluster dominated by that subtype
+(miRNA-only condition). Figure~\ref{fig:venn_diagrams} shows the Venn diagrams of the
+feature set overlaps for each subtype, and Table~\ref{tab:cross_paradigm_intersection}
+summarises the intersections.
+
+\todo{colocar aqui diagrama de vern ou guardar para o fim?}
+
+% \begin{figure}[t]
+%     \centering
+%     \begin{subfigure}[b]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{venn_basal.png}
+%         \caption{Basal-Like}
+%         \label{fig:venn_basal}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{venn_her2.png}
+%         \caption{HER2-Enriched}
+%         \label{fig:venn_her2}
+%     \end{subfigure}
+
+%     \vspace{1em}
+
+%     \begin{subfigure}[b]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{venn_luma.png}
+%         \caption{Luminal A}
+%         \label{fig:venn_luma}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{venn_lumb.png}
+%         \caption{Luminal B}
+%         \label{fig:venn_lumb}
+%     \end{subfigure}
+
+%     \caption{Venn diagrams of the top-20 feature sets from the supervised (XGBoost gain,
+%     miRNA-only) and unsupervised (K-Means centroid z-score, miRNA-only) approaches for
+%     each PAM50 subtype. The intersection represents the doubly-validated miRNA panel for
+%     each subtype. The size of the intersection relative to the full sets reflects the
+%     degree of convergence between the two paradigms.}
+%     \label{fig:venn_diagrams}
+% \end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Cross-paradigm miRNA intersection for each PAM50 subtype. Features listed
+appear in the top-20 rankings of both XGBoost gain importance and K-Means centroid
+z-score under the miRNA-only condition. The corresponding unsupervised cluster and its
+purity are indicated for reference.}
+\label{tab:cross_paradigm_intersection}
+\begin{tabular}{llcl}
+\hline
+\textbf{Subtype} & \textbf{Unsupervised cluster} & \textbf{Intersection size} &
+\textbf{Doubly-validated miRNAs} \\
+\hline
+Basal-Like  & C1 (72.3\% purity) & 5/20 &
+  MIR-577/577, MIR-135B/135B*, \\
+& & & MIR-934/934, MIR-505/505, \\
+& & & MIR-18A/18A* \\
+\hline
+HER2-Enriched & C3 (41.3\%, mixed) & $\leq$2/20 & MIR-142/5P, MIR-3150B/3P \\
+\hline
+Luminal A & C0 (66.2\%) + C2 (63.6\%) & $\leq$2/20 each &
+  MIR-326/326 (C0 only) \\
+\hline
+Luminal B & C3 (41.3\%, mixed) & 1/20 & MIR-3677/3P \\
+\hline
+\end{tabular}
+\end{table}
+
 % ----------------------------------------------------------
-\subsection{Discussion}
+\subsection{Subtype-by-Subtype Interpretation}
 \label{sec:unsupervised:discussion}
+
+The intersection results paint a coherent and biologically grounded picture of the
+information content of miRNA expression data with respect to PAM50 subtype structure.
+Rather than producing a uniform result across subtypes, the cross-paradigm analysis
+reveals a clear gradient: one subtype is robustly characterised, one is partially so,
+and two remain elusive. This gradient is not a failure of the methodology, it is
+itself a finding.
+
+\paragraph{Basal-Like: a robust, compact, and convergent miRNA panel.}
+
+Basal-Like is the only subtype for which both analytical paradigms converge onto a
+substantial and overlapping feature set. Five miRNAs, \textbf{(MIR-577/577, MIR-135B/135B*,
+MIR-934/934, MIR-505/505, and MIR-18A/18A*)}, appear simultaneously in the top-20
+XGBoost gain rankings and the top-20 K-Means centroid z-scores for the Basal-dominant
+cluster. This is a strong result for several compounding reasons. First, the supervised
+classifier achieved perfect classification for Basal-Like ($\text{F1} = 1.00$), and the
+ANOVA F-scores for its top features (386 for MIR-934, 358 for MIR-577, 292 for
+MIR-135B) are an order of magnitude above those of any other subtype's top features.
+Second, the unsupervised Basal-Like cluster is the most geometrically coherent of the
+four ($72.3\%$ purity, highest across both conditions), and its centroid z-scores are
+the highest in the entire analysis (MIR-18A/18A* at $z = 1.46$). Third, the feature
+signatures are stable across experimental conditions: adding clinical covariates does
+not materially change the top-ranked miRNAs for this cluster. Taken together, these
+converging lines of evidence support the conclusion that the five doubly-validated
+miRNAs constitute a compact, robust, and biologically credible panel for Basal-Like
+subtype identification. This is consistent with the well-established clinical
+distinctiveness of Basal-Like (triple-negative) tumours, which exhibit a markedly
+different molecular programme from hormone-receptor-positive subtypes and have been
+consistently separable in expression-based studies since the earliest molecular
+classifications of breast cancer \cite{perou2000molecular}.
+
+\paragraph{Luminal A: a partially distinctive subtype with intrinsic heterogeneity.}
+
+Luminal A occupies an intermediate position. The supervised approach identifies a
+distributed miRNA signature - the gain is spread across $\sim$20 features, with no
+single dominant marker (top feature contributes only $\sim$5\% of gain) - and
+classification performance is moderate ($\text{F1} = 0.81$). The unsupervised analysis
+adds a structural observation that the supervised approach cannot: Luminal A is not a
+geometrically cohesive entity in miRNA expression space. It consistently fragments into
+two distinct clusters, each dominated by a completely non-overlapping set of miRNAs.
+One subgroup is characterised by MIR-197/197, MIR-186/186*, and MIR-324/5P; the other
+by MIR-199B/5P, MIR-151/3P, and MIR-145/145. These two feature sets are orthogonal
+within each condition, and neither overlaps substantially with the supervised top-20
+for Luminal A.
+
+This divergence between the supervised and unsupervised feature sets for Luminal A
+should not be interpreted as a contradiction. The supervised model learns boundaries
+that maximally separate Luminal A from other subtypes in a multivariate discriminative
+setting; the unsupervised model identifies the directions of greatest internal variation
+within the cohort. The fact that these two objectives yield different miRNA rankings
+for Luminal A is itself informative: it suggests that Luminal A is internally
+heterogeneous, containing at least two biologically distinct subpopulations whose
+within-group variation is comparable to their between-group signal against other
+subtypes. This is consistent with growing evidence in the literature that the Luminal A
+category, as defined by PAM50, conflates molecularly distinct entities
+\cite{perou2000molecular}. The practical consequence for biomarker discovery is that
+a single panel of Luminal A markers is likely to be insufficient; any clinically
+deployed panel would need to account for this heterogeneity by either targeting the
+shared boundary features identified by the supervised approach, or by embracing the
+two-subgroup structure revealed by clustering and defining separate panels for each.
+
+\paragraph{HER2-Enriched: a diffuse signature with no compact discriminative panel.}
+
+HER2-Enriched is the most analytically challenging subtype, and the cross-paradigm
+results confirm this systematically. In the supervised analysis, classification
+performance was the weakest of the four subtypes ($\text{F1} = 0.50$, with low recall
+of $0.33$), the gain profile is the most distributed of all classes (top feature
+MIR-30/30A contributes only $\sim$15\% of total gain), and the ANOVA F-scores for its
+top features barely exceed 50, confirming the absence of a statistically dominant,
+individually discriminative marker. In the unsupervised analysis, HER2-Enriched samples
+are never captured by a dedicated cluster: they are consistently co-assigned with
+Luminal B samples in a mixed cluster of $41\%$ purity. The near-identical composition
+of this mixed cluster across both experimental conditions ($28.6\%$ HER2-Enriched in
+miRNA-only; $27.7\%$ in miRNA + clinical) confirms that the inseparability of
+HER2-Enriched and Luminal B is not a consequence of any particular feature set, but
+an intrinsic property of the miRNA expression space. The cross-paradigm intersection
+for HER2-Enriched is consequently minimal (at most 2 features), and these features
+(MIR-142/5P, MIR-3150B/3P) are shared with a mixed cluster rather than a
+HER2-specific one. The conclusion is unambiguous: \textbf{miRNA expression alone is
+insufficient to define a robust discriminative panel for HER2-Enriched tumours.} The
+supervised results confirm that the most informative supplementary signal for this
+subtype is \texttt{HER2\_STATUS}, a clinical covariate that encodes protein-level
+receptor amplification information that miRNA expression does not capture. Any
+practical diagnostic panel for HER2-Enriched classification would therefore require
+the integration of molecular receptor status data alongside miRNA profiling.
+
+\paragraph{Luminal B: no compact panel, boundary inseparability confirmed.}
+
+Luminal B presents the most challenging scenario of all four subtypes. Supervised
+classification performance was the lowest ($\text{F1} = 0.50$ under miRNA-only),
+improved moderately with the addition of clinical features ($\text{F1} = 0.64$), and
+the gain distribution is the most diffuse across all subtypes (top 20 features account
+for only $\sim$50\% of total gain). In the unsupervised analysis, Luminal B shares its
+dedicated cluster with HER2-Enriched samples and only contributes $41.3\%$ of that
+cluster's composition. The cross-paradigm intersection is limited to a single feature:
+MIR-3677/3P, which ranks first in the supervised top-20 for Luminal B and second in
+the unsupervised mixed cluster. This single-feature overlap is insufficient to
+constitute a discriminative panel. The picture is therefore consistent across both
+paradigms: Luminal B lacks a geometrically compact and statistically concentrated
+miRNA identity, and its boundary with Luminal A on one side and HER2-Enriched on the
+other is diffuse in miRNA expression space. As with HER2-Enriched, the supervised
+results suggest that clinical features (particularly \texttt{ER\_STATUS}) carry
+discriminative information that miRNA expression alone does not provide. Unlike
+HER2-Enriched, however, even the addition of clinical features does not fully resolve
+the boundary; the improvement in F1-score from $0.50$ to $0.64$ is meaningful but
+leaves substantial room for further misclassification.
+
+% ================================================================
+\subsection{Summary of Conclusions}
+\label{sec:unsupervised:summary}
+
+The cross-paradigm analysis yields a coherent and internally consistent set of
+conclusions that address the central question of this thesis: \textit{which miRNAs
+carry subtype-discriminative information, and what do the two analytical paradigms
+together tell us about the biological structure of the PAM50 classification?}
+
+The results can be summarised along three axes.
+
+\textbf{In terms of discriminative miRNA panels:} A compact, doubly-validated panel
+exists for Basal-Like only, comprising MIR-577/577, MIR-135B/135B*, MIR-934/934,
+MIR-505/505, and MIR-18A/18A*. For Luminal A, a panel of candidate features can be
+identified from the supervised analysis, but the unsupervised results caution that this
+panel describes a boundary rather than a coherent subgroup, and that a two-panel
+approach accounting for internal heterogeneity may be more appropriate. For HER2-Enriched
+and Luminal B, no compact miRNA-only panel is supported by either paradigm; their
+discrimination requires integration of clinical receptor status data.
+
+\textbf{In terms of the data's intrinsic structure:} The unsupervised analysis reveals
+that the miRNA expression space of this cohort contains one compact and isolated
+subgroup (Basal-Like), one heterogeneous but partially structured region (Luminal A),
+and one diffuse region where HER2-Enriched and Luminal B co-occupy indistinct
+geometric neighbourhoods. This structure is stable across experimental conditions and
+is not an artefact of any particular algorithmic choice.
+
+\textbf{In terms of the value of the unsupervised approach:} The K-Means analysis adds
+genuine scientific value beyond what the supervised analysis alone could establish. It
+confirms the Basal-Like panel through an entirely independent lens; it reveals the
+internal fragmentation of Luminal A that the classifier treats as a single class; and
+it places the difficulty of HER2-Enriched and Luminal B classification in a geometric
+context, showing that these subtypes do not occupy separable regions of miRNA space
+regardless of the algorithm used. Together, the two paradigms provide a more complete
+and more trustworthy characterisation of the miRNA landscape of breast cancer subtypes
+than either could achieve individually.
