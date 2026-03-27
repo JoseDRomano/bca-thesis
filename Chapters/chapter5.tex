@@ -7,20 +7,407 @@
 % - Discussão limitações
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\typeout{NT FILE chapter5.tex}%
-\chapter{Results and Discussion}
-\label{cha:results_and_discussion}
+\chapter{Conclusions and Discussion}
+\label{ch:discussion}
+ 
+% ================================================================
+\section{Overview}
+\label{sec:disc_overview}
+% ================================================================
+ 
+This chapter synthesises the findings of this dissertation and addresses three
+central questions that motivated the work: what are the main conclusions; whether
+the research hypotheses formulated in Chapter~\ref{cha:introduction} have been
+answered; and in what ways the results obtained can bring value to the real world.
+ 
+The experimental work was conducted in two phases. A \textbf{pilot study}
+(Chapter~\ref{ch:pilot}) developed, validated, and tuned the analytical pipeline on a
+244-patient cohort curated by our partners at Nova Medical School, establishing a
+methodological foundation and a first set of biological findings. The
+\textbf{main analysis} (Chapter~\ref{ch:expanded}) re-applied the same pipeline, 
+without any modification, to an independently assembled, larger cohort of 702 patients
+drawn directly from cBioPortal \ref{cerami2012cbio}, testing whether the pilot findings generalise at
+scale. The results of both phases are brought together here to draw final conclusions.
+ 
+Three complementary analytical approaches were used throughout both phases: a
+supervised discriminative framework (XGBoost under a One-vs-Rest formulation),
+a statistical validation layer (ANOVA F-test feature ranking), and an unsupervised
+geometric analysis (K-Means clustering). Because the three methods make no shared
+modelling assumptions, any conclusion that emerges consistently from all three carries
+a level of evidential weight that no single method could achieve alone. The degree of
+convergence (or divergence) between them is therefore central to the discussion that
+follows.
+ 
+% ================================================================
+\section{The Separability Gradient: A Consistent Biological Finding}
+\label{sec:disc_gradient}
+% ================================================================
+ 
+The most robust and replicable result of this dissertation is the existence of a
+\textbf{consistent separability gradient} across the four PAM50 breast cancer
+subtypes in miRNA expression space:
+ 
+\begin{equation}
+    \text{Basal-like} \;\succ\; \text{Luminal A} \;\succ\;
+    \text{HER2-Enriched} \;\approx\; \text{Luminal B}
+    \label{eq:gradient}
+\end{equation}
+ 
+This ordering was first observed in the pilot cohort, where Basal-like was
+classified with perfect F1-score (1.00), Luminal A with moderate performance
+(F1 = 0.81), and both HER2-Enriched and Luminal B at substantially lower performance
+(F1 = 0.50 each) under miRNA-only conditions, where this was subsequently confirmed in the
+expanded cohort with near-identical ordering (Basal: F1 = 0.98, Luminal A:
+F1 = 0.89, HER2-Enriched: F1 = 0.42, Luminal B: F1 = 0.56) - these results converge with 
+the one seen in the literature \ref{10.1093/bioadv/vbaf116}. Crucially, this
+gradient was independently corroborated by both the ANOVA F-test sweep and the
+K-Means clustering purity analysis in both cohorts, establishing that it is not a
+model-specific or cohort-specific artefact, but a \textbf{genuine geometric property
+of the miRNA expression space}.
+ 
+[MEDIA] Comparison table: supervised F1 scores (XGBoost), best ANOVA F1 scores,
+and K-Means purity for all four subtypes across both cohorts, laid out side by side.
+% [SUGGESTION] Present this as a 4-column table (subtype | pilot XGBoost F1 |
+% expanded XGBoost F1 | expanded K-Means purity) to make the gradient immediately
+% legible. Colour-code the cells by performance tier (green / yellow / red).
+ 
+The consistency of this gradient across two independently assembled datasets, 
+differing in size (244 vs.\ 702 samples), clinical annotations (receptor status
+vs.\ hypoxia and genomic instability scores), miRNA nomenclature conventions, and
+preprocessing histories, constitutes a strong form of experimental replication. It
+strongly suggests that the gradient reflects \textbf{a real biological property of
+PAM50 subtypes as encoded in miRNA expression}: Basal-like tumours possess a distinct
+and compact miRNA programme; Luminal A has a detectable but more heterogeneous
+signature; and HER2-Enriched and Luminal B are transcriptomically proximal, their
+miRNA profiles lacking the geometric separability required for reliable algorithmic
+recovery. This conclusion is consistent with the well-established clinical
+distinctiveness of Basal-like (triple-negative) breast cancer
+\cite{bc_molecular_Perou2000} and with the known transcriptomic proximity between
+the two Luminal subtypes.
+ 
+Importantly, this finding was first established in the pilot cohort (Chapter~\ref{ch:pilot})
+and then confirmed in the expanded cohort (Chapter~\ref{ch:expanded}). The fact that
+the pilot correctly anticipated
+the ordering and approximate magnitudes of separability seen in the expanded analysis
+validates the pilot study as a reliable methodological scaffold, not merely a
+preliminary exercise.
+ 
+% ================================================================
+\section{Cross-Paradigm Validation and the Proposed Feature Panels}
+\label{sec:disc_panels}
+% ================================================================
+ 
+Beyond the separability gradient, the central biological question of this dissertation
+concerns the \textbf{identity of the features that drive the separation}. Three
+independent analytical approaches - the XGBoost booster gain importances, the ANOVA
+F-test ranking, and the K-Means centroid Z-scores - each produce a ranked list of
+candidate features per subtype. Features that appear consistently across all three
+methods represent the strongest biomarker candidates, as their discriminative power
+cannot be attributed to the assumptions or biases of any single method. This section
+presents the proposed panels derived from the expanded cohort and then assesses their
+cross-cohort robustness.
+ 
+% ---------------------------------------------------------------
+\subsection{The Expanded Cohort Biomarker Panel}
+\label{subsec:disc_expanded_panel}
+% ---------------------------------------------------------------
 
-\section{Comparative Performance}\
-Discussion on how model performance evolved from the small dataset to the large dataset (did it generalize better?).
+The proposed panel is not uniformly strong across subtypes; the following paragraphs
+examine each subtype in turn.
+ 
+\paragraph{Basal-like: the most robust and actionable panel.}
+The Basal-like panel is the most compact and most multiply validated of the four.
+Six miRNAs : \textbf{MIR-577, MIR-934, MIR-18a, MIR-135b, MIR-671, and MIR-190b},
+ are doubly validated by both XGBoost and ANOVA in the expanded cohort, with
+MIR-190b additionally appearing in the Luminal B panel (see the intersection in
+Figure~\ref{fig:venn_expanded}). Of these, \textbf{MIR-577} is by far the most
+dominant feature: it accounts for 46.6\% of the total XGBoost booster gain under
+miRNA-only conditions and for 64.2\% when clinical features are added. MIR-577 and
+MIR-18a are additionally corroborated by the K-Means centroid Z-score analysis,
+making them \textbf{triply validated} candidates. The concentration of discriminative
+power in a small set of miRNAs, combined with a near-perfect supervised classification
+performance (F1 = 0.98) and a 95.5\% unsupervised cluster purity, makes Basal-like
+the most biologically credible and practically actionable case for miRNA-based subtype
+identification in this work.
+ 
+\paragraph{Luminal A: a learnable boundary, an internally heterogeneous subtype.}
+Luminal A presents a more nuanced picture. Two miRNAs: \textbf{MIR-590} and
+\textbf{MIR-130b}, are doubly validated in the miRNA-only condition, with MIR-590
+being the leading feature by XGBoost gain (8.84\% of total gain). The Ragnum Hypoxia
+Score is the top-ranked clinical feature when clinical annotations are added, reflecting
+the annotation-specific nature of the clinical signal available in the expanded cohort.
+However, the unsupervised analysis consistently fragments Luminal A into two distinct
+sub-clusters with non-overlapping centroid signatures, suggesting that this subtype
+harbours genuine \textbf{internal heterogeneity} that the PAM50 classification does
+not resolve. The practical implication is that a single Luminal A miRNA panel may be
+insufficient; a deployed diagnostic panel would need to account for this intra-subtype
+structure.
+ 
+\paragraph{HER2-Enriched: a diffuse panel requiring clinical complementation.}
+For HER2-Enriched, the doubly-validated miRNA panel consists of \textbf{MIR-4728,
+MIR-2115, MIR-30a,} and \textbf{MIR-6733}. The Buffa Hypoxia Score is additionally
+validated as a clinical discriminator in the miRNA + clinical condition, consistent
+with the known association between HER2 amplification and tumour hypoxia
+\cite{bc_subtypes_Prat2015Clinical}. Classification performance, however, remains
+limited (F1 = 0.42 miRNA-only; F1 = 0.57 with clinical features) and no high-purity
+unsupervised cluster was recovered for this subtype in either cohort. Both paradigms,
+across both datasets, converge on the same conclusion: \textbf{miRNA expression alone
+is insufficient to define a robust discriminative panel for HER2-Enriched tumours.}
+Any practical diagnostic panel for this subtype would require the integration of
+additional molecular data, receptor status or hypoxia profiling, alongside miRNA
+expression.
+ 
+\paragraph{Luminal B: the most analytically challenging subtype.}
+Luminal B is the most challenging subtype across all methods. The doubly-validated
+miRNA panel in the expanded cohort is limited to \textbf{MIR-193b} and
+\textbf{MIR-301a} (miRNA-only), with MIR-190b added in the miRNA + clinical
+condition; this last feature, however, is shared with the Basal-like panel
+(Figure~\ref{fig:venn_expanded}). Luminal B's transcriptomic proximity to Luminal A,
+ confirmed geometrically by the K-Means analysis in both cohorts, limits the
+identifiability of a compact, subtype-specific miRNA signature. The improvement in
+F1-score from 0.56 to 0.65 with clinical features (in particular Ragnum Hypoxia
+Score and MSI-related metrics) is meaningful but not sufficient to fully resolve
+the Luminal A / Luminal B boundary.
 
-\section{miRNA Biomarker Evaluation}
-Consistency of "important" miRNAs across different models.
-
-Are these miRNAs known in literature, or are they novel candidates for personalized medicine?
-
-\section{Practical Implications for Clinicians}
-How these models can aid in faster, data-driven subtyping.
-
-\section{Limitations of the Study}
-Data imbalance, biological noise in miRNA, etc.
+Figure~\ref{fig:venn_expanded} summarises the proposed biomarker panel from the
+expanded cohort analysis. The features shown in each subtype region are
+\textit{doubly validated} by both XGBoost gain importances and ANOVA F-test ranking.
+Features additionally corroborated by the K-Means centroid Z-scores — making them
+\textit{triply validated} — are marked with~$\ast$.
+ 
+% [MEDIA] Figure — Expanded Cohort Venn Diagram (Panel A from venn_biomarker_panels.html)
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.90\textwidth]{venn_expanded_panel.pdf}
+    \caption{Proposed biomarker panel from the expanded cohort (TCGA-BRCA, $n = 702$).
+    Each region contains the \textit{doubly-validated} features (XGBoost gain + ANOVA
+    F-test) for the corresponding subtype. Features marked $\ast$ are additionally
+    validated by K-Means centroid Z-score (triple validation). Features marked $\dagger$
+    are clinical variables. The bold number in each region indicates the count of
+    unique doubly-validated features. MIR-190b appears at the Basal-like/Luminal B
+    intersection, having been identified as doubly validated in both panels.}
+    \label{fig:venn_expanded}
+\end{figure}
+ 
+ 
+% ---------------------------------------------------------------
+\subsection{Cross-Cohort Validated Panel}
+\label{subsec:disc_cross_panel}
+% ---------------------------------------------------------------
+ 
+The pilot and expanded cohorts differ in their preprocessing pipelines, clinical
+annotations, miRNA nomenclatures, and cohort sizes. Cross-cohort replication -
+features that appear as doubly-validated biomarker candidates \textit{in both}
+cohorts - therefore represents the strongest validation standard in this work: a
+finding that is stable across all sources of systematic variation between the two
+datasets.
+ 
+Figure~\ref{fig:venn_crosscohort} presents the cross-cohort validated panel. Only
+features identified as doubly-validated candidates in both the pilot cohort
+($n = 244$) and the expanded cohort ($n = 702$) are shown. Features that appeared
+only in one of the two cohorts are annotated in dashed callout boxes to make
+visible what was gained or lost in the replication.
+ 
+% [MEDIA] Figure — Cross-Cohort Validated Panel (Panel B from venn_biomarker_panels.html)
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.90\textwidth]{venn_crosscohort_panel.pdf}
+    \caption{Cross-cohort validated miRNA panel. Only features identified as
+    doubly-validated biomarker candidates in \textit{both} the pilot cohort
+    ($n = 244$) and the expanded cohort ($n = 702$) are shown. Dashed ellipses
+    represent subtypes for which no cross-cohort replicated panel was established.
+    The Basal-like subtype is the only one with a cross-cohort validated panel,
+    comprising four miRNAs (MIR-577, MIR-934, MIR-18a, MIR-135b). Dashed callouts
+    indicate miRNAs exclusive to the pilot (MIR-505) or the expanded (MIR-190b,
+    MIR-671) cohort.}
+    \label{fig:venn_crosscohort}
+\end{figure}
+ 
+The result is unambiguous: \textbf{only the Basal-like subtype yields a cross-cohort
+validated miRNA panel}. Four miRNAs: \textbf{MIR-577, MIR-934, MIR-18a,} and
+\textbf{MIR-135b} appear as top-ranked features in both the XGBoost gain
+importances and the ANOVA F-test ranking for Basal-like, independently, in both
+datasets. These four miRNAs are therefore supported by three converging layers of
+evidence: multivariate discriminative power (XGBoost), marginal statistical
+separation (ANOVA), and cross-cohort replication. For MIR-577 and MIR-18a, a
+fourth layer of evidence (K-Means centroid Z-score analysis) further strengthens
+their candidacy, making these two miRNAs the most robustly supported biomarker
+candidates of the entire study.
+ 
+For the remaining subtypes, the absence of cross-cohort validated features is itself
+an informative finding. It is not a power problem: the expanded cohort contains almost
+three times as many samples as the pilot and the separability gradient is preserved.
+Rather, it reflects the biological and statistical nature of these subtypes: their
+miRNA signatures are more diffuse, more context-dependent (as evidenced by the
+annotation-dependence of the clinical features that enter their panels), and
+insufficiently concentrated to produce a stable cross-dataset biomarker set. This
+conclusion is consistent with the broader literature on Luminal B and HER2-Enriched
+breast cancer, where robust and reproducible miRNA panels have remained elusive.
+ 
+% ================================================================
+\section{Revisiting the Research Hypotheses}
+\label{sec:disc_hypothesis}
+% ================================================================
+ 
+Chapter~\ref{cha:introduction} articulated several interconnected research hypotheses.
+This section revisits each one in light of the results obtained.
+ 
+\paragraph{Can miRNA expression profiles discriminate between breast cancer subtypes?}
+\textbf{Partially, and in a structured way.}
+MiRNA expression profiles can reliably discriminate Basal-like tumours from all others,
+and Luminal A to a meaningful but lesser extent. For HER2-Enriched and Luminal B, the
+miRNA expression space does not provide a compact enough geometric separation for
+reliable discrimination by either supervised or unsupervised means. This answer is
+itself scientifically valuable: it rules out both the pessimistic hypothesis (no
+signal) and the optimistic hypothesis (complete signal), clarifying the true scope and
+limits of miRNA-based subtyping.
+ 
+\paragraph{Can machine learning identify a compact panel of discriminative miRNA biomarkers?}
+\textbf{Yes, for Basal-like; tentatively for others.}
+The XGBoost and ANOVA approaches consistently identify a small set of miRNAs dominated
+by MIR-577 for Basal-like, accounting for the vast majority of the discriminative
+signal. For the other subtypes, the signal is distributed across many features and a
+compact panel of sufficient clinical relevance has not been conclusively established.
+ 
+\paragraph{Does unsupervised learning reveal implicit structure in the miRNA expression space?}
+\textbf{Yes, and it adds independent scientific value.}
+K-Means, operating without any label supervision, recovers a Basal-like cluster with
+up to 100\% purity in the expanded cohort, corroborating the same miRNAs identified
+by the supervised approach. Beyond validation, the unsupervised analysis provides
+observations that the supervised approach alone could not: it reveals the internal
+heterogeneity of Luminal A (consistently split into two sub-clusters) and places the
+difficulty of HER2-Enriched and Luminal B in a geometric context, confirming that
+their inseparability is a data-intrinsic property rather than a model limitation.
+ 
+\paragraph{Do clinical features improve classification?}
+\textbf{Yes, selectively.}
+Clinical features improve the supervised classification of HER2-Enriched
+($+0.15$ F1) and Luminal B ($+0.09$ F1) but leave Basal-like essentially unchanged,
+confirming that the miRNA signal for Basal-like is self-sufficient. Importantly,
+however, the clinical features most useful in the pilot (receptor status: ER, PR,
+HER2) are not the same as those in the expanded cohort (Buffa and Ragnum Hypoxia
+Scores, MSI metrics), highlighting that the identity of useful clinical covariates is
+\textit{annotation-dependent} and may not generalise across institutional data
+releases.
+ 
+\paragraph{Do the findings generalise across independent datasets?}
+\textbf{Yes for the separability gradient and the Basal-like panel; not for the
+specific feature panels of the other subtypes.}
+The separability ordering (Basal $>$ Luminal A $>$ HER2 $\approx$ Luminal B) is
+reproduced with near-identical rankings in both cohorts. The Basal-like feature
+panel (MIR-577, MIR-934, MIR-18a, MIR-135b) is cross-cohort replicated. The panels
+for Luminal A, HER2-Enriched, and Luminal B should be treated as
+\textbf{hypothesis-generating} observations specific to their respective cohorts'
+annotations and sample compositions.
+ 
+% ================================================================
+\section{Real-World Applicability and Future Directions}
+\label{sec:disc_applications}
+% ================================================================
+ 
+The computational work developed in this dissertation does not exist in isolation
+from experimental biology. As stated in Chapter~\ref{cha:introduction}, the findings
+of this work could be tested through \textit{in vitro} and \textit{in vivo} experiments
+conducted by the research team of Dr.\ Bárbara Mendes at NOVA Medical School
+\cite{_Mendes2022Nanodelivery}. This direct collaboration between computational
+biomarker discovery and laboratory biology represents a critical bridge between data
+analysis and clinical relevance.
+ 
+The cross-cohort replicated panel, \textbf{MIR-577, MIR-934, MIR-18a, and
+MIR-135b}, is the most well-positioned target for this biological validation.
+The fact that these miRNAs are doubly validated computationally \textit{and}
+cross-cohort replicated substantially reduces the risk of false positives compared
+to findings derived from a single dataset or a single method. If laboratory
+validation confirms their differential expression and functional relevance to
+Basal-like tumour biology, these miRNAs could form the basis of a targeted
+diagnostic panel for the identification of triple-negative breast cancer — a
+subtype for which targeted molecular biomarkers are particularly needed, given the
+absence of hormone receptor targets that would otherwise guide therapy.
+ 
+% [SUGGESTION] Mention any preliminary or in-progress biological validation results
+% if available from the NOVA Medical School team, even as anecdotal observations.
+% This would dramatically increase the translational relevance of this section.
+ 
+% ---------------------------------------------------------------
+\subsection{Limitations}
+\label{subsec:disc_limitations}
+% ---------------------------------------------------------------
+ 
+Several limitations must be acknowledged to contextualise the findings appropriately.
+ 
+\textbf{Single-study origin.} Both datasets originate from TCGA-BRCA, a single large
+multi-omics study conducted under a uniform experimental protocol. Although the two
+releases are independently processed and their patient sets partially non-overlapping,
+they cannot be considered fully independent biological replicates. External validation
+on entirely distinct cohorts, such as METABRIC \cite{bc_molecular_Perou2000} or
+publicly available GEO datasets, would be required to establish the generalisability
+of the proposed panels beyond the TCGA ecosystem.
+ 
+\textbf{Absence of a healthy control set.} As discussed in
+Section~\ref{sec:challenges+research-hypothesis}, neither dataset includes miRNA
+expression profiles from healthy breast tissue. The models therefore discriminate
+subtypes from one another, but cannot determine whether a given miRNA signature is
+cancer-specific. A control group would not only expand the scope of the classification
+task but also improve the specificity of the identified biomarker, as demonstrated
+in related work on gastric cancer \cite{ml_gastric_Azari2023}.
+ 
+% ---------------------------------------------------------------
+\subsection{Future Directions}
+\label{subsec:disc_future}
+% ---------------------------------------------------------------
+ 
+The findings of this dissertation open several promising directions for future research.
+ 
+The most immediate next step is the biological validation by the NOVA Medical School
+team. If the cross-cohort replicated Basal-like panel is confirmed experimentally,
+the logical subsequent step is the development of a \textbf{minimal clinical panel}
+by identifying the fewest miRNAs from the proposed set that achieve sufficient
+classification accuracy in a targeted assay context.
+ 
+The internal heterogeneity of Luminal A identified by the K-Means analysis warrants
+dedicated investigation. A sub-clustering analysis with varying values of $K$,
+combined with clinical outcome data (survival, treatment response), could determine
+whether the two Luminal A sub-populations correspond to clinically distinct entities
+with different prognoses or treatment sensitivities.
+ 
+For HER2-Enriched and Luminal B, the integration of additional omics layers alongside
+miRNA data (such as mRNA expression, copy number variation, or DNA methylation)
+might provide the orthogonal signal necessary to build compact, reliable discriminative
+panels. These multi omnic data sources could reveal new relations in the biological 
+dynamics of the human body and the nature of breast cancer subtyping.
+ 
+% ================================================================
+\section{Summary}
+\label{sec:disc_summary}
+% ================================================================
+ 
+This dissertation investigated the applicability of machine learning — supervised and
+unsupervised — to the classification of breast cancer subtypes using microRNA
+expression and clinical data from two independent releases of the TCGA-BRCA cohort.
+The main conclusions are as follows.
+ 
+\textbf{First}, a consistent separability gradient was identified and replicated across
+both cohorts: \mbox{Basal-like $>$ Luminal A $>$ HER2-Enriched $\approx$ Luminal B}.
+This gradient is a genuine, dataset-independent property of the PAM50 miRNA expression
+space.
+ 
+\textbf{Second}, a cross-paradigm and cross-cohort validated biomarker panel was
+established for the Basal-like subtype, comprising \textbf{MIR-577, MIR-934, MIR-18a,
+and MIR-135b}, with MIR-577 exhibiting the strongest and most consistent discriminative
+signal across all methods and both datasets. For the other subtypes, the proposed
+panels are hypothesis-generating rather than conclusive.
+ 
+\textbf{Third}, the unsupervised K-Means analysis provided independent corroboration
+of the supervised findings for Basal-like and added novel insight into the internal
+heterogeneity of Luminal A: a dimension of the data structure that the supervised
+approach alone could not have revealed.
+ 
+\textbf{Fourth}, clinical features carry discriminative signal that supplements miRNA
+expression for HER2-Enriched and Luminal B, but the identity of the most useful
+clinical covariates is annotation-dependent, limiting cross-cohort generalisability
+of any clinical-feature-dependent panel.
+ 
+These findings are ready to be tested biologically through the ongoing collaboration
+with NOVA Medical School, and they lay a computational foundation for the development
+of targeted, evidence-based miRNA panels for breast cancer subtype stratification,
+with the Basal-like panel representing the most mature and actionable candidate.

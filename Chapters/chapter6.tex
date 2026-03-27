@@ -8,10 +8,85 @@
 \chapter{Conclusions and Future Work}
 \label{cha:conclusions_and_future_work}
 
-\section{Concluding Remarks}
-Summary of the effectiveness of classical ML on miRNA data.
+This research demonstrated that classical machine learning, when applied within
+a cross-paradigm validation framework, can effectively characterise breast cancer
+subtypes from microRNA expression data. The study identified a consistent
+separability gradient across two independent cohorts: 
+\mbox{Basal-like $>$ Luminal A $>$ HER2-Enriched $\approx$ Luminal B}, and
+established that this ordering is a robust, data-intrinsic property rather than
+a modelling artefact.
 
+Supervised and unsupervised methods converged on the same conclusion: the
+Basal-like subtype is reliably discriminated by miRNA expression alone, while
+HER2-Enriched and Luminal B lack sufficient transcriptomic separability for
+reliable classification without additional data modalities. Beyond classification,
+the unsupervised analysis revealed internal heterogeneity within Luminal A that
+the supervised approach alone could not have uncovered, underscoring the value
+of combining complementary analytical paradigms.
+
+The primary output of this work is a cross-cohort validated biomarker panel for
+the Basal-like subtype - \textbf{MIR-577, MIR-934, MIR-18a, and MIR-135b} -
+supported by multiple independent lines of computational evidence and positioned
+for biological validation at NOVA Medical School~\cite{_Mendes2022Nanodelivery}.
+For the remaining subtypes, the supplementary use of clinical features was
+shown to improve classification, though the dependence on specific institutional
+annotations limits the generalisability of those panels.
+
+% ================================================================
 \section{Future Work}
-Integrating Genetic data and Protein data to deepen the biological mechanics with AI algorithms (ML and DL)
+\label{sec:future_work}
+% ================================================================
 
-Testing Deep Learning architectures as data continues to grow.
+While this work established a robust computational baseline, several avenues
+remain to deepen the biological insights and predictive accuracy of breast
+cancer subtyping.
+
+% ---------------------------------------------------------------
+\subsection{Multi-Omic Integration}
+\label{subsec:future_multiomics}
+% ---------------------------------------------------------------
+
+A primary limitation of the present study is the difficulty in separating
+Luminal B and HER2-Enriched subtypes using miRNA expression alone. Future
+research should transition towards a \textbf{multi-omic approach} that
+combines miRNA with complementary data modalities. Integrating epigenetic
+layers such as DNA methylation or copy number variation (CNV) could provide
+the orthogonal signal necessary to resolve the boundaries where miRNA
+signatures overlap. Beyond genomics, the incorporation of protein expression
+data would allow for the direct validation of miRNA-target interactions,
+bridging the gap between transcriptomic signatures and the functional
+biological mechanics that drive subtype-specific tumour behaviour.
+
+% ---------------------------------------------------------------
+\subsection{Advanced Algorithmic Architectures}
+\label{subsec:future_dl}
+% ---------------------------------------------------------------
+
+As biological datasets continue to scale and encompass more diverse data
+modalities, the limitations of classical ML may be effectively addressed by
+more complex models. Deep learning architectures (such as Autoencoders for
+non-linear dimensionality reduction or Graph Neural Networks for modelling
+molecular interaction networks) could capture dependencies that linear or
+tree-based classifiers miss. Simultaneously, evolutionary and genetic algorithms
+for feature selection could further refine the search for minimal clinical
+panels, identifying the most potent biomarker combinations across
+high-dimensional multi-omic spaces without relying on predefined assumptions
+about feature relevance.
+
+% ---------------------------------------------------------------
+\subsection{Experimental Validation}
+\label{subsec:future_validation}
+% ---------------------------------------------------------------
+
+The computational findings of this dissertation do not exist in isolation
+from experimental biology. The cross-cohort validated Basal-like panel
+(MIR-577, MIR-934, MIR-18a, and MIR-135b) is currently positioned for
+\textit{in vitro} and \textit{in vivo} testing at NOVA Medical School, in
+collaboration with the research team of Dr.\ Bárbara Mendes~\cite{_Mendes2022Nanodelivery}.
+Future studies should prioritise these functional assays to confirm the
+biological relevance of the identified miRNAs and to establish the minimum
+effective panel size for a reliable diagnostic readout. If validated
+experimentally, these candidates could form the basis of a targeted
+diagnostic tool for Basal-like (triple-negative) breast cancer, a subtype
+for which robust molecular biomarkers are particularly needed, given the
+absence of hormone receptor targets that would otherwise guide therapy.

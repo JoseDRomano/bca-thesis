@@ -18,26 +18,26 @@ codificantes com papéis fundamentais na regulação pós-transcricional, oferec
 uma via promissora para melhorar a precisão do diagnóstico e a possibilidade de
 tratamentos personalizados.
 
-Esta dissertação investiga como as técnicas de Machine Learning e Deep Learning
-podem ser usadas para mapear perfis de expressão de miRNA para os subtipos
-moleculares intrínsecos do cancro da mama: Luminal A, Luminal B,
-HER2-enriquecido e Basal-like (Triplo-Negativo). A principal direção da
-pesquisa está centrada na avaliação da eficácia da combinação de dados de miRNA
-com variáveis clínicas para desenvolver classificadores de subtipos robustos e
-interpretáveis. É dada especial atenção à comparação de abordagens
-discriminatórias (por exemplo, regressão logística, XGBoost) com métodos
-baseados em correlação ou espaço latente (por exemplo, DIABLO), a fim de
-identificar as estratégias de modelação mais adequadas para a integração
-multi-ómica e avaliar o impacto da incorporação de dados de diferentes naturezas.
-
-Os resultados preliminares sugerem que os modelos de ML podem capturar com
-sucesso as assinaturas de expressão de miRNA associadas a determinados
-subtipos, embora o Luminal B e o HER2-enriched continuem a ser difíceis de
-distinguir. Estas descobertas representam um primeiro passo para o objetivo
-mais amplo deste trabalho: contribuir para o desenvolvimento de ferramentas de
-apoio à decisão fiáveis e específicas para cada subtipo, que incorporem dados
-moleculares e clínicos para uma estratificação mais precisa do cancro da mama e
-um planeamento personalizado do tratamento.
+Esta dissertação investiga a capacidade da aprendizagem automática clássica
+para classificar os quatro subtipos PAM50 do cancro da mama a partir de perfis
+de expressão de miRNA. Foi aplicada uma abordagem de validação multi-paradigma
+combinando classificação supervisionada (XGBoost), ordenação estatística de
+variáveis (teste F ANOVA) e análise geométrica não supervisionada (K-Means),
+a duas coortes do TCGA-BRCA (244 e 702 pacientes), com o intuito
+de avaliar tanto o desempenho classificativo como a reprodutibilidade das
+assinaturas identificadas. Um gradiente de separabilidade consistente foi identificado e replicado em
+ambas as coortes: \mbox{Basal-like $>$ Luminal A $>$ HER2-Enriched $\approx$
+Luminal B}. O subtipo Basal-like foi classificado com desempenho
+quase-perfeito, ao passo que o HER2-Enriched e o Luminal B revelaram
+separabilidade insuficiente a partir de dados de miRNA isolados. A validação
+multi-paradigma e inter-coorte estabeleceu um painel de quatro miRNAs:
+\textbf{MIR-577, MIR-934, MIR-18a e MIR-135b}, como os candidatos a
+biomarcadores com maior suporte evidencial, sendo o MIR-577 consistentemente
+dominante em todos os métodos e ambas as coortes. Estes resultados delimitam o alcance e os limites da subtipagem baseada em
+miRNA e fornecem um painel concreto e fundamentado para validação biológica,
+actualmente em curso na NOVA Medical School, com vista ao desenvolvimento de
+ferramentas de diagnóstico direcionadas para o cancro da mama Basal-like
+(triplo-negativo).
 
 % Palavras-chave do resumo em Português
 % \begin{keywords}
@@ -47,6 +47,6 @@ um planeamento personalizado do tratamento.
   microRNAs \and
   cancro da mama \and
   biomarcadores \and
-  aprendizagem automática aplicado à Medicina \and
-  dados multi-ômics
+  aprendizagem automática \and
+  subtipagem molecular
 }

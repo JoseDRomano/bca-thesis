@@ -17,30 +17,28 @@ biomarkers such as microRNAs (miRNAs), small non-coding RNAs with key roles in
 post-transcriptional regulation, offers a promising avenue for improving
 diagnostic precision and the possibility for personalized treatments.
 
-This dissertation investigates how Machine Learning and Deep Learning
-techniques can be used to map miRNA expression profiles to the intrinsic
-molecular subtypes of breast cancer: Luminal A, Luminal B, HER2-enriched, and
-Basal-like (Triple-Negative). The main research direction is centred on
-evaluating the effectiveness of combining miRNA data with clinical variables to
-develop robust and interpretable subtype classifiers. Particular attention is
-given to comparing discriminative approaches (e.g., Logistic Regression,
-XGBoost) with correlation-based or latent space methods (e.g., DIABLO), in
-order to identify the most appropriate modelling strategies for multi-omics
-integration and evaluate the impact of incorporating data form different
-natures.
+This dissertation investigates the capacity of classical machine learning to
+classify the four PAM50 breast cancer subtypes from miRNA expression profiles.
+A cross-paradigm framework combining supervised classification (XGBoost),
+statistical feature ranking (ANOVA F-test), and unsupervised geometric
+analysis (K-Means) was applied to two TCGA-BRCA cohorts (244 and
+702 patients) to assess both performance and the replicability of identified
+signatures.
 
-Preliminary results suggest that ML models can successfully capture miRNA
-expression signatures associated with certain subtypes, although Luminal B and
-HER2-enriched remain challenging to distinguish. These findings represent an
-initial step toward the broader goal of this work: to contribute to the
-development of reliable, subtype-specific decision support tools that
-incorporate molecular and clinical data for more precise breast cancer
-stratification and personalised treatment planning.
+A consistent separability gradient was identified and replicated across both
+cohorts: \mbox{Basal-like $>$ Luminal A $>$ HER2-Enriched $\approx$ Luminal B}.
+The Basal-like subtype was classified with near-perfect performance, while
+HER2-Enriched and Luminal B proved insufficiently separable from miRNA data
+alone. Cross-paradigm and cross-cohort validation established a four-miRNA
+panel: \textbf{MIR-577, MIR-934, MIR-18a, and MIR-135b}, as the most
+robustly supported biomarker candidates, with MIR-577 consistently dominating
+the discriminative signal across all methods and both datasets.
 
-% Palavras-chave do resumo em Inglês
-% \begin{keywords}
-% Keyword 1, Keyword 2, Keyword 3, Keyword 4, Keyword 5, Keyword 6, Keyword 7, Keyword 8, Keyword 9
-% \end{keywords}
+These findings delineate the scope and limits of miRNA-based subtyping and
+provide a concrete, evidence-based panel for biological validation, currently
+in progress at NOVA Medical School, towards targeted diagnostic tools for
+Basal-like (triple-negative) breast cancer.
+
 \keywords{
   microRNAs \and
   breast cancer \and
