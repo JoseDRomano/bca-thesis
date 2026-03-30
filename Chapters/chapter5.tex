@@ -172,8 +172,8 @@ the Luminal A / Luminal B boundary.
 Figure~\ref{fig:venn_expanded} summarises the proposed biomarker panel from the
 expanded cohort analysis. The features shown in each subtype region are
 \textit{doubly validated} by both XGBoost gain importances and ANOVA F-test ranking.
-Features additionally corroborated by the K-Means centroid Z-scores — making them
-\textit{triply validated} — are marked with~$\ast$.
+Features additionally corroborated by the K-Means centroid Z-scores - making them
+\textit{triply validated} - are marked with~$\ast$.
  
 % [MEDIA] Figure — Expanded Cohort Venn Diagram (Panel A from venn_biomarker_panels.html)
 \begin{figure}[h!]
@@ -320,7 +320,7 @@ cross-cohort replicated substantially reduces the risk of false positives compar
 to findings derived from a single dataset or a single method. If laboratory
 validation confirms their differential expression and functional relevance to
 Basal-like tumour biology, these miRNAs could form the basis of a targeted
-diagnostic panel for the identification of triple-negative breast cancer — a
+diagnostic panel for the identification of triple-negative breast cancer - a
 subtype for which targeted molecular biomarkers are particularly needed, given the
 absence of hormone receptor targets that would otherwise guide therapy.
  
@@ -381,8 +381,8 @@ dynamics of the human body and the nature of breast cancer subtyping.
 \label{sec:disc_summary}
 % ================================================================
  
-This dissertation investigated the applicability of machine learning — supervised and
-unsupervised — to the classification of breast cancer subtypes using microRNA
+This dissertation investigated the applicability of machine learning - supervised and
+unsupervised - to the classification of breast cancer subtypes using microRNA
 expression and clinical data from two independent releases of the TCGA-BRCA cohort.
 The main conclusions are as follows.
  
@@ -411,3 +411,72 @@ These findings are ready to be tested biologically through the ongoing collabora
 with NOVA Medical School, and they lay a computational foundation for the development
 of targeted, evidence-based miRNA panels for breast cancer subtype stratification,
 with the Basal-like panel representing the most mature and actionable candidate.
+
+\section{Future Work}
+\label{sec:future_work}
+% ================================================================
+
+While this work established a robust computational baseline, several avenues
+remain to deepen the biological insights and predictive accuracy of breast
+cancer subtyping.
+
+% ---------------------------------------------------------------
+\paragraph{Multi-Omic Integration}
+\label{subsec:future_multiomics}
+% ---------------------------------------------------------------
+
+A primary limitation of the present study is the difficulty in separating
+Luminal B and HER2-Enriched subtypes using miRNA expression alone. Future
+research should transition towards a \textbf{multi-omic approach} that
+combines miRNA with complementary data modalities. Integrating epigenetic
+layers such as DNA methylation or copy number variation (CNV) could provide
+the orthogonal signal necessary to resolve the boundaries where miRNA
+signatures overlap. Beyond genomics, the incorporation of protein expression
+data would allow for the direct validation of miRNA-target interactions,
+bridging the gap between transcriptomic signatures and the functional
+biological mechanics that drive subtype-specific tumour behaviour.
+
+% ---------------------------------------------------------------
+\paragraph{Advanced Algorithmic Architectures}
+% ---------------------------------------------------------------
+
+As biological datasets continue to scale and encompass more diverse data
+modalities, the limitations of classical ML may be effectively addressed by
+more complex models. Deep learning architectures (such as Autoencoders for
+non-linear dimensionality reduction or Graph Neural Networks for modelling
+molecular interaction networks) could capture dependencies that linear or
+tree-based classifiers miss. Simultaneously, evolutionary and genetic algorithms
+for feature selection could further refine the search for minimal clinical
+panels, identifying the most potent biomarker combinations across
+high-dimensional multi-omic spaces without relying on predefined assumptions
+about feature relevance.
+
+% ---------------------------------------------------------------
+\paragraph{Control Group}
+% ---------------------------------------------------------------
+
+As a limitation of the present study, neither dataset includes miRNA expression 
+profiles from healthy breast tissue. The models therefore discriminate subtypes 
+from one another, but cannot determine whether a given miRNA signature is 
+cancer-specific. A control group would not only expand the scope of the 
+classification task but also improve the specificity of the identified 
+biomarker, as demonstrated in related work on gastric cancer 
+\cite{ml_gastric_Azari2023}.
+
+
+% ---------------------------------------------------------------
+\paragraph{Experimental Validation}
+% ---------------------------------------------------------------
+
+The computational findings of this dissertation do not exist in isolation
+from experimental biology. The cross-cohort validated Basal-like panel
+(MIR-577, MIR-934, MIR-18a, and MIR-135b) is currently positioned for
+\textit{in vitro} and \textit{in vivo} testing at NOVA Medical School, in
+collaboration with the research team of Dr.\ Bárbara Mendes~\cite{_Mendes2022Nanodelivery}.
+Future studies should prioritise these functional assays to confirm the
+biological relevance of the identified miRNAs and to establish the minimum
+effective panel size for a reliable diagnostic readout. If validated
+experimentally, these candidates could form the basis of a targeted
+diagnostic tool for Basal-like (triple-negative) breast cancer, a subtype
+for which robust molecular biomarkers are particularly needed, given the
+absence of hormone receptor targets that would otherwise guide therapy.

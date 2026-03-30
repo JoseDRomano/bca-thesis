@@ -23,11 +23,12 @@ expected contributions and organization of the document.
 \subsection{Breast Cancer - A Global Health Challenge}
 
 \gls{bc} is currently one of the biggest public health challenges worldwide. In
-2022, an article from \textcite{bcaData2024_bray} showed that more than $2.3$
+2022, an article from \textcite{bcaData2024_bray} and \textcite{Force2025The} 
+showed that more than $2.3$
 million new cases of \gls{bc} were diagnosed, resulting in
 around $665,\!000$ global deaths . Other studies
 estimate that \gls{bc} will continue to not only be the most commonly diagnosed
-cancer but also to increase in incidence, with projections indicating that by
+cancer in women but also to increase in incidence, with projections indicating that by
 2040, the number of deaths will almost double and the number of new cases will
 be around $3.2$ million \cite{bca_data_Arnold2022Current}. Figure
 \ref{fig:graphic_incidencies_world} and \ref{fig:estimates_2020_2040}
@@ -73,14 +74,18 @@ we get a comprehensive explanation of why accurate classification of these
 subtypes is essential to enable personalized therapeutic approaches, with a
 direct impact on treatment efficacy and disease prognosis.
 
-\subsection{Can we improve the classification of Breast Cancer subtypes?}
+\subsection{Can we improve the classification of Breast Cancer subtypes based on miRNAs?}
 Among the emerging candidates for robust biomarkers of \gls{bc} subtypes are
 \gls{mirna}, small non-coding RNA molecules that play a crucial regulatory role
 in gene expression. They are estimated to modulate the expression of about
 one-third of the genes in the human genome
 \cite{mirna_importance_Hammond2015An} and are implicated in the regulation of
 multiple physiological and pathological processes, including various human
-diseases \cite{mirna_as_biomarkers_Ho2022}.
+diseases \cite{mirna_as_biomarkers_Ho2022}. Their stability in biological
+fluids and tissue-specific expression patterns make them particularly attractive
+as non-invasive diagnostic markers, with the potential to enable earlier
+detection and more precise patient stratification than currently available
+clinical tools \cite{mirna_as_biomarkers_Ho2022}.
 
 Given their regulatory nature, several studies have demonstrated a significant
 association between \gls{mirna} expression profiles and relevant clinical
@@ -91,13 +96,18 @@ progression and metastasis development, as seen in
 \textcite{mirna_as_bio_for_sub_Blenkiron2007MicroRNA} demonstrated that
 \gls{mirna} expression profiles can effectively distinguish between different
 molecular subtypes of \gls{bc}, highlighting their potential as a precise
-subtyping tool. This ability to discriminate between subtypes reinforces the
-value of \gls{mirna} as promising clinical biomarkers.
+subtyping tool \cite{Blenkiron2007MicroRNA}. This ability to discriminate
+between subtypes is of particular clinical relevance: a reliable
+\gls{mirna}-based subtyping panel could support earlier diagnosis and, 
+crucially, guide the selection of subtype-specific therapeutic strategies, 
+moving towards a more personalised model of \gls{bc} care in which treatment 
+decisions are grounded in the molecular identity of each tumour rather than 
+broad clinical categories alone.
 
 \subsection{How to identify the most relevant miRNAs?}
 
 The identification of the most relevant \gls{mirna} for \gls{bc} profilling
-represents a major analytical challenge due to the complexity of these high
+represents a major challenge due to the complexity of these high
 dimensional regulatory molecules, non-linearity interactions between and
 clinical phenotypes that require advanced computational approaches to be
 effectively modelled. Recent advances in \gls{ai}, some of which are explored
@@ -127,11 +137,10 @@ aggressive and hard-to-treat \gls{bc} subtypes.
 Based on the assumption that it is possible to use microRNA expression values
 and clinical data to map \gls{bc} subtypes, as shown by
 \textcites{mirna_as_biomarkers_Ho2022}{mirnas_in_bc_Muñoz2023}, this dissertation
-proposes to explore several complementary directions for this pathology where
+proposes to explore several complementary directions for this hypothesis where
 the application of \gls{ai} techniques is still growing.
 
-First, we intend to assess on a pre-selected set of patients (selected by NOVA 
-Medical School team) the performance supervised models for the classification 
+First, we intend to assess on a pre-selected set of patients the performance supervised models for the classification 
 of \gls{bc} subtypes. At the same time, we will be
 investigating the impact of patient clinical information (such as age, presence
 or absence of metastases, hormone levels, among others) on the classification
@@ -139,7 +148,7 @@ performance of those models, where we will be able to gain valuable insights int
 possible relationships between these features and \gls{bc} subtypes. After that, 
 we will use other methods to extract meaningful features from the data
 where the soul objective is to identify a smaller panel of features that are more 
-discriminative and can be used to classify wether a patient belongs to a given 
+discriminative and can be used to classify whether a patient belongs to a given 
 \gls{bc} subtype (or not, both answers provide great value for the research 
 and the development of personalized treatments - which would be the ultimate benefit 
 of this investigation).
@@ -154,8 +163,7 @@ currently established subtypes. This exploration could reveal new insights into
 the heterogeneity of the disease and potentially identify new therapeutic
 targets.
 
-Even though the base study we've done seems promising, there are several challenges to overcome
-in order to achieve the desired results such as: \\ \textbf{1. Inter-Tumor
+There are several challenges to overcomein order to achieve the desired results such as: \\ \textbf{1. Inter-Tumor
   Heterogeneity:} \\ One of the main challenges in studying breast cancer is the
 significant biological variation between tumours classified within the same
 subtype, known as \textit{intertumoral heterogeneity}. This diversity can
@@ -175,61 +183,49 @@ interdependent behavior raises questions about the effectiveness of overly
 simplistic or linear models. The application of nonlinear models allows for the
 discovery of complex relationships and cross-interactions between different
 \gls{mirna} or between them and clinical variables. These relationships and
-interactions would be invisible to more traditional approaches. \\ \textbf{3.
-  No control set:} Another relevant challenge is the absence of a control set
-that includes data from healthy individuals. Since this type of analysis
-(\gls{mirna} expression profiling) is not routinely performed in individuals
-without cancer, it is difficult to define what would be a “normal level” of
-expression. The implementation of a control group would not only broaden the
-scope of the model's task (e.g., distinguishing between the presence and
-absence of cancer before predicting the subtype), but also optimize the
-robustness of biomarker identification. An illustrative example of this
-phenomenon is presented in the study \textcite{ml_gastric_Azari2023} where the
-implementation of a control set was fundamental to the identification of
-discriminative markers.
+interactions would be invisible to more traditional approaches.
 
-The morphology of this dataset limits the choice of approaches to be used and
+The structure of this dataset limits the choice of approaches to be used and
 requires extra caution in how we work with certain models, such as nonlinear
 ones, given their high adaptability in high dimensions, which, in a context of
 limited data, can easily lead to overfitting. This requires careful selection
 of algorithms and attention to the pipeline that is set up to ensure that the
 results obtained are robust and relevant.
 
-Having a control would be an important step toward increasing the
+Having a control would have been an important step toward increasing the
 generalizability of our model. Using a negative sampling, it would not only
-allow us to expand the problem to include the distinction between healthy and
-sick individuals, but also improve the identification of discriminative
-biomarkers. The latter has already been successfully tested in other types of
-cancer, and a key step in the pipeline used is precisely the comparison with a
+have allowed us to expand the problem to include the distinction between healthy and
+sick individuals, but also improved the identification of discriminative
+biomarkers. The latter had already been successfully tested in other types of
+cancer, and a key step in the pipeline used was precisely the comparison with a
 control set \cite{ml_gastric_Azari2023} to isolate clinically relevant markers.
 
-\section{Expected Contributions}
-\label{sec:expected-contributions}
-The main contribution of this dissertation is the development of a computational
+\section{Contributions}
+\label{sec:contributions}
+The main contribution of this dissertation is the study of a computational
 framework for the classification of \gls{bc} subtypes based
 on \gls{mirna} expression and patient clinical data. This
-framework integrates and compares different \gls{ml} approaches and how wee can 
-leverage the use of group-based approaches for feature extraction and feature 
-selection of \gls{bc} subtypes.
+framework integrates and compares \gls{ml} approaches from different algorithmic
+families - spanning supervised discriminative models and unsupervised 
+group-based methods - with the goal of extracting consistent and robust 
+findings that no single method alone could reliably establish. By triangulating
+results across complementary paradigms, the framework identifies
+subtype-specific \gls{mirna} signatures that are stable across methodological
+choices rather than artefacts of any particular model's assumptions.
 A preliminary version of this framework, focused on discriminative models and
 subtype-specific biomarker identification, was presented in the article accepted
 at the EPIA 2025 conference under the track AI in Medicine \ref{ann:EPIA_paper}.
 
-In addition to the classification process, this framework includes a statistical 
-feature extraction through the use of ANOVA F-test, in order to confer robustness 
-to the decisions generated by the model. This
-robustness is particularly relevant in a clinical setting, where transparency
-and reliability of predictions are essential for potential future translation
-into medical practice. The findings of this work could be tested using both
-\textit{in-vivo} and \textit{in-vitro} methods by the team of Dr. Bárbara
-Mendes \+ NOVA Medical School.
-
 Throughout the work, a critical and comparative analysis of the explored
-approaches will be promoted, focusing on their applicability to complex and
-heterogeneous biomedical data. It is thus hoped to contribute to the
-development of more robust, explainable computational solutions adapted to the
-reality of biological systems, reinforcing the potential of \gls{mirna} as
-relevant molecular markers in the stratification of \gls{bc} patients.
+approaches is promoted, focusing on their applicability to complex and
+heterogeneous biomedical data. It is hoped that the identified \gls{mirna} 
+panels will serve as a foundation for future experimental validation, whether 
+through \textit{in-vivo} or \textit{in-vitro} studies, by any research team 
+working at the intersection of computational biology and breast cancer 
+diagnostics. The ultimate goal is to contribute to the development of more 
+robust and explainable computational solutions adapted to the reality of 
+biological systems, reinforcing the potential of \gls{mirna} as relevant 
+molecular markers in the stratification of \gls{bc} patients.
 
 \section{Document Organization}
 \label{sec:document-organization}

@@ -1,0 +1,35 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% - Principais contributos da tese
+% - Limitações do trabalho
+% - Trabalho futuro
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\typeout{NT FILE chapter6.tex}%
+\chapter{Conclusions and Future Work}
+\label{cha:conclusions_and_future_work}
+
+This research demonstrated that classical machine learning, when applied within
+a cross-paradigm validation framework, can effectively characterise breast cancer
+subtypes from microRNA expression data. The study identified a consistent
+separability gradient across two independent cohorts: 
+\mbox{Basal-like $>$ Luminal A $>$ HER2-Enriched $\approx$ Luminal B}, and
+established that this ordering is a robust, data-intrinsic property rather than
+a modelling artefact.
+
+Supervised and unsupervised methods converged on the same conclusion: the
+Basal-like subtype is reliably discriminated by miRNA expression alone, while
+HER2-Enriched and Luminal B lack sufficient transcriptomic separability for
+reliable classification without additional data modalities. Beyond classification,
+the unsupervised analysis revealed internal heterogeneity within Luminal A that
+the supervised approach alone could not have uncovered, underscoring the value
+of combining complementary analytical paradigms.
+
+The primary output of this work is a cross-cohort validated biomarker panel for
+the Basal-like subtype - \textbf{MIR-577, MIR-934, MIR-18a, and MIR-135b} -
+supported by multiple independent lines of computational evidence and positioned
+for biological validation at NOVA Medical School~\cite{_Mendes2022Nanodelivery}.
+For the remaining subtypes, the supplementary use of clinical features was
+shown to improve classification, though the dependence on specific institutional
+annotations limits the generalisability of those panels.
+
+% ================================================================

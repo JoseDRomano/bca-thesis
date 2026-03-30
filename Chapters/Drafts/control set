@@ -1,0 +1,12 @@
+\\ \textbf{3.
+  No control set:} Another relevant challenge is the absence of a control set
+that includes data from healthy individuals. Since this type of analysis
+(\gls{mirna} expression profiling) is not routinely performed in individuals
+without cancer, it is difficult to define what would be a “normal level” of
+expression. The implementation of a control group would not only broaden the
+scope of the model's task (e.g., distinguishing between the presence and
+absence of cancer before predicting the subtype), but also optimize the
+robustness of biomarker identification. An illustrative example of this
+phenomenon is presented in the study \textcite{ml_gastric_Azari2023} where the
+implementation of a control set was fundamental to the identification of
+discriminative markers.

@@ -11,7 +11,7 @@
 
 This chapter will provide the necessary background to understand the biological
 context related to this work, as well as the work that has been already made in
-the field of \gls{mirna} reaserch and its applications in \gls{bc} as a
+the field of \gls{mirna} research and its applications in \gls{bc} as a
 biomarker and a subtype classifier. The chapter is divided into two main
 sections: the first one will present the biological background, including the
 central dogma of molecular biology, the role of \gls{mirna} in gene expression
@@ -113,7 +113,7 @@ biology tools and biotechnological applications prooved by
 Although the focus of molecular biology for decades has been on the coding
 sequence of the genome (that is, the genes that give rise to proteins) it is
 now known that a large part of the human genome is transcribed into \gls{rna}
-that does not code for proteins. These non-coding \gls{rna} (ncRNA) molecules
+that does not code for proteins. These non-coding \gls{rna} molecules
 play crucial regulatory roles in controlling gene expression. One of the most
 studied groups within this class are \gls{mirna}, which appear to be central
 elements in the fine-tuning of the genetic regulation process.
@@ -130,7 +130,7 @@ proteins, they control the production of proteins from genes.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{mirna_process.png}
-  \caption{The figure shows the process of gene expression: DNA is transcribed
+  \caption{This figure shows the process of gene expression: DNA is transcribed
     into mRNA, which is then translated into protein by the ribosome. \gls{mirna}
     are shown as regulators acting on the mRNA before translation.}
   \label{fig:mirna_mechanism}
@@ -197,15 +197,15 @@ malignant. There are precancerous conditions, such as \textit{hyperplasia or
 their morphology, but which do not yet invade surrounding tissues.
 
 The advance of cancer stages is a complex process that involves the
-\textbf{acquisition of invasive and metastatic capacity - properties that
-  distinguish malignant tumors from benign ones}. This process can be silent for
+acquisition of invasive and metastatic capacity - properties that
+  distinguish malignant tumors from benign ones. This process can be silent for
 years, until more severe symptoms arise, often related to the invasion of vital
 organs.
 
 \section{Biological Context}
 Breast cancer represents both one of the greatest challenges in modern medicine
-and one of the most dynamic areas of biomedical research. Its relevance stems
-not only from its high incidence and mortality rates, but above all from its
+and one of the most dynamic areas of biomedical research \cite{bc_molecular_Perou2000}. Its relevance stems
+not only from its high incidence and mortality rates \cite{bcaData2024_bray, bca_data_Arnold2022Current}, but above all from its
 biological complexity, which distinguishes it from many other neoplasms. This
 type of tumour is not uniform, resulting from the accumulation of multiple
 genetic and epigenetic alterations in breast epithelial cells that deregulate
@@ -216,18 +216,18 @@ expression profiles, progression patterns, and metastatic behaviours. This
 diversity, both intertumoral and intratumoral, constitutes a significant
 obstacle to the accurate stratification of the disease and the definition of
 universal therapeutic strategies, given that even patients diagnosed with the
-same clinical subtype may respond differently to the same treatments.
+same clinical subtype may respond differently to the same treatments \cite{need_for_subtype_treatments_Testa2020Breast, bc_subtypes_Haque2012}.
 
 Although therapeutic advances in recent decades have transformed the prognosis
 for many patients, with the introduction of more effective surgical therapies,
 combined drug regimens, hormone blockade, and therapies targeting specific
-molecular targets, substantial limitations remain, particularly related to
+molecular targets \cite{complete_analysis_bca_Łukasiewicz2021Breast}, substantial limitations remain, particularly related to
 phenomena such as acquired resistance, clonal adaptation, and tumour
 recurrence. In this context, there is a clear need to explore new therapeutic
 avenues capable of overcoming these limitations. Among the emerging strategies,
-nucleic acid-based therapies stand out, which aim to directly modulate the gene
+nucleic acid-based therapies stand out \cite{_Mendes2022Nanodelivery}, which aim to directly modulate the gene
 expression involved in tumour progression, constituting a paradigm shift in the
-treatment of breast cancer.
+treatment of breast cancer \cite{Mendes2024Nanoparticles}.
 
 \subsection{Breast Cancer \& its Subtypes}
 \label{sec:breast_cancer}
@@ -368,25 +368,20 @@ implications for both therapy and prognosis.
   \small
   \caption{Summary of intrinsic \gls{bc} subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{bc_subtypes_Prat2015Clinical}, \cite{updatedbca_Hong2022Breast}, \cite{tnbc_therapies_Mahalingam2020The}.}
   \label{tab:bc_subtypes_summary}
-  \begin{tabularx}{\textwidth}{l l l l X}
+  \begin{tabular}{llll}
     \toprule
-    \textbf{Subtype}  & \textbf{Receptors / HER2} & \textbf{Prolif.} & \textbf{Prognosis} & \textbf{Treatment}          \\
+    \textbf{Subtype}  & \textbf{Receptors / HER2} & \textbf{Prolif.} & \textbf{Prognosis} \\
     \midrule
-    Luminal A         & ER+/PR+, HER2−            & Low              & Favorable          & Endocrine only              \\
-    \midrule
-    Luminal B         & ER+, PR↓, HER2±           & High             & Intermediate       & Hormone ± Chemo ± Anti-HER2 \\
-    \midrule
-    HER2-enriched     & HER2+, ER−, PR−           & High             & Improved           & Anti-HER2 + Chemo           \\
-    \midrule
-    Basal-like / TNBC & ER−, PR−, HER2−           & High             & Poor               & Chemo; ± PARP/IO (selected) \\
-
+    Luminal A         & ER+/PR+, HER2−            & Low              & Favorable          \\
+    Luminal B         & ER+, PR↓, HER2±           & High             & Intermediate       \\
+    HER2-enriched     & HER2+, ER−, PR−           & High             & Improved           \\
+    TNBC              & ER−, PR−, HER2−           & High             & Poor               \\
     \bottomrule
-  \end{tabularx}
+  \end{tabular}
 
   \vspace{1ex}
   \raggedright
   \footnotesize
-  \textit{Acronyms:} Chemo = Chemotherapy , IO = Immunotherapy .
 \end{table}
 
 Recent evidence by
@@ -410,21 +405,14 @@ patient groups. These factors, analyzed below, reveal the complexity of the
 disease and the continuing need for more effective and safer solutions
 \cite{bc_molecular_Perou2000, bc_subtypes_Prat2015Clinical}.
 
-One of the most striking limitations when it comes to breast cancer treatment
-is undoubtedly the triple-negative subtype, recognized for its aggressiveness
-in the patient's body and poor prognosis, as seen in the study by
-\textcite{diff_bca_usa_Howlader2018} and \textcite{Loibl2021Breast}. The
-absence of estrogen, progesterone, and HER2 receptors (hence the term triple
-negative) immediately eliminates the possibility of using hormonal or targeted
-therapies, leaving chemotherapy as the main treatment option. Although many
-patients respond positively in the initial period, relapses are frequent and,
-in most cases, there are no effective options to counteract the gradual
-weakening of the body given the aggressiveness of the treatments
-\cite{Eroles2012Molecular}. Trials with anti-angiogenic agents, such as
-bevacizumab, have shown only marginal benefits and no consistent impact on
-overall patient survival. Epidemiological studies find that TNBC has the lowest
-specific survival rate among the subtypes, reflecting the lack of a therapy
-with clear and targeted targets.
+One of the most striking examples of these limitations is the triple-negative 
+subtype, characterized by the absence of estrogen, progesterone, and HER2 
+receptors, which eliminates the possibility of hormonal or targeted therapies 
+and leaves chemotherapy as the main treatment option \cite{tnbc_therapies_Mahalingam2020The}. 
+Despite initial responses, relapses are frequent and trials with agents such as 
+bevacizumab have shown only marginal benefits, resulting in the lowest 
+subtype-specific survival rate among all breast cancer subtypes 
+\cite{diff_bca_usa_Howlader2018, Eroles2012Molecular}.
 
 Therapeutic resistance is another cross-cutting challenge. In the study by
 \textcite{Sun2017Risk}, hormone-sensitive tumors, acquired resistance to
@@ -478,7 +466,7 @@ metastatic disease remains incurable and why many patients are still subjected
 to therapeutic regimens that do not offer the ideal balance between efficacy
 and safety. Overcoming these barriers will depend on the ability to integrate
 new biomarkers, innovative treatment strategies, and truly personalized
-approaches—points that also form the basis for research into computational
+approaches, these are the points that also form the basis for research into computational
 methods and artificial intelligence applied to oncology.
 
 \subsection{Nucleic acids as gene therapies}
@@ -521,7 +509,7 @@ therapies offer a unique opportunity: instead of resorting to nonspecific
 chemotherapeutic agents, highly selective interventions can be designed to
 correct specific alterations in each tumor subtype - from restoring inactivated
 suppressor genes to blocking active oncogenes or regulating key elements of the
-tumor microenvironment.
+tumor microenvironment (TME).
 
 Breast cancer is thus a privileged model for preclinical research on nucleic
 acid delivery. Recent trials highlight the use of lipid and inorganic
@@ -670,7 +658,7 @@ performance.
 \end{figure}
 
 Furthermore, in more complex scenarios with multiple classes (three and nine
-disease categories), the model maintained its\textbf{remarkable levels of
+disease categories), the model maintained its \textbf{remarkable levels of
   accuracy} (72.1\% and 55.4\%), surpassing or equaling human experts (the levels
 itself are not extraordinary, but considering that surpases the group of
 experts, it becomes a great achievement). The robustness of the methodology,
@@ -723,7 +711,7 @@ authors to achieve high levels of accuracy, sensitivity, and specificity,
 demonstrating the potential of \gls{ai} in classifying \gls{bc} subtypes based
 on genomic information. The type of information for this study was the
 RNA-Sequence (RNA-Seq) profiles made available by The Cancer Genome Atlas
-(TCGA), a public database containing thousands of tumor samples characterized
+(TCGA) \cite{TCGA_BRCA}, a public database containing thousands of tumor samples characterized
 at the genomic level. This dataset, after pre processing, had 934 tumor samples
 and over 57{,}000 genes per sample, a typical high-dimensionality scenario
 where the number of variables far exceeds the number of observations, and
@@ -757,7 +745,7 @@ classification task:
 \begin{itemize}
   \label{list:models}
   \item \textbf{K-nearest Neighbors (\textit{kNN})}: classifies new data based on the K nearest neighbors in the feature space \cite{knn_article}.
-        \begin{figure} [h]
+        \begin{figure} [H]
           \centering
           \includegraphics[width=0.45\linewidth]{Chapters/Figures/knn-example.jpg}
           \caption{Illustration of the k-Nearest Neighbors (k-NN) classification process. The top-left panel shows the initial labeled data (Class A in yellow, Class B in purple) and a new unlabeled sample (?). The top-right panel demonstrates the calculation of distances from the new sample to all existing points. The bottom panel shows the selection of the k=3 nearest neighbors and class assignment based on majority voting, resulting in the classification of the new sample.}
@@ -770,14 +758,14 @@ classification task:
 
   \item \textbf{Decision Tree (\textit{DT})}: a model that makes decisions through a hierarchical tree-shaped structure, where each internal node represents a condition on a variable, and each branch represents a possible outcome of that condition. The process continues until it reaches a leaf node, which indicates the final class or value \cite{decision_trees_Jijo2021}.
 
-        \begin{figure} [h]
+        \begin{figure} [H]
           \centering
           \includegraphics[width=0.45\linewidth]{Chapters/Figures/dt-example.png}
           \caption{Example of a Decision Tree for Classification Based on Attributes: Income, Age, Student Status, and Credit Rating (CR). The tree predicts a binary decision outcome (Yes/No) using hierarchical decision rules \cite{decision_trees_Jijo2021Classification}.}
         \end{figure}
 
   \item \textbf{Support Vector Machine (\textit{SVM})}: This algorithm constructs an optimal hyperplane that best separates samples from different classes. The goal of SVM is to maximize the margin between the two classes for better generalization. Support vectors are the data points that lie closest to the hyperplane and define its position.
-        \begin{figure} [h]
+        \begin{figure} [H]
           \centering
           \includegraphics[width=0.45\linewidth]{Chapters/Figures/SVM.png}
           \caption{Visualization of a Support Vector Machine (SVM) classifier. The red line represents the optimal hyperplane that separates two classes (blue and green points), while the dashed lines indicate the margins.}
@@ -1477,7 +1465,7 @@ to samples in other groups. Unlike supervised classification, there is no ground
 optimise against during training; evaluation relies either on internal geometric measures
 or on post-hoc comparison with external labels when available. Unsupervised learning
 has been applied to cancer genomics since the early studies of molecular classification
-\cite{perou2000molecular, eisen1998cluster}, where hierarchical clustering on gene
+\cite{perou2000molecular}, where hierarchical clustering on gene
 expression microarray data demonstrated that transcriptomic profiles alone, without
 clinical labels, can recover biologically meaningful tumour classes. More broadly, with
 the increasing availability of clinical and molecular patient data, unsupervised methods
@@ -1487,7 +1475,7 @@ therapeutically homogeneous patient subclasses within heterogeneous diseases
 
 A representative example of this paradigm is the work of \citeauthor{ferro2021phenomapping}
 \cite{ferro2021phenomapping}, who applied unsupervised clustering to a cohort of 712
-women with primary breast cancer (PBC) to identify clinically meaningful patient
+women with primary breast cancer to identify clinically meaningful patient
 subgroups from biological prognostic parameters. The study is motivated by the high
 heterogeneity of PBC at the clinical, histopathological, and molecular levels, which
 complicates patient management when similar clinical presentations may conceal
@@ -1496,14 +1484,13 @@ problem and argue that unsupervised learning offers a principled approach to unc
 hidden structures in such complex, high-dimensional data.
 
 The input feature set comprised five continuous quantitative variables: patient age,
-oestrogen receptor (ER) levels, progesterone receptor (PgR) levels, pS2 protein levels,
+oestrogen receptor (ER) levels, progesterone receptor levels, pS2 protein levels,
 and cathepsin D levels. The restriction to continuous variables was imposed by the
 requirements of the algorithms under consideration; tumour size was excluded due to an
 elevated proportion of missing values (49\%). Rather than committing to a single method,
-the authors compared four clustering algorithms: K-Means \cite{hartigan1979kmeans},
-self-organising maps (SOM) \cite{kohonen2001som}, hierarchical agglomerative clustering
-(HAC) \cite{gordon1999classification}, and Gaussian mixture models (GMM)
-\cite{scrucca2016mclust}; so as to assess whether the identified structure was robust
+the authors compared four clustering algorithms: K-Means,
+self-organising maps (SOM), hierarchical agglomerative clustering
+(HAC), and Gaussian mixture models (GMM); so as to assess whether the identified structure was robust
 across methodological choices.
 
 Since no external reference partition was available in this historical dataset, model
@@ -1602,7 +1589,7 @@ discovery and domain knowledge.
 The analysis of the studies presented throughout this chapter allows us not
 only to understand the state of the art in the use of \gls{ml} algorithms for
 biomarker identification, but also how these computational resources can become
-key elements in the classification of tumor masses, directly outlining some
+key elements in the classification of tumor biopsies, directly outlining some
 possible paths for this thesis.
 
 One of the first aspects to highlight is the \textbf{importance of differential

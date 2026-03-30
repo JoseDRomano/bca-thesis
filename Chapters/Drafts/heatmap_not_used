@@ -1,0 +1,21 @@
+% This complexity 
+% can be visually appreciated in the heatmap shown in Figure~\ref{fig:mirna-heatmap}, 
+% which displays the expression patterns of a random subset of 50 patients and 50 miRNAs, 
+% with the PAM50 subtype associated for context.
+
+% [MEDIA: Heatmap of a random subset of patients $\times$ miRNAs (e.g.\ 50 patients
+% $\times$ 50 miRNAs, sorted by subtype) to visually convey the high-dimensional
+% nature of the expression matrix and give an intuition of the expression
+% variation across subtypes. A colourbar from low (blue) to high (red) expression
+% would work well here.]
+% \begin{figure}[h!]
+%     \centering
+%     \includegraphics[width=\textwidth]{miRNA_heatmap_complexity.png}
+%     \caption{miRNA expression heatmap for a random subset of 50 patients and the 50
+%              highest-variance miRNAs from the TCGA breast cancer cohort. Rows are
+%              grouped by PAM50 subtype (colour strip, left); columns are individual
+%              miRNA features. Expression values are z-scored per miRNA; blue denotes
+%              low and red denotes high expression. The block structure reflects
+%              subtype-specific miRNA signatures.}
+%     \label{fig:mirna-heatmap}
+% \end{figure}

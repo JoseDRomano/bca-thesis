@@ -1,0 +1,38 @@
+% ============================================================
+\subsection{Initial Baselines Assessment}
+\label{sec:early-models}
+% ============================================================
+
+A initial exploratory phase was conducted to assess 
+which classifiers were most suitable for the multiclass PAM50 subtype prediction task.
+The four classifiers evaluated were \textbf{Decision Tree}, \textbf{Logistic Regression},
+\textbf{XGBoost}, and \textbf{DIABLO}. The selection of these four models was deliberate,
+as the first three are established baselines that span the spectrum of model complexity,
+from a single-split decision surfxace to a regularised linear model to a full gradient-boosted
+ensemble, and are routinely used for benchmarking on tabular genomic data and classification
+problems. DIABLO was included as it is a widley used and well-established method in the multi-omics classification literature~\cite{singh2019diablo},
+explicitly designed to integrate heterogeneous data blocks, in this case, \gls{mirna} expression
+and clinical features, through a sparse latent-variable structure.
+ 
+A criterion that shaped the selection equally alongside predictive performance was
+\textbf{interpretability}. The ultimate aim of this supervised approach is not classification
+per se, but the identification of the features - specially the miRNAs proven to be 
+great biomarkers - that best
+characterise each subtype. A model that classifies accurately but obscures its decision
+process provides limited biological insight and brings lower value to the table. This requirement 
+favoured models with accessible
+and meaningful feature importance mechanisms, a point that would later prove decisive in
+choosing XGBoost as the final architecture.
+ 
+All four models were evaluated on \textbf{both feature configurations} (\gls{mirna} only and
+\gls{mirna} + clinical data) to assess whether the inclusion
+of clinical covariates represented a worthwhile investment for improving discrimination.
+The Logistic Regression was configured with an L2 penalty (\texttt{C}~=~1.0,
+\texttt{solver}~=~\texttt{lbfgs}, \texttt{multi\_class}~=~\texttt{multinomial}) and the
+initial XGBoost used 100 estimators with a learning rate of 0.1 and a maximum tree depth
+of 3, this would later be our starting point before grid search
+refinement. Table~\ref{tab:early-models}, extracted from our published paper \ref{ann:EPIA_paper}, reports the results on the \gls{mirna} + clinical configuration
+which represented the most informative of the two conditions for this comparison.
+
+\subsection{Baseline Results}
+
