@@ -26,7 +26,7 @@ The experimental work was conducted in two phases. A \textbf{pilot study}
 methodological foundation and a first set of biological findings. The
 \textbf{main analysis} (Chapter~\ref{ch:expanded}) re-applied the same pipeline, 
 without any modification, to an independently assembled, larger cohort of 702 patients
-drawn directly from cBioPortal \ref{cerami2012cbio}, testing whether the pilot findings generalise at
+drawn directly from cBioPortal \cite{cerami2012cbio, TCGA2012}, testing whether the pilot findings generalise at
 scale. The results of both phases are brought together here to draw final conclusions.
  
 Three complementary analytical approaches were used throughout both phases: a
@@ -44,8 +44,8 @@ follows.
 % ================================================================
  
 The most robust and replicable result of this dissertation is the existence of a
-\textbf{consistent separability gradient} across the four PAM50 breast cancer
-subtypes in miRNA expression space:
+\textbf{consistent separability gradient} across the four PAM50 \gls{bc}
+subtypes in \gls{mirna} expression space:
  
 \begin{equation}
     \text{Basal-like} \;\succ\; \text{Luminal A} \;\succ\;
@@ -59,17 +59,11 @@ classified with perfect F1-score (1.00), Luminal A with moderate performance
 (F1 = 0.50 each) under miRNA-only conditions, where this was subsequently confirmed in the
 expanded cohort with near-identical ordering (Basal: F1 = 0.98, Luminal A:
 F1 = 0.89, HER2-Enriched: F1 = 0.42, Luminal B: F1 = 0.56) - these results converge with 
-the one seen in the literature \ref{10.1093/bioadv/vbaf116}. Crucially, this
+the one seen in the literature \cite{GAIN_BRCA_Patel2025}. Crucially, this
 gradient was independently corroborated by both the ANOVA F-test sweep and the
 K-Means clustering purity analysis in both cohorts, establishing that it is not a
 model-specific or cohort-specific artefact, but a \textbf{genuine geometric property
 of the miRNA expression space}.
- 
-[MEDIA] Comparison table: supervised F1 scores (XGBoost), best ANOVA F1 scores,
-and K-Means purity for all four subtypes across both cohorts, laid out side by side.
-% [SUGGESTION] Present this as a 4-column table (subtype | pilot XGBoost F1 |
-% expanded XGBoost F1 | expanded K-Means purity) to make the gradient immediately
-% legible. Colour-code the cells by performance tier (green / yellow / red).
  
 The consistency of this gradient across two independently assembled datasets, 
 differing in size (244 vs.\ 702 samples), clinical annotations (receptor status
@@ -175,20 +169,26 @@ expanded cohort analysis. The features shown in each subtype region are
 Features additionally corroborated by the K-Means centroid Z-scores - making them
 \textit{triply validated} - are marked with~$\ast$.
  
-% [MEDIA] Figure — Expanded Cohort Venn Diagram (Panel A from venn_biomarker_panels.html)
-\begin{figure}[h!]
+
+\begin{figure}[!ht]
     \centering
-    % \includegraphics[width=0.90\textwidth]{venn_expanded_panel.pdf}
-    \caption{Proposed biomarker panel from the expanded cohort (TCGA-BRCA, $n = 702$).
-    Each region contains the \textit{doubly-validated} features (XGBoost gain + ANOVA
-    F-test) for the corresponding subtype. Features marked $\ast$ are additionally
-    validated by K-Means centroid Z-score (triple validation). Features marked $\dagger$
-    are clinical variables. The bold number in each region indicates the count of
-    unique doubly-validated features. MIR-190b appears at the Basal-like/Luminal B
-    intersection, having been identified as doubly validated in both panels.}
+    \begin{subfigure}{0.95\textwidth}
+        \centering
+        \includegraphics[width=0.90\textwidth]{diagrama_venn_crosscohort_mirna.drawio.png}
+        \caption{miRNA only}
+    \end{subfigure}
+    \vspace{0.5cm}
+    \begin{subfigure}{0.95\textwidth}
+        \centering
+        \includegraphics[width=0.90\textwidth]{diagrama_venn_crosscohort_mirna+clinical.drawio.drawio.png}
+        \caption{miRNA and Clinical data}
+    \end{subfigure}
+
+    {\footnotesize \textbf{Note:} The prefix "MIR-" is omitted for brevity and to improve readability.}
+    
+    \caption{Feature intersections showing doubly-validated markers for all subtypes under both miRNA-only and miRNA+clinical conditions.}
     \label{fig:venn_expanded}
-\end{figure}
- 
+\end{figure} 
  
 % ---------------------------------------------------------------
 \subsection{Cross-Cohort Validated Panel}
@@ -205,10 +205,10 @@ datasets.
 Figure~\ref{fig:venn_crosscohort} presents the cross-cohort validated panel. Only
 features identified as doubly-validated candidates in both the pilot cohort
 ($n = 244$) and the expanded cohort ($n = 702$) are shown. Features that appeared
-only in one of the two cohorts are annotated in dashed callout boxes to make
-visible what was gained or lost in the replication.
+only in the pilot cohort are annotated in red, the features that appeared only in 
+the expanded cohort are annotated in orange, while the features that appeared in 
+both cohorts are annotated in \textbf{bold}.
  
-% [MEDIA] Figure — Cross-Cohort Validated Panel (Panel B from venn_biomarker_panels.html)
 \begin{figure}[h!]
     \centering
     % \includegraphics[width=0.90\textwidth]{venn_crosscohort_panel.pdf}
@@ -224,15 +224,12 @@ visible what was gained or lost in the replication.
 \end{figure}
  
 The result is unambiguous: \textbf{only the Basal-like subtype yields a cross-cohort
-validated miRNA panel}. Four miRNAs: \textbf{MIR-577, MIR-934, MIR-18a,} and
+validated miRNA panel}. Four miRNAs: \textbf{MIR-577, MIR-934, MIR-190B} and
 \textbf{MIR-135b} appear as top-ranked features in both the XGBoost gain
 importances and the ANOVA F-test ranking for Basal-like, independently, in both
 datasets. These four miRNAs are therefore supported by three converging layers of
 evidence: multivariate discriminative power (XGBoost), marginal statistical
-separation (ANOVA), and cross-cohort replication. For MIR-577 and MIR-18a, a
-fourth layer of evidence (K-Means centroid Z-score analysis) further strengthens
-their candidacy, making these two miRNAs the most robustly supported biomarker
-candidates of the entire study.
+separation (ANOVA), and cross-cohort replication.
  
 For the remaining subtypes, the absence of cross-cohort validated features is itself
 an informative finding. It is not a power problem: the expanded cohort contains almost
@@ -323,10 +320,7 @@ Basal-like tumour biology, these miRNAs could form the basis of a targeted
 diagnostic panel for the identification of triple-negative breast cancer - a
 subtype for which targeted molecular biomarkers are particularly needed, given the
 absence of hormone receptor targets that would otherwise guide therapy.
- 
-% [SUGGESTION] Mention any preliminary or in-progress biological validation results
-% if available from the NOVA Medical School team, even as anecdotal observations.
-% This would dramatically increase the translational relevance of this section.
+
  
 % ---------------------------------------------------------------
 \subsection{Limitations}

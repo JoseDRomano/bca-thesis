@@ -1,0 +1,37 @@
+\begin{figure}[!ht]
+    \centering
+    % This makebox trick allows the content to be wider than the margins
+    \makebox[\textwidth][c]{
+        \begin{minipage}{1.25\textwidth} % Adjust this to control how far it bleeds
+            \centering
+            \begin{subfigure}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{sc_unsupervised_top20_c0_mirna.png}
+                \caption{Cluster 0}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{sc_unsupervised_top20_c1_mirna.png}
+                \caption{Cluster 1}
+            \end{subfigure}
+
+            \vspace{1em} % Vertical gap between rows
+
+            \begin{subfigure}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{sc_unsupervised_top20_c2_mirna.png}
+                \caption{Cluster 2}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\linewidth]{sc_unsupervised_top20_c3_mirna.png}
+                \caption{Cluster 3}
+            \end{subfigure}
+        \end{minipage}
+    }
+    \caption{Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA-only features, where
+    each panel shows the miRNAs most strongly characteristic of the cluster.}
+    \label{fig:sc_kmeans_top_features_mirna_only}
+\end{figure}

@@ -1,0 +1,182 @@
+% =====================================================================
+% TABLE 1 — BASAL-LIKE
+% =====================================================================
+\begin{table}[t]
+\centering
+\caption{Feature intersection for \textbf{Basal-like} (OvR binary classification).
+ANOVA F-scores and XGBoost gain percentages are reported for each condition.
+Doubly-validated features appear in both methods independently.}
+\label{tab:intersect-basal}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+ 
+\begin{tabular}{l rr rr}
+\toprule
+& \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA only}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-934/934}     & 1  & 386.11 & 3  & 8.50  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-577/577}     & 2  & 358.03 & 1  & 59.22 \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-135B/135B*}  & 3  & 291.92 & 2  & 9.45  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-190B/190B}   & 4  & 204.94 & 4  & 4.29  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-455/5P}      & 8  & 134.45 & 5  & 2.76  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-505/505}     & 10 & 124.91 & 7  & 1.86  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-18A/18A*}    & 4  & 214.21 & 19 & 0.45  \\
+MIR-106B/106B*  & 5  & 117.62 & --- & ---   \\
+MIR-18B/18B*    & 6  &  76.65 & --- & ---   \\
+MIR-20A/20A*    & 9  & 119.19 & --- & ---   \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-934/934}      & 1  & 386.11 & 3  & 7.73  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-577/577}      & 2  & 358.03 & 1  & 56.86 \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-135B/135B*}   & 3  & 291.92 & 2  & 10.49 \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-190B/190B}    & 4  & 204.94 & 5  & 3.79  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-455/5P}       & 9  & 134.45 & 6  & 3.37  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-505/505}      & 11 & 124.91 & 7  & 1.92  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-519A-1/519A*} & 13 & 135.26 & 14 & 0.77  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-20A/20A*}     & 8  & 119.19 & 19 & 0.56  \\
+\rowcolor{clinicalfill}\textcolor{clinicaltext}{ER\_STATUS}     & 10 & 256.72 & ---& ---   \\
+MIR-106B/106B*  & 6  & 117.62 & --- & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+% =====================================================================
+% TABLE 2 — HER2-ENRICHED
+% =====================================================================
+\begin{table}[htbp]
+\centering
+\caption{Feature intersection for \textbf{HER2-enriched} (OvR binary classification).}
+\label{tab:intersect-her2}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+ 
+\begin{tabular}{l rr rr}
+\toprule
+& \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA only}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-30/30A}      & 3  & 40.36 & 1  & 15.20 \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-192/192*}    & 5  & 37.88 & 5  & 6.09  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-184/184}     & 4  & 26.99 & 20 & 1.70  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-187/187}     & 14 & 35.39 & 7  & 3.71  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-2115/2115*}  & 1  & 54.22 & 14 & 2.38  \\
+MIR-345/345     & 17 & 22.53 & --- & ---   \\
+MIR-181D/181D   & 8  & 11.24 & --- & ---   \\
+MIR-497/497*    & 13 & 17.32 & --- & ---   \\
+MIR-3150B/3P    & ---& ---   & 6  & 4.84  \\
+MIR-101/101     & 5  & 13.43 & --- & ---   \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+\midrule
+\rowcolor{clinicalfill}\textcolor{clinicaltext}{HER2\_STATUS}   & 1  & 76.90 & 10 & 2.85  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-3150B/3P}    & 2  & 37.55 & 2  & 9.84  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-184/184}     & 4  & 26.99 & 12 & 2.55  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-497/497*}    & 6  & 17.32 & 11 & 2.74  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-30C/3P}      & 9  & 20.79 & 14 & 2.12  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-187/187}     & 10 & 35.39 & 7  & 4.28  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-30/30A}      & 14 & 40.36 & 1  & 10.65 \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-217/217}     & 19 & 11.83 & 19 & 1.73  \\
+\rowcolor{clinicalfill}\textcolor{clinicaltext}{PR\_STATUS}    & 5  & 17.39 & ---& ---   \\
+MIR-345/345     & 3  & 22.53 & --- & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+% =====================================================================
+% TABLE 3 — LUMINAL A
+% =====================================================================
+\begin{table}[htbp]
+\centering
+\caption{Feature intersection for \textbf{Luminal A} (OvR binary classification).}
+\label{tab:intersect-luma}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+ 
+\begin{tabular}{l rr rr}
+\toprule
+& \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA only}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-1301/1301}   & 2  & 85.14 & 4  & 4.61  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-15B/15B*}    & 4  & 71.69 & 5  & 4.00  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-19A/19A}     & 20 & 76.81 & 3  & 4.79  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-106B/106B*}  & 7  & 68.14 & 15 & 1.61  \\
+MIR-942/942     & 1  & 102.90& --- & ---   \\
+MIR-590/3P      & 5  & 76.03 & --- & ---   \\
+MIR-18A/18A*    & 3  & 70.57 & --- & ---   \\
+MIR-30/30A      & ---& ---   & 1  & 5.14  \\
+MIR-501/3P      & ---& ---   & 2  & 4.82  \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-1301/1301}   & 2  & 85.14 & 5  & 4.06  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-15B/15B*}    & 5  & 71.69 & 7  & 3.61  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-106B/106B*}  & 8  & 68.14 & 8  & 3.15  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-105-1/105}   & 18 & 41.56 & 12 & 2.36  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-30A/30A*}    & 20 & 40.86 & 1  & 5.38  \\
+MIR-942/942     & 1  & 102.90& --- & ---   \\
+MIR-590/3P      & 6  & 76.03 & --- & ---   \\
+MIR-210/210     & 7  & 44.84 & --- & ---   \\
+MIR-19A/19A     & ---& ---   & 2  & 4.98  \\
+MIR-501/3P      & ---& ---   & 3  & 4.94  \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+% =====================================================================
+% TABLE 4 — LUMINAL B
+% =====================================================================
+\begin{table}[htbp]
+\centering
+\caption{Feature intersection for \textbf{Luminal B} (OvR binary classification).
+The sparsity of doubly-validated features in the miRNA-only condition reflects
+the known molecular heterogeneity of this subtype.}
+\label{tab:intersect-lumb}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+ 
+\begin{tabular}{l rr rr}
+\toprule
+& \multicolumn{2}{c}{\textbf{ANOVA}} & \multicolumn{2}{c}{\textbf{XGBoost}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Feature} & Rank & F-score & Rank & Gain (\%) \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA only}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-99/99A}      & 4  & 34.53 & 7  & 2.77  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-15A/15A}     & 9  & 10.32 & 15 & 1.69  \\
+MIR-99A/99A*    & 1  & 34.53 & --- & ---   \\
+MIR-887/887     & 2  & 25.71 & --- & ---   \\
+MIR-193B/3P     & 5  & 10.29 & --- & ---   \\
+MIR-3677/3P     & ---& ---   & 1  & 5.09  \\
+MIR-190B/190B   & ---& ---   & 2  & 4.90  \\
+MIR-126/126     & ---& ---   & 3  & 4.13  \\
+MIR-135B/135B*  & 15 & 13.10 & --- & ---   \\
+MIR-934/934     & 16 & 16.68 & --- & ---   \\
+\midrule
+\multicolumn{5}{l}{\textit{miRNA + clinical}} \\
+\midrule
+\rowcolor{validated}\textcolor{validatedtext}{MIR-99/99A}      & 1  & 34.53 & 11 & 1.93  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-205/205*}    & 2  & 24.22 & 9  & 2.41  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-338/3P}      & 19 & 8.96  & 8  & 2.76  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-454/454}     & 15 & 10.56 & 14 & 1.69  \\
+\rowcolor{validated}\textcolor{validatedtext}{MIR-15A/15A}     & 18 & 10.32 & 16 & 1.54  \\
+\rowcolor{clinicalfill}\textcolor{clinicaltext}{ER\_STATUS}    & 13 & 32.17 & ---& ---   \\
+MIR-193B/3P     & 3  & 10.29 & --- & ---   \\
+MIR-107-10/107  & 4  & 14.49 & --- & ---   \\
+MIR-190B/190B   & ---& ---   & 1  & 5.49  \\
+MIR-3677/3P     & ---& ---   & 2  & 4.95  \\
+\bottomrule
+\end{tabular}
+\end{table}
