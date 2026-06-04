@@ -1,0 +1,57 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="OTi7Donlt4pIKZpBPiH5">
+    <mxGraphModel dx="1099" dy="718" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-1" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;strokeColor=none;fillColor=none;fontSize=12;fontColor=#5F5E5A;fontStyle=0;" value="Dataset Analysis" vertex="1">
+          <mxGeometry height="20" width="150" x="15" y="76" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;align=center;verticalAlign=middle;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=12;strokeWidth=1.5;opacity=30;" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b style=&quot;&quot;&gt;TCGA-BRCA&lt;/b&gt;&lt;br&gt;miRNA data&lt;br&gt;clinical vars&lt;/font&gt;" vertex="1">
+          <mxGeometry height="143" width="150" x="15" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;align=center;verticalAlign=middle;fillColor=#EEEDFE;strokeColor=#534AB7;fontColor=#3C3489;fontSize=12;strokeWidth=1.5;spacingTop=0;spacingBottom=0;opacity=30;" value="&lt;div&gt;&lt;table width=&quot;100%&quot; height=&quot;100%&quot; cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;border-collapse:collapse;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; valign=&quot;middle&quot; style=&quot;border-bottom: 1px solid rgb(175, 169, 236);&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Pilot cohort&lt;/b&gt;&lt;br&gt;n = 244&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; valign=&quot;middle&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Expanded&lt;/b&gt;&lt;br&gt;n = 702&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="143" width="158" x="270" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;align=center;verticalAlign=middle;fillColor=#FAECE7;strokeColor=#993C1D;fontColor=#712B13;fontSize=12;strokeWidth=1.5;spacingTop=0;spacingBottom=0;opacity=30;" value="&lt;table width=&quot;100%&quot; height=&quot;100%&quot; cellpadding=&quot;4&quot; cellspacing=&quot;0&quot; style=&quot;border-collapse:collapse;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; valign=&quot;middle&quot; style=&quot;border-bottom: 1px solid rgb(240, 153, 123);&quot;&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Supervised Method&lt;/b&gt;&lt;br&gt;XGBoost&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; valign=&quot;middle&quot; style=&quot;border-bottom: 1px solid rgb(240, 153, 123);&quot;&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;&lt;b&gt;Unsupervised Method&lt;/b&gt;&lt;br&gt;K-Means&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; valign=&quot;middle&quot;&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;&lt;b&gt;Statistical Method&lt;/b&gt;&lt;br&gt;ANOVA F-test&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="143" width="188" x="530" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;align=center;verticalAlign=middle;fillColor=#FAEEDA;strokeColor=#854F0B;fontColor=#633806;fontSize=12;strokeWidth=1.5;opacity=30;" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Validation&lt;/b&gt;&lt;br&gt;cross-paradigm&lt;br&gt;&amp;amp; cross-cohort&lt;/font&gt;" vertex="1">
+          <mxGeometry height="143" width="173" x="810" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;align=center;verticalAlign=middle;fillColor=#EAF3DE;strokeColor=#3B6D11;fontColor=#27500A;fontSize=12;strokeWidth=1.5;" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Biomarker Panel&lt;/b&gt;&lt;br&gt;per subtype&lt;/font&gt;" vertex="1">
+          <mxGeometry height="143" width="165" x="1077" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-7" edge="1" parent="1" source="o7omnAAFZEAHKlwOYzUX-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#888780;strokeWidth=1.5;endArrow=block;endFill=1;" target="o7omnAAFZEAHKlwOYzUX-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="207" y="172" />
+              <mxPoint x="207" y="172" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-8" edge="1" parent="1" source="o7omnAAFZEAHKlwOYzUX-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#888780;strokeWidth=1.5;endArrow=block;endFill=1;" target="o7omnAAFZEAHKlwOYzUX-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-9" edge="1" parent="1" source="o7omnAAFZEAHKlwOYzUX-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#888780;strokeWidth=1.5;endArrow=block;endFill=1;" target="o7omnAAFZEAHKlwOYzUX-5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-10" edge="1" parent="1" source="o7omnAAFZEAHKlwOYzUX-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#888780;strokeWidth=1.5;endArrow=block;endFill=1;" target="o7omnAAFZEAHKlwOYzUX-6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-12" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;strokeColor=none;fillColor=none;fontSize=12;fontColor=#5F5E5A;fontStyle=0;" value="Data Pipeline and Preprocessing" vertex="1">
+          <mxGeometry height="20" width="150" x="274" y="76" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-13" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;strokeColor=none;fillColor=none;fontSize=12;fontColor=#5F5E5A;fontStyle=0;" value="Multi-analytical Approaches for&amp;nbsp;&lt;div&gt;Breast Cancer Subtype Classification&lt;/div&gt;" vertex="1">
+          <mxGeometry height="20" width="150" x="549" y="73" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-14" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;strokeColor=none;fillColor=none;fontSize=12;fontColor=#5F5E5A;fontStyle=0;" value="Cross-Method Assessment&lt;div&gt;and Subtype Consensus&lt;/div&gt;" vertex="1">
+          <mxGeometry height="20" width="150" x="821.5" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="o7omnAAFZEAHKlwOYzUX-15" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;strokeColor=none;fillColor=none;fontSize=12;fontColor=#5F5E5A;fontStyle=0;" value="Feature Convergence&amp;nbsp;" vertex="1">
+          <mxGeometry height="20" width="150" x="1084.5" y="70" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
