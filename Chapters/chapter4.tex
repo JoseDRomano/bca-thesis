@@ -97,7 +97,7 @@ fundamental incompatibility between the two sources.
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.5\textwidth]{vern_datasets.drawio.png}
-    \caption{This is a description of my image.}
+    \caption{Vern diagram of the overlaping patients between cohorts. It translates the percentage of patients that share the same identifier.}
     \label{fig:ver_datasets}
 \end{figure}
 
@@ -560,7 +560,7 @@ On the 141-sample expanded test set (with 24 Basal-like cases) the answer is
 unambiguous. In miRNA-only configuration, the classifier achieves precision 1.00,
 recall 0.96, and F1-score 0.98; with clinical features added, it recovers to a
 perfect F1-score of 1.00. The marginal drop in recall observed without clinical
-data (four missed Basal-like samples out of 24) vanishes entirely when clinical
+data vanishes entirely when clinical
 covariates are included. This performance, maintained across a nearly three-fold
 larger test set, confirms that the pilot result was not a small-sample artifact:
 Basal-like tumours occupy a geometrically isolated region of the miRNA expression
@@ -888,7 +888,9 @@ subtype-specific miRNA programme rather than diffuse expression differences.
     \end{subfigure}
     \caption{
         Top 20 XGBoost gain importances for the Basal-like subtype in the expanded cohort, 
-        shown side by side for both feature configurations.
+        shown one on top of the other.    
+        \textbf{Top:} miRNA-only feature configuration. 
+        \textbf{Bottom:} miRNA + clinical features configuration. 
     }
     \label{fig:basal_xgboost_importances_png}
 \end{figure}
@@ -928,9 +930,9 @@ observed in Section~\ref{sec:expanded_per_subtype}.
         \label{fig:her2_xgboost_importances_clinical}
     \end{subfigure}
     \caption{
-        Top 20 XGBoost gain importances for HER2-enriched subtype in the expanded cohort, shown side by side. 
-        \textbf{Left:} miRNA-only feature configuration. 
-        \textbf{Right:} miRNA + clinical features configuration. 
+        Top 20 XGBoost gain importances for HER2-enriched subtype in the expanded cohort, shown one on top of the other. 
+        \textbf{Top:} miRNA-only feature configuration. 
+        \textbf{Bottom:} miRNA + clinical features configuration. 
     }
     \label{fig:her2_xgboost_importances_png}
 \end{figure}
@@ -969,9 +971,9 @@ with Luminal B: the model must leverage many features to partition the majority 
         \label{fig:luma_xgboost_importances_clinical}
     \end{subfigure}
     \caption{
-        Top 20 XGBoost gain importances for Luminal A subtype in the expanded cohort, shown side by side. 
-        \textbf{Left:} miRNA-only feature configuration. 
-        \textbf{Right:} miRNA + clinical features configuration. 
+        Top 20 XGBoost gain importances for Luminal A subtype in the expanded cohort, shown one on top of the other. 
+        \textbf{Top:} miRNA-only feature configuration. 
+        \textbf{Bottom:} miRNA + clinical features configuration. 
     }
     \label{fig:luma_xgboost_importances_png}
 \end{figure}
@@ -1008,9 +1010,9 @@ consequence of its transcriptomic heterogeneity.
     \end{subfigure}
     \caption{
         Top 20 XGBoost gain importances for Luminal B subtype in the expanded cohort, 
-        shown side by side. 
-        \textbf{Left:} miRNA-only feature configuration.
-        \textbf{Right:} miRNA + clinical features configuration.
+        shown one on top of the other.
+        \textbf{Top:} miRNA-only feature configuration.
+        \textbf{Bottom:} miRNA + clinical features configuration.
     }
     \label{fig:lumb_xgboost_importances_png}
 \end{figure}

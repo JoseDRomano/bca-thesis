@@ -265,55 +265,6 @@ risk factors, which include:
         \cite{BreastEpidemiology_Romanowicz2022,clinical_implication_bca_Adamo2015}.
 \end{itemize}
 
-% From a molecular and clinical point of view, \textbf{\gls{bc} is highly
-%   heterogeneous}. Each tumor may have unique combinations of genetic alterations,
-% signaling pathways, and gene expression profiles, which are reflected in
-% different clinical behaviors, degrees of aggressiveness, and response to
-% treatment
-% \cite{origins_and_evolution_bca_Polyak2007,diff_bca_usa_Howlader2018}. Given
-% this, early detection is crucial for prognosis. When diagnosed in its early
-% stages, \gls{bc} has survival rates of over $90\%$. However, in more advanced
-% stages, especially when metastases appear, controlling the disease becomes
-% substantially more difficult and the therapeutic goal shifts from curative to
-% palliative \cite{updatedbca_Hong2022Breast,clinical_implication_bca_Adamo2015}.
-
-% The therapeutic approach is typically multimodal, combining surgery,
-% radiotherapy, chemotherapy, hormone therapy, and targeted or biological
-% therapies, depending on the characteristics of the tumor and the patient's
-% general condition. The most significant advance in the last decade has been the
-% transition from a uniform model to a personalized treatment approach, tailored
-% to the molecular subtype and individual risk as studied by
-% \textcite{BreastEpidemiology_Romanowicz2022}.
-
-% In addition, a study made by \textcite{origins_and_evolution_bca_Polyak2007}
-% recognized that breast tumors are not static entities. Due to phenomena of
-% intra-tumor heterogeneity and clonal evolution, tumors adapt to the selective
-% pressure of treatments, often leading to the development of therapeutic
-% resistance and disease progression.
-
-% Given the molecular complexity and clinical diversity of breast tumors, it was
-% established in the papers
-% \textcite{clinical_implication_bca_Adamo2015,bc_subtypes_Prat2015Clinical} that
-% \gls{bc} is not a single disease but rather a collection of biologically
-% distinct entities that arise from a common anatomical site. This heterogeneity
-% is reflected in major differences in tumor progression, metastatic behavior,
-% response to therapy, and long-term prognosis.
-
-% To better capture this complexity and inform clinical decision-making,
-% researchers from various studies, such as
-% \textcite{bc_molecular_Perou2000,bc_subtypes_Prat2015Clinical}, have developed
-% a molecular classification system that subdivides breast tumors into intrinsic
-% subtypes which are: \textit{Luminal-A}, \textit{Luminal-B}, \textit{Basal-like}
-% (or Triple-negative) and \textit{HER2-enriched} . These subtypes are defined
-% based on the expression status of three key hormonal biomarkers:
-% \textbf{estrogen receptor (ER)}, \textbf{progesterone receptor (PR)}, and
-% \textbf{human epidermal growth factor receptor 2 (HER2)} as well as other
-% proliferation indices (e.g., Ki-67) and gene expression patterns. The
-% relationship between \gls{bc} subtypes and these hormone receptors can be seen
-% in Table \ref{tab:bc_subtypes_summary}. This classification underpins modern
-% precision oncology approaches and has profound implications for therapy and
-% prognosis.
-
 From a molecular and clinical point of view, \textbf{breast cancer is highly
   heterogeneous}. Each tumor may have unique combinations of genetic alterations,
 signaling pathways, and gene expression profiles, which are reflected in
@@ -344,14 +295,14 @@ characterization. Indeed, given the molecular complexity and clinical diversity
 of breast tumors, several studies have established that breast cancer is not a
 single disease but rather a collection of biologically distinct entities that
 arise from a common anatomical site
-\cite{clinical_implication_bca_Adamo2015,bc_subtypes_Prat2015Clinical}. This
+\cite{clinical_implication_bca_Adamo2015,clinical_implication_bca_Adamo2015}. This
 heterogeneity is reflected in major differences in tumor progression,
 metastatic behavior, response to therapy, and long-term prognosis.
 
 To better capture this complexity and inform clinical decision-making,
 researchers have proposed molecular classification systems that subdivide
 breast tumors into intrinsic subtypes
-\cite{bc_molecular_Perou2000,bc_subtypes_Prat2015Clinical}. These are typically
+\cite{bc_molecular_Perou2000,clinical_implication_bca_Adamo2015}. These are typically
 defined as \textit{Luminal-A}, \textit{Luminal-B}, \textit{Basal-like} (or
 Triple-negative) and \textit{HER2-enriched}, and rely on the expression status
 of three key hormonal biomarkers: \textbf{estrogen receptor (ER)},
@@ -366,7 +317,7 @@ implications for both therapy and prognosis.
 \begin{table}
   \centering
   \small
-  \caption{Summary of intrinsic breast cancer subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{bc_subtypes_Prat2015Clinical}, \cite{updatedbca_Hong2022Breast}, \cite{tnbc_therapies_Mahalingam2020The}.}
+  \caption{Summary of intrinsic breast cancer subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{clinical_implication_bca_Adamo2015}, \cite{updatedbca_Hong2022Breast}, \cite{tnbc_therapies_Mahalingam2020The}.}
   \label{tab:bc_subtypes_summary}
   \begin{tabular}{llll}
     \toprule
@@ -403,7 +354,7 @@ acquired resistance to different treatment modalities, the toxicity associated
 with existing regimens, and difficulties in personalizing therapy for specific
 patient groups. These factors, analyzed below, reveal the complexity of the
 disease and the continuing need for more effective and safer solutions
-\cite{bc_molecular_Perou2000, bc_subtypes_Prat2015Clinical}.
+\cite{bc_molecular_Perou2000, clinical_implication_bca_Adamo2015}.
 
 One of the most striking examples of these limitations is the triple-negative 
 subtype, characterized by the absence of estrogen, progesterone, and HER2 
@@ -455,7 +406,7 @@ the best sequence of therapies for some patient profiles, and clinical practice
 often faces the dilemma between undertreatment and overtreatment: in many
 contexts, more intensive regimens are chosen to reduce the risk of failure, but
 this results in adverse effects that significantly impact quality of life
-\cite{bc_subtypes_Prat2015Clinical}.
+\cite{clinical_implication_bca_Adamo2015}.
 
 In summary, the current limitations of breast cancer treatment reflect the
 interaction of multiple factors: subtypes with poor prognosis (such as TNBC),
@@ -756,7 +707,7 @@ classification task:
           P(C_k \mid \mathbf{x}) = \frac{P(C_k) \prod_{i=1}^n P(x_i \mid C_k)}{P(\mathbf{x})}
         \]
 
-  \item \textbf{Decision Tree (\textit{DT})}: a model that makes decisions through a hierarchical tree-shaped structure, where each internal node represents a condition on a variable, and each branch represents a possible outcome of that condition. The process continues until it reaches a leaf node, which indicates the final class or value \cite{decision_trees_Jijo2021}.
+  \item \textbf{Decision Tree (\textit{DT})}: a model that makes decisions through a hierarchical tree-shaped structure, where each internal node represents a condition on a variable, and each branch represents a possible outcome of that condition. The process continues until it reaches a leaf node, which indicates the final class or value \cite{decision_trees_Jijo2021Classification}.
 
         \begin{figure} [H]
           \centering
@@ -825,22 +776,6 @@ the metrics used to evaluate them, let us return to the study by Wu and Hicks
 the following table, allows us to see more clearly how each algorithm performed
 in the task of distinguishing between TNBC and non-TNBC, highlighting the
 performance of SVM in virtually all scenarios evaluated.
-
-% \begin{table}[h!]
-%   \centering
-%   \begin{tabular}{|l|c|c|c|c|c|}
-%     \hline
-%     \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1-score} & \textbf{Specificity} \\
-%     \hline
-%     kNN            & 0.81              & 0.76            & 0.80               & 0.78              & 0.86                 \\
-%     Naïve Bayes    & 0.84              & 0.81            & 0.83               & 0.82              & 0.88                 \\
-%     Decision Tree  & 0.88              & 0.86            & 0.87               & 0.86              & 0.89                 \\
-%     \textbf{SVM}   & \textbf{0.90}     & \textbf{0.87}   & \textbf{0.90}      & \textbf{0.88}     & \textbf{0.90}        \\
-%     \hline
-%   \end{tabular}
-%   \caption{Performance of models in classifying \gls{bc} subtypes (TNBC vs non-TNBC) based on differential gene expression.}
-%   \label{tab:model-performance}
-% \end{table}
 
 In the complete gene set, SVM achieved 90\% accuracy, 87\% recall, and 90\%
 specificity - metrics that indicate, respectively, the proportion of correct
@@ -1232,55 +1167,6 @@ Forest) evaluated according to several relevant metrics: accuracy, F1-score,
 sensitivity, specificity, and AUC. Validation was conducted using 10-fold
 cross-validation, ensuring the reliability of the results.
 
-% \begin{table}[h!]
-%   \centering
-%   \caption{Performance Metrics across different thresholds of miRNA Features (3, 5, 10).}
-%   \begin{tabular}{llcccc}
-%     \toprule
-%     \textbf{Classifier} & \textbf{Method} & \textbf{Accuracy} & \textbf{Sensitivity} & \textbf{Specificity} & \textbf{AUC} \\
-%     \midrule
-%     \multirow{10}{*}{RF}
-%                         &                 & 0.996             & 1.000                & 0.952                & 0.999        \\
-%                         & IG-10           & 0.995             & 0.998                & 0.962                & 0.996        \\
-%                         & IG-5            & 0.996             & 0.997                & 0.977                & 0.998        \\
-%                         & IG-3            & 0.997             & 0.997                & 0.990                & 0.999        \\
-%                         & CHI2-10         & 0.995             & 0.999                & 0.952                & 0.995        \\
-%                         & CHI2-5          & 0.996             & 0.999                & 0.979                & 0.996        \\
-%                         & CHI2-3          & 0.996             & 0.997                & 0.981                & 0.999        \\
-%                         & LASS-10         & 0.996             & 0.998                & 0.971                & 0.997        \\
-%                         & LASS-5          & 0.995             & 0.997                & 0.965                & 0.998        \\
-%                         & LASS-3          & 0.994             & 0.997                & 0.962                & 0.999        \\
-
-%     \midrule
-%     \multirow{10}{*}{SVM-RBF}
-%                         &                 & 0.989             & 1.000                & 0.875                & 0.938        \\
-%                         & IG-10           & 0.994             & 0.998                & 0.952                & 0.995        \\
-%                         & IG-5            & 0.996             & 1.000                & 0.990                & 0.985        \\
-%                         & IG-3            & 0.998             & 0.998                & 0.990                & 0.980        \\
-%                         & CHI2-10         & 0.994             & 0.999                & 0.951                & 0.995        \\
-%                         & CHI2-5          & 0.996             & 0.998                & 0.983                & 0.993        \\
-%                         & CHI2-3          & 0.998             & 0.999                & 0.990                & 0.980        \\
-%                         & LASS-10         & 0.995             & 0.998                & 0.962                & 0.996        \\
-%                         & LASS-5          & 0.995             & 0.999                & 0.974                & 0.985        \\
-%                         & LASS-3          & 0.996             & 0.999                & 0.962                & 0.980        \\
-
-%     \midrule
-%     \multirow{10}{*}{SVM}
-%                         &                 & 0.997             & 0.999                & 0.971                & 0.985        \\
-%                         & IG-10           & 0.997             & 0.999                & 0.971                & 0.997        \\
-%                         & IG-5            & 0.997             & 0.999                & 0.985                & 0.989        \\
-%                         & IG-3            & 0.998             & 0.999                & 0.990                & 0.981        \\
-%                         & CHI2-10         & 0.997             & 0.999                & 0.971                & 0.997        \\
-%                         & CHI2-5          & 0.996             & 1.000                & 0.088                & 0.987        \\
-%                         & CHI2-3          & 0.998             & 0.999                & 0.990                & 0.991        \\
-%                         & LASS-10         & 0.994             & 0.997                & 0.962                & 0.996        \\
-%                         & LASS-5          & 0.995             & 0.999                & 0.956                & 0.993        \\
-%                         & LASS-3          & 0.997             & 1.000                & 0.962                & 0.981        \\
-
-%     \bottomrule
-%   \end{tabular}
-% \end{table}
-
 One of the most relevant results of this study was the finding that the use of
 only three highly informative miRNA could support high-quality
 classifications, with performance comparable (or superior) to that obtained
@@ -1326,118 +1212,6 @@ expression profiles, not only to detect cancer, but also to support more
 specific tasks such as tumor subtype stratification, with real potential for
 clinical translation.
 
-% \subsection{Background: Unsupervised Learning and K-Means}
-% \label{sec:unsupervised:background}
-
-% Unsupervised learning refers to a family of methods that operate on unlabelled data, seeking
-% to discover latent structure without explicit supervision \cite{hastie2009elements}. The
-% prototypical task is \textit{clustering}: partitioning a dataset into groups such that samples
-% within a group are more similar to each other than to samples in other groups. Unlike supervised
-% classification, there is no ground truth to optimise against during training; evaluation relies
-% either on internal geometric measures or on post-hoc comparison with external labels when
-% available.
-
-% K-Means is among the most widely used clustering algorithms. Originally
-% introduced by \citeauthor{macqueen1967some} \cite{macqueen1967some}, it partitions $n$ samples
-% into $K$ clusters by iteratively minimising the within-cluster sum of squared Euclidean
-% distances (inertia):
-
-% \begin{equation}
-%     \mathcal{L} = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k}
-%     \left\| \mathbf{x}_i - \boldsymbol{\mu}_k \right\|^2
-%     \label{eq:kmeans_objective}
-% \end{equation}
-
-% \noindent where $C_k$ denotes the set of samples assigned to cluster $k$ and
-% $\boldsymbol{\mu}_k$ is the centroid of that cluster. The algorithm alternates between two
-% steps: \\
-
-% \begin{enumerate}
-%     \item assigning each sample to its nearest centroid;
-%     \item recomputing each centroid as the mean of its assigned samples.
-% \end{enumerate}
-
-% \noindent Because the objective in Equation~\ref{eq:kmeans_objective} is non-convex, the
-% solution depends on the choice of initial centroids. To mitigate convergence to poor local
-% minima, the K-Means\texttt{++} initialisation strategy \cite{arthur2007kmeans} selects initial
-% centroids with probability proportional to their squared distance from already-chosen centroids,
-% yielding both faster convergence and consistently better solutions in practice.
-
-% Unsupervised learning methods have been applied to genomic and transcriptomic cancer data since
-% the early studies of molecular classification \cite{perou2000molecular, eisen1998cluster}.
-% Notably, hierarchical clustering on gene expression microarray data was used to identify
-% intrinsic breast cancer subtypes in the landmark work of \citeauthor{perou2000molecular}
-% \cite{perou2000molecular}, demonstrating that transcriptomic profiles alone, without clinical
-% labels, can recover biologically meaningful tumour classes.
-
-% % ----------------------------------------------------------
-% \subsection{Evaluation Metrics}
-% \label{sec:unsupervised:metrics}
-% \paragraph{Evaluation Metrics for Clustering} Evaluating clustering solutions is inherently 
-% challenging due to the absence of ground-truth labels. In the context of this work, where the goal 
-% is to recover known breast cancer subtypes from transcriptomic data, we have access to true 
-% class labels that can be used for external validation. However, since the clustering 
-% algorithm does not use these labels during model fitting, we also consider internal metrics 
-% that assess the geometric quality of the clusters without reference to the true classes.
-
-% Four complementary metrics were computed to evaluate the quality of the clustering solution.
-% The first is \textit{internal} (does not use labels); the remaining three are \textit{external}
-% (compare cluster assignments against the ground-truth PAM50 labels post-hoc).
-
-% \paragraph{Silhouette Score.}
-% The silhouette coefficient \cite{rousseeuw1987silhouettes} for a sample $i$ is defined as:
-
-% \begin{equation}
-%     s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
-%     \label{eq:silhouette}
-% \end{equation}
-
-% \noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other samples
-% in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest neighbouring cluster.
-% Values close to $+1$ indicate that the sample is well matched to its own cluster and poorly
-% matched to neighbouring clusters; values near $0$ indicate overlap; negative values indicate
-% potential misassignment. The overall silhouette score is the mean over all samples.
-
-% \paragraph{Purity.}
-% Cluster purity measures, for each cluster, the proportion of samples belonging to the most
-% frequent true class within that cluster. The overall purity is the weighted average across
-% clusters:
-
-% \begin{equation}
-%     \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
-%     \label{eq:purity}
-% \end{equation}
-
-% \noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total number of
-% samples. Purity ranges from 0 to 1, with higher values indicating better alignment between
-% clusters and true classes.
-
-% \paragraph{Adjusted Rand Index (ARI).}
-% The Rand Index counts the fraction of sample pairs for which the clustering and the
-% ground-truth labelling agree (both in the same group or both in different groups). The
-% \textit{Adjusted} Rand Index \cite{hubert1985comparing} corrects for chance agreement:
-
-% \begin{equation}
-%     \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) - \mathbb{E}[\text{RI}]}
-%     \label{eq:ari}
-% \end{equation}
-
-% \noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better than
-% random; negative values are possible and indicate systematic disagreement.
-
-% \paragraph{Adjusted Mutual Information (AMI).}
-% AMI \cite{vinh2010information} measures the information shared between the cluster assignments
-% and the true labels, normalised and adjusted for chance:
-
-% \begin{equation}
-%     \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) - \mathbb{E}[I(U;V)]}
-%     \label{eq:ami}
-% \end{equation}
-
-% \noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the true
-% labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
-% AMI $= 0$ is random.
-
 \subsection{Unsupervised Learning in Breast Cancer Subtype Discovery}
 \label{sec:background:unsupervised}
 The studies discussed in the preceding sections establish that machine learning can
@@ -1465,7 +1239,7 @@ to samples in other groups. Unlike supervised classification, there is no ground
 optimise against during training; evaluation relies either on internal geometric measures
 or on post-hoc comparison with external labels when available. Unsupervised learning
 has been applied to cancer genomics since the early studies of molecular classification
-\cite{perou2000molecular}, where hierarchical clustering on gene
+\cite{bc_molecular_Perou2000}, where hierarchical clustering on gene
 expression microarray data demonstrated that transcriptomic profiles alone, without
 clinical labels, can recover biologically meaningful tumour classes. More broadly, with
 the increasing availability of clinical and molecular patient data, unsupervised methods

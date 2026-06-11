@@ -1111,8 +1111,7 @@ persist through subsequent refinements.
 
 \begin{table}[!ht]
     \centering
-    \caption{Baseline model performance on the held-out test set (miRNA + Clinical Data).
-    Classes: 0 = Basal-like, 1 = HER2-enriched, 2 = Luminal A, 3 = Luminal B.}
+    \caption{Baseline model performance on the held-out test set (miRNA + Clinical Data).}
     \label{tab:baseline-results}
     \small
     \begin{tabular}{llcccccc}
@@ -1667,12 +1666,12 @@ configurations. For each subtype, the table reflects the features that the
 XGBoost model identified as most informative when learning to distinguish 
 that subtype from all others, that is, the variables whose inclusion in 
 the decision trees led to the greatest cumulative reduction in classification 
-error.Reading across subtypes, the table thus provides a direct window into 
+error. Reading across subtypes, the table thus provides a direct window into 
 the molecular signatures that the model has learned to associate with each class.
 
 \begin{table}[!ht]
 \centering
-\caption{Top 20 XGBoost Feature Importance: miRNA Only vs. miRNA + Clinical Integration (\% Gain)}
+\caption{Top 20 XGBoost Feature Importance: miRNA Only vs. miRNA + Clinical Integration (\% Gain) - the clinical features are presented in bold.}
 \label{tab:feature_importance_percent}
 \scriptsize
 \begin{tabular}{r|ll|ll}
@@ -2349,7 +2348,7 @@ samples but draws in 3 additional non-Basal samples, reducing purity slightly to
 ($n=50$). The high coherence of this cluster in both conditions is consistent with the
 clinical literature: Basal-Like (triple-negative) tumours are known to exhibit a
 markedly distinct molecular profile from hormone-receptor-positive subtypes
-\cite{perou2000molecular}, and this distinction is clearly captured by miRNA expression
+\cite{bc_molecular_Perou2000}, and this distinction is clearly captured by miRNA expression
 alone. The small purity drop when clinical features are added is a direct consequence
 of the metric dilution described above: a few non-Basal samples whose clinical profile
 places them geometrically close to the Basal centroid are drawn into the cluster.
@@ -2365,7 +2364,7 @@ itself: Luminal A tumours do not occupy a single compact region in miRNA express
 but form at least two separable subgroups with distinct centroid profiles. This is
 consistent with the supervised analysis, where Luminal A showed heterogeneous behaviour
 across feature subsets, and aligns with evidence in the literature of biological
-heterogeneity within the Luminal A class \cite{perou2000molecular}.
+heterogeneity within the Luminal A class \cite{bc_molecular_Perou2000}.
 
 \paragraph{Luminal B and HER2-Enriched remain systematically mixed in both conditions.}
 Both conditions produce one cluster in which Luminal B and HER2-Enriched samples
@@ -2405,42 +2404,80 @@ features per biological cluster type.
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c0_mirna.png}
-    \caption*{(a) Cluster 0}
+    \makebox[\textwidth][c]{
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c0_mirna.png}
+            \caption*{(a) Cluster 0}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c1_mirna.png}
+            \caption*{(b) Cluster 1}
+        \end{minipage}
+    }
+
     \vspace{0.5em}
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c1_mirna.png}
-    \caption*{(b) Cluster 1}
-    \vspace{0.5em}
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c2_mirna.png}
-    \caption*{(c) Cluster 2}
-    \vspace{0.5em}
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c3_mirna.png}
-    \caption*{(d) Cluster 3}
+
+    \makebox[\textwidth][c]{
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c2_mirna.png}
+            \caption*{(c) Cluster 2}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c3_mirna.png}
+            \caption*{(d) Cluster 3}
+        \end{minipage}
+    }
+
     \caption{
-        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA-only features, where
-        each panel shows the miRNAs most strongly characteristic of the cluster.
-        (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
+        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA-only features, where each panel shows the miRNAs most strongly characteristic of the cluster. Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.
     }
     \label{fig:sc_kmeans_top_features_mirna_only}
 \end{figure}
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c0_clinical.png}
-    \caption*{(a) Cluster 0}
+
+    \makebox[\textwidth][c]{
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c0_clinical.png}
+            \caption*{(a) Cluster 0}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c1_clinical.png}
+            \caption*{(b) Cluster 1}
+        \end{minipage}
+    }
+
     \vspace{0.5em}
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c1_clinical.png}
-    \caption*{(b) Cluster 1}
-    \vspace{0.5em}
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c2_clinical.png}
-    \caption*{(c) Cluster 2}
-    \vspace{0.5em}
-    \includegraphics[width=0.7\textwidth]{sc_unsupervised_top20_c3_clinical.png}
-    \caption*{(d) Cluster 3}
+
+    \makebox[\textwidth][c]{
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c2_clinical.png}
+            \caption*{(c) Cluster 2}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.52\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{sc_unsupervised_top20_c3_clinical.png}
+            \caption*{(d) Cluster 3}
+        \end{minipage}
+    }
+
     \caption{
-        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA and clinical features, where
-        each panel shows the features that most strongly characterize the cluster
-        (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
+        Top-20 absolute centroid z-score feature rankings for each K-Means cluster 
+        with miRNA and clinical features, where each panel shows the features 
+        that most strongly characterize the cluster (Cluster assignments and 
+        correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
     }
     \label{fig:sc_kmeans_top_features_mirna_clinical}
 \end{figure}
@@ -2648,7 +2685,7 @@ for Basal-Like subtype identification. This is consistent with the well-establis
 clinical distinctiveness of Basal-Like (triple-negative) tumours, which exhibit a
 markedly different molecular programme from hormone-receptor-positive subtypes and have
 been consistently separable in expression-based studies since the earliest molecular
-classifications of breast cancer \cite{perou2000molecular}.
+classifications of breast cancer \cite{bc_molecular_Perou2000}.
 
 \paragraph{Luminal A: a partially distinctive subtype with intrinsic heterogeneity.}
 
@@ -2677,7 +2714,7 @@ heterogeneous, containing at least two biologically distinct subpopulations whos
 within-group variation is comparable to their between-group signal against other
 subtypes. This is consistent with growing evidence in the literature that the Luminal A
 category, as defined by PAM50, conflates molecularly distinct entities
-\cite{perou2000molecular}. The practical consequence for biomarker discovery is that
+\cite{bc_molecular_Perou2000}. The practical consequence for biomarker discovery is that
 a single panel of Luminal A markers is likely to be insufficient; any clinically
 deployed panel would need to account for this heterogeneity by either targeting the
 shared boundary features identified by the supervised approach, or by embracing the

@@ -142,7 +142,7 @@ For HER2-Enriched, the doubly-validated miRNA panel consists of \textbf{MIR-4728
 MIR-2115, MIR-30a,} and \textbf{MIR-6733}. The Buffa Hypoxia Score is additionally
 validated as a clinical discriminator in the miRNA + clinical condition, consistent
 with the known association between HER2 amplification and tumour hypoxia
-\cite{bc_subtypes_Prat2015Clinical}. Classification performance, however, remains
+\cite{clinical_implication_bca_Adamo2015}. Classification performance, however, remains
 limited (F1 = 0.42 miRNA-only; F1 = 0.57 with clinical features) and no high-purity
 unsupervised cluster was recovered for this subtype in either cohort. Both paradigms,
 across both datasets, converge on the same conclusion: \textbf{miRNA expression alone
@@ -186,7 +186,10 @@ Features additionally corroborated by the K-Means centroid Z-scores - making the
 
     {\footnotesize \textbf{Note:} The prefix "MIR-" is omitted for brevity and to improve readability.}
     
-    \caption{Feature intersections showing doubly-validated markers for all subtypes under both miRNA-only and miRNA+clinical conditions.}
+    \caption{Feature intersections cross-cohorts showing doubly-validated markers 
+    in black, where the features from the small-cohort are presented in red and the
+    ones from large-cohort shown in orange. Here we can see that Basal-Like panel
+    is represented by 4 miRNAs - the same panel between data configurations.}
     \label{fig:venn_expanded}
 \end{figure} 
  
@@ -208,20 +211,6 @@ features identified as doubly-validated candidates in both the pilot cohort
 only in the pilot cohort are annotated in red, the features that appeared only in 
 the expanded cohort are annotated in orange, while the features that appeared in 
 both cohorts are annotated in \textbf{bold}.
- 
-\begin{figure}[h!]
-    \centering
-    % \includegraphics[width=0.90\textwidth]{venn_crosscohort_panel.pdf}
-    \caption{Cross-cohort validated miRNA panel. Only features identified as
-    doubly-validated biomarker candidates in \textit{both} the pilot cohort
-    ($n = 244$) and the expanded cohort ($n = 702$) are shown. Dashed ellipses
-    represent subtypes for which no cross-cohort replicated panel was established.
-    The Basal-like subtype is the only one with a cross-cohort validated panel,
-    comprising four miRNAs (MIR-577, MIR-934, MIR-18a, MIR-135b). Dashed callouts
-    indicate miRNAs exclusive to the pilot (MIR-505) or the expanded (MIR-190b,
-    MIR-671) cohort.}
-    \label{fig:venn_crosscohort}
-\end{figure}
  
 The result is unambiguous: \textbf{only the Basal-like subtype yields a cross-cohort
 validated miRNA panel}. Four miRNAs: \textbf{MIR-577, MIR-934, MIR-190B} and
@@ -464,9 +453,8 @@ biomarker, as demonstrated in related work on gastric cancer
 
 The computational findings of this dissertation do not exist in isolation
 from experimental biology. The cross-cohort validated Basal-like panel
-(MIR-577, MIR-934, MIR-18a, and MIR-135b) is currently positioned for
-\textit{in vitro} and \textit{in vivo} testing at NOVA Medical School, in
-collaboration with the research team of Dr.\ Bárbara Mendes~\cite{_Mendes2022Nanodelivery}.
+(MIR-577, MIR-934, MIR-18a, and MIR-135b) is currently well positioned for
+\textit{in vitro} and \textit{in vivo} experimental analysis.
 Future studies should prioritise these functional assays to confirm the
 biological relevance of the identified miRNAs and to establish the minimum
 effective panel size for a reliable diagnostic readout. If validated
