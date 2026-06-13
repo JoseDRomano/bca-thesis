@@ -1489,93 +1489,167 @@ gain importances for Luminal A, suggesting that different aspects of the Luminal
 miRNA expression landscape are captured by the centroid geometry versus the
 multivariate decision boundary.
 
-\begin{figure}[!ht]
+\begin{figure}[!htbp]
     \centering
 
-    \begin{subfigure}{\textwidth}
+    % ===== MI RNA =====
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c0_mirna.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c0_mirna.png}
         \caption{Cluster 0}
         \label{fig:bc_unsupervised_top20_c0_mirna}
     \end{subfigure}
-
-    \vspace{0.5em}
-
-    \begin{subfigure}{\textwidth}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c1_mirna.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c1_mirna.png}
         \caption{Cluster 1}
         \label{fig:bc_unsupervised_top20_c1_mirna}
     \end{subfigure}
 
-    \vspace{0.5em}
+    \vspace{0.3em}
 
-    \begin{subfigure}{\textwidth}
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c2_mirna.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c2_mirna.png}
         \caption{Cluster 2}
         \label{fig:bc_unsupervised_top20_c2_mirna}
     \end{subfigure}
-
-    \vspace{0.5em}
-
-    \begin{subfigure}{\textwidth}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c3_mirna.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c3_mirna.png}
         \caption{Cluster 3}
         \label{fig:bc_unsupervised_top20_c3_mirna}
     \end{subfigure}
 
-    \caption{
-        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA-only features, where
-        each panel shows the miRNAs most strongly characteristic of the cluster.
-        (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
-    }
-\end{figure}
+    \vspace{0.6em}
 
-\begin{figure}[!ht]
-    \centering
-
-    \begin{subfigure}{\textwidth}
+    % ===== CLINICAL =====
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c0_clinical.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c0_clinical.png}
         \caption{Cluster 0}
         \label{fig:bc_unsupervised_top20_c0_clinical}
     \end{subfigure}
-
-    \vspace{0.5em}
-
-    \begin{subfigure}{\textwidth}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c1_clinical.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c1_clinical.png}
         \caption{Cluster 1}
         \label{fig:bc_unsupervised_top20_c1_clinical}
     \end{subfigure}
 
-    \vspace{0.5em}
+    \vspace{0.3em}
 
-    \begin{subfigure}{\textwidth}
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c2_clinical.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c2_clinical.png}
         \caption{Cluster 2}
         \label{fig:bc_unsupervised_top20_c2_clinical}
     \end{subfigure}
-
-    \vspace{0.5em}
-
-    \begin{subfigure}{\textwidth}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
         \centering
-        \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c3_clinical.png}
+        \includegraphics[width=0.95\textwidth]{bc_unsupervised_top20_c3_clinical.png}
         \caption{Cluster 3}
         \label{fig:bc_unsupervised_top20_c3_clinical}
     \end{subfigure}
 
     \caption{
-        Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA and clinical features, where
-        each panel shows the features that most strongly characterize the cluster
+        Top-20 absolute centroid z-score feature rankings for each K-Means cluster.
+        Top: miRNA-only features. Bottom: miRNA + clinical features.
         (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
     }
 \end{figure}
+
+% \begin{figure}[!ht]
+%     \centering
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.49\textwidth]{bc_unsupervised_top20_c0_mirna.png}
+%         \caption{Cluster 0}
+%         \label{fig:bc_unsupervised_top20_c0_mirna}
+%     \end{subfigure}
+
+%     \vspace{0.5em}
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.49\textwidth]{bc_unsupervised_top20_c1_mirna.png}
+%         \caption{Cluster 1}
+%         \label{fig:bc_unsupervised_top20_c1_mirna}
+%     \end{subfigure}
+
+%     \vspace{0.5em}
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.49\textwidth]{bc_unsupervised_top20_c2_mirna.png}
+%         \caption{Cluster 2}
+%         \label{fig:bc_unsupervised_top20_c2_mirna}
+%     \end{subfigure}
+
+%     \vspace{0.5em}
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.49\textwidth]{bc_unsupervised_top20_c3_mirna.png}
+%         \caption{Cluster 3}
+%         \label{fig:bc_unsupervised_top20_c3_mirna}
+%     \end{subfigure}
+
+%     \caption{
+%         Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA-only features, where
+%         each panel shows the miRNAs most strongly characteristic of the cluster.
+%         (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
+%     }
+% \end{figure}
+
+% \begin{figure}[!ht]
+%     \centering
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c0_clinical.png}
+%         \caption{Cluster 0}
+%         \label{fig:bc_unsupervised_top20_c0_clinical}
+%     \end{subfigure}
+
+%     \vspace{0.5em}
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c1_clinical.png}
+%         \caption{Cluster 1}
+%         \label{fig:bc_unsupervised_top20_c1_clinical}
+%     \end{subfigure}
+
+%     \vspace{0.5em}
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c2_clinical.png}
+%         \caption{Cluster 2}
+%         \label{fig:bc_unsupervised_top20_c2_clinical}
+%     \end{subfigure}
+
+%     \vspace{0.5em}
+
+%     \begin{subfigure}{\textwidth}
+%         \centering
+%         \includegraphics[width=0.6\textwidth]{bc_unsupervised_top20_c3_clinical.png}
+%         \caption{Cluster 3}
+%         \label{fig:bc_unsupervised_top20_c3_clinical}
+%     \end{subfigure}
+
+%     \caption{
+%         Top-20 absolute centroid z-score feature rankings for each K-Means cluster with miRNA and clinical features, where
+%         each panel shows the features that most strongly characterize the cluster
+%         (Cluster assignments and correspondence are described in Table~\ref{tab:kmeans_both_composition}.)
+%     }
+% \end{figure}
 
 \FloatBarrier
 % ----------------------------------------------------------

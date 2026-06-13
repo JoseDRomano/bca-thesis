@@ -147,7 +147,7 @@ complementarity between the miRNA sequence and that of the target mRNA:
         translation without destroying the mRNA.
 \end{itemize}
 
-A study made by \textcite{role_mirna_Calaf2023} demonstrates the high
+A study made by \textcite{Gulyaeva2016Regulatory} demonstrates the high
 effienciency of this mechanism of regulation: a \textbf{single miRNA can
   control dozens to hundreds of different genes}, and it is estimated that more
 than $60\%$ of human coding genes are targeted for regulation by miRNA.
@@ -216,12 +216,13 @@ expression profiles, progression patterns, and metastatic behaviours. This
 diversity, both intertumoral and intratumoral, constitutes a significant
 obstacle to the accurate stratification of the disease and the definition of
 universal therapeutic strategies, given that even patients diagnosed with the
-same clinical subtype may respond differently to the same treatments \cite{need_for_subtype_treatments_Testa2020Breast, bc_subtypes_Haque2012}.
+same clinical subtype may respond differently to the same treatments \cite{bc_subtypes_Haque2012}.
 
 Although therapeutic advances in recent decades have transformed the prognosis
 for many patients, with the introduction of more effective surgical therapies,
 combined drug regimens, hormone blockade, and therapies targeting specific
-molecular targets \cite{complete_analysis_bca_Łukasiewicz2021Breast}, substantial limitations remain, particularly related to
+molecular targets, substantial 
+limitations remain, particularly related to
 phenomena such as acquired resistance, clonal adaptation, and tumour
 recurrence. In this context, there is a clear need to explore new therapeutic
 avenues capable of overcoming these limitations. Among the emerging strategies,
@@ -233,8 +234,7 @@ treatment of breast cancer \cite{Mendes2024Nanoparticles}.
 \label{sec:breast_cancer}
 Breast cancer is the most commonly diagnosed cancer in women worldwide and is
 one of the leading causes of cancer death in developed and developing countries
-as seen in \textcite{BreastEpidemiology_Romanowicz2022,
-  updatedbca_Hong2022Breast}. It is estimated that \textbf{one in eight women}
+as seen in \textcite{updatedbca_Hong2022Breast}. It is estimated that \textbf{one in eight women}
 will be diagnosed with this disease during their lifetime, although it can also
 affect men - albeit with a much lower incidence.
 
@@ -262,7 +262,7 @@ risk factors, which include:
         late menopause, hormone therapy);
   \item Environmental and behavioral factors, such as obesity, physical inactivity,
         alcohol consumption, and a diet rich in saturated fats
-        \cite{BreastEpidemiology_Romanowicz2022,clinical_implication_bca_Adamo2015}.
+        \cite{clinical_implication_bca_Adamo2015}.
 \end{itemize}
 
 From a molecular and clinical point of view, \textbf{breast cancer is highly
@@ -283,7 +283,7 @@ therapies, depending on the characteristics of the tumor and the patient’s
 general condition. The most significant advance in the last decade has been the
 transition from a uniform model to a personalized treatment approach, tailored
 to the molecular subtype and individual risk as studied by
-\textcite{BreastEpidemiology_Romanowicz2022}.
+\textcite{_Mendes2022Nanodelivery}.
 
 It is also important to note that breast tumors are not static entities. As
 recognized by \textcite{origins_and_evolution_bca_Polyak2007}, phenomena such
@@ -317,7 +317,7 @@ implications for both therapy and prognosis.
 \begin{table}
   \centering
   \small
-  \caption{Summary of intrinsic breast cancer subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{clinical_implication_bca_Adamo2015}, \cite{updatedbca_Hong2022Breast}, \cite{tnbc_therapies_Mahalingam2020The}.}
+  \caption{Summary of intrinsic breast cancer subtypes and typical characteristics of each one.\newline\textit{References:} \cite{clinical_implication_bca_Adamo2015}, \cite{diff_bca_usa_Howlader2018}, \cite{clinical_implication_bca_Adamo2015}, \cite{updatedbca_Hong2022Breast}.}
   \label{tab:bc_subtypes_summary}
   \begin{tabular}{llll}
     \toprule
@@ -359,7 +359,7 @@ disease and the continuing need for more effective and safer solutions
 One of the most striking examples of these limitations is the triple-negative 
 subtype, characterized by the absence of estrogen, progesterone, and HER2 
 receptors, which eliminates the possibility of hormonal or targeted therapies 
-and leaves chemotherapy as the main treatment option \cite{tnbc_therapies_Mahalingam2020The}. 
+and leaves chemotherapy as the main treatment option \cite{Yin2020Triple-negative}. 
 Despite initial responses, relapses are frequent and trials with agents such as 
 bevacizumab have shown only marginal benefits, resulting in the lowest 
 subtype-specific survival rate among all breast cancer subtypes 
@@ -642,201 +642,203 @@ The effectiveness demonstrated in the previous project shows the magnitude of
 the benefits that \gls{ai} can bring to the world of medicine, helping doctors
 diagnose and stratify diseases with an accuracy that, in some cases, surpasses
 that of human specialists. This capability is not limited to imaging data: it
-also extends to the field of molecular data and dermatology, as demonstrated by
-the study by \textcite{bca_subtypes_with_ml_Wu_2021}, which applies machine
-learning algorithms to the task of classifying breast cancer subtypes (in this case,
-the goal was to distinguish between Triple Negative, or basal-like, and
-non-Triple Negative tumors, since TNBC is the most deadly cancer with the most
-difficult prognosis, as we saw in the table).
+also extends to the field of molecular data, as we will see in the next sections.
 
-In the study by \textcite{bca_subtypes_with_ml_Wu_2021}, when working with gene
-expression data from thousands of patients, additional challenges arise related
-to the high dimensionality of the data, requiring robust feature selection
-methods and predictive models capable of dealing with complex and often
-non-linear correlations. This type of study brings us closer not only to the
-context of this thesis, but also to the type of challenges we will encounter
-and how we can take advantage of the methodologies used in this paper to
-achieve good results. From all the algorithms that were tested, Support Vector
-Machine (\textit{SVM}) stood out for its performance. This approach allowed the
-authors to achieve high levels of accuracy, sensitivity, and specificity,
-demonstrating the potential of \gls{ai} in classifying breast cancer subtypes based
-on genomic information. The type of information for this study was the
-RNA-Sequence (RNA-Seq) profiles made available by The Cancer Genome Atlas
-(TCGA) \cite{TCGA_BRCA}, a public database containing thousands of tumor samples characterized
-at the genomic level. This dataset, after pre processing, had 934 tumor samples
-and over 57{,}000 genes per sample, a typical high-dimensionality scenario
-where the number of variables far exceeds the number of observations, and
-considering that not all of them are necessary or have a great impact,
-\textbf{differential expression analysis was applied} - a bioinformatics
-technique used to detect which genes are significantly more or less expressed
-between different conditions - resulting in the selection of 5{,}502
-differentially expressed genes, which served as input for the predictive models
-(a large reduction of over 50{,}000 genes). This step corresponds to feature
-selection, which is essential in problems where there is a high risk of
-\textit{overfitting} - that is, when the model memorizes the training data but
-fails to generalize to new examples.
+% This capability is not limited to imaging data: it
+% also extends to the field of molecular data and dermatology, as demonstrated by
+% the study by \textcite{bca_subtypes_with_ml_Wu_2021}, which applies machine
+% learning algorithms to the task of classifying breast cancer subtypes (in this case,
+% the goal was to distinguish between Triple Negative, or basal-like, and
+% non-Triple Negative tumors, since TNBC is the most deadly cancer with the most
+% difficult prognosis, as we saw in the table).
 
-\begin{figure} [h]
-  \centering
-  \includegraphics[width=0.7\textwidth]{Chapters/Figures/overfit.png}
-  \caption{Examples of underfitting, proper fitting, and overfitting.
-    From left to right: the model underfits the data, fits it appropriately, and overfits by capturing noise instead of the underlying pattern \cite{overfiting_ailab_mti_image}.}
-  \label{fig:overfitting}
-\end{figure}
+% In the study by \textcite{bca_subtypes_with_ml_Wu_2021}, when working with gene
+% expression data from thousands of patients, additional challenges arise related
+% to the high dimensionality of the data, requiring robust feature selection
+% methods and predictive models capable of dealing with complex and often
+% non-linear correlations. This type of study brings us closer not only to the
+% context of this thesis, but also to the type of challenges we will encounter
+% and how we can take advantage of the methodologies used in this paper to
+% achieve good results. From all the algorithms that were tested, Support Vector
+% Machine (\textit{SVM}) stood out for its performance. This approach allowed the
+% authors to achieve high levels of accuracy, sensitivity, and specificity,
+% demonstrating the potential of \gls{ai} in classifying breast cancer subtypes based
+% on genomic information. The type of information for this study was the
+% RNA-Sequence (RNA-Seq) profiles made available by The Cancer Genome Atlas
+% (TCGA) \cite{TCGA_BRCA}, a public database containing thousands of tumor samples characterized
+% at the genomic level. This dataset, after pre processing, had 934 tumor samples
+% and over 57{,}000 genes per sample, a typical high-dimensionality scenario
+% where the number of variables far exceeds the number of observations, and
+% considering that not all of them are necessary or have a great impact,
+% \textbf{differential expression analysis was applied} - a bioinformatics
+% technique used to detect which genes are significantly more or less expressed
+% between different conditions - resulting in the selection of 5{,}502
+% differentially expressed genes, which served as input for the predictive models
+% (a large reduction of over 50{,}000 genes). This step corresponds to feature
+% selection, which is essential in problems where there is a high risk of
+% \textit{overfitting} - that is, when the model memorizes the training data but
+% fails to generalize to new examples.
 
-Now that the dataset had been reduced to a more informative and manageable
-subset of features, the authors moved on to the predictive modeling phase. This
-is a crucial moment in the \gls{ml} pipeline, where the ability of different
-algorithms to learn discriminative patterns present in the data is tested - in
-this case, distinguishing between TNBC and non-TNBC tumors based on the
-expression levels of selected genes. Several classic supervised learning
-algorithms were then evaluated, representing different approaches to the
-classification task:
+% \begin{figure} [h]
+%   \centering
+%   \includegraphics[width=0.7\textwidth]{Chapters/Figures/overfit.png}
+%   \caption{Examples of underfitting, proper fitting, and overfitting.
+%     From left to right: the model underfits the data, fits it appropriately, and overfits by capturing noise instead of the underlying pattern \cite{overfiting_ailab_mti_image}.}
+%   \label{fig:overfitting}
+% \end{figure}
 
-\begin{itemize}
-  \label{list:models}
-  \item \textbf{K-nearest Neighbors (\textit{kNN})}: classifies new data based on the K nearest neighbors in the feature space \cite{knn_article}.
-        \begin{figure} [H]
-          \centering
-          \includegraphics[width=0.45\linewidth]{Chapters/Figures/knn-example.jpg}
-          \caption{Illustration of the k-Nearest Neighbors (k-NN) classification process. The top-left panel shows the initial labeled data (Class A in yellow, Class B in purple) and a new unlabeled sample (?). The top-right panel demonstrates the calculation of distances from the new sample to all existing points. The bottom panel shows the selection of the k=3 nearest neighbors and class assignment based on majority voting, resulting in the classification of the new sample.}
-        \end{figure}
+% Now that the dataset had been reduced to a more informative and manageable
+% subset of features, the authors moved on to the predictive modeling phase. This
+% is a crucial moment in the \gls{ml} pipeline, where the ability of different
+% algorithms to learn discriminative patterns present in the data is tested - in
+% this case, distinguishing between TNBC and non-TNBC tumors based on the
+% expression levels of selected genes. Several classic supervised learning
+% algorithms were then evaluated, representing different approaches to the
+% classification task:
 
-  \item \textbf{Naïve Bayes (\textit{NB})}: uses Bayes' Theorem to estimate the most likely class of a sample, assuming that the input variables are independent of each other \cite{naivebayes_Watson2001}.
-        \[
-          P(C_k \mid \mathbf{x}) = \frac{P(C_k) \prod_{i=1}^n P(x_i \mid C_k)}{P(\mathbf{x})}
-        \]
+% \begin{itemize}
+%   \label{list:models}
+%   \item \textbf{K-nearest Neighbors (\textit{kNN})}: classifies new data based on the K nearest neighbors in the feature space \cite{knn_article}.
+%         \begin{figure} [H]
+%           \centering
+%           \includegraphics[width=0.45\linewidth]{Chapters/Figures/knn-example.jpg}
+%           \caption{Illustration of the k-Nearest Neighbors (k-NN) classification process. The top-left panel shows the initial labeled data (Class A in yellow, Class B in purple) and a new unlabeled sample (?). The top-right panel demonstrates the calculation of distances from the new sample to all existing points. The bottom panel shows the selection of the k=3 nearest neighbors and class assignment based on majority voting, resulting in the classification of the new sample.}
+%         \end{figure}
 
-  \item \textbf{Decision Tree (\textit{DT})}: a model that makes decisions through a hierarchical tree-shaped structure, where each internal node represents a condition on a variable, and each branch represents a possible outcome of that condition. The process continues until it reaches a leaf node, which indicates the final class or value \cite{decision_trees_Jijo2021Classification}.
+%   \item \textbf{Naïve Bayes (\textit{NB})}: uses Bayes' Theorem to estimate the most likely class of a sample, assuming that the input variables are independent of each other \cite{naivebayes_Watson2001}.
+%         \[
+%           P(C_k \mid \mathbf{x}) = \frac{P(C_k) \prod_{i=1}^n P(x_i \mid C_k)}{P(\mathbf{x})}
+%         \]
 
-        \begin{figure} [H]
-          \centering
-          \includegraphics[width=0.45\linewidth]{Chapters/Figures/dt-example.png}
-          \caption{Example of a Decision Tree for Classification Based on Attributes: Income, Age, Student Status, and Credit Rating (CR). The tree predicts a binary decision outcome (Yes/No) using hierarchical decision rules \cite{decision_trees_Jijo2021Classification}.}
-        \end{figure}
+%   \item \textbf{Decision Tree (\textit{DT})}: a model that makes decisions through a hierarchical tree-shaped structure, where each internal node represents a condition on a variable, and each branch represents a possible outcome of that condition. The process continues until it reaches a leaf node, which indicates the final class or value \cite{decision_trees_Jijo2021Classification}.
 
-  \item \textbf{Support Vector Machine (\textit{SVM})}: This algorithm constructs an optimal hyperplane that best separates samples from different classes. The goal of SVM is to maximize the margin between the two classes for better generalization. Support vectors are the data points that lie closest to the hyperplane and define its position.
-        \begin{figure} [H]
-          \centering
-          \includegraphics[width=0.45\linewidth]{Chapters/Figures/SVM.png}
-          \caption{Visualization of a Support Vector Machine (SVM) classifier. The red line represents the optimal hyperplane that separates two classes (blue and green points), while the dashed lines indicate the margins.}
-        \end{figure}
-\end{itemize}
+%         \begin{figure} [H]
+%           \centering
+%           \includegraphics[width=0.45\linewidth]{Chapters/Figures/dt-example.png}
+%           \caption{Example of a Decision Tree for Classification Based on Attributes: Income, Age, Student Status, and Credit Rating (CR). The tree predicts a binary decision outcome (Yes/No) using hierarchical decision rules \cite{decision_trees_Jijo2021Classification}.}
+%         \end{figure}
 
-In order to evaluate a model, performance metrics are used to assess how well
-it performs across different dimensions, such as accuracy, relevance, and
-sensitivity to different classes. These metrics provide quantitative insight
-into the strengths and limitations of a classification algorithm, allowing
-researchers and practitioners to make informed decisions when comparing models
-or tuning parameters. Evaluating models using multiple metrics is especially
-important in scenarios involving imbalanced datasets, where a single metric
-(such as accuracy) may not provide a complete picture. The most commonly used
-evaluation metrics in classification tasks, according to
-\textcite{metrics_models_yaseen2021}, are:
+%   \item \textbf{Support Vector Machine (\textit{SVM})}: This algorithm constructs an optimal hyperplane that best separates samples from different classes. The goal of SVM is to maximize the margin between the two classes for better generalization. Support vectors are the data points that lie closest to the hyperplane and define its position.
+%         \begin{figure} [H]
+%           \centering
+%           \includegraphics[width=0.45\linewidth]{Chapters/Figures/SVM.png}
+%           \caption{Visualization of a Support Vector Machine (SVM) classifier. The red line represents the optimal hyperplane that separates two classes (blue and green points), while the dashed lines indicate the margins.}
+%         \end{figure}
+% \end{itemize}
 
-\begin{enumerate}
-  \item \textbf{Accuracy} \\
-        Accuracy is the ratio of correctly predicted instances to the total number of instances. It measures the overall effectiveness of a classification model.
-        \[
-          \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-        \]
-        where:
-        \begin{itemize}
-          \item TP = True Positives
-          \item TN = True Negatives
-          \item FP = False Positives
-          \item FN = False Negatives
-        \end{itemize}
+% In order to evaluate a model, performance metrics are used to assess how well
+% it performs across different dimensions, such as accuracy, relevance, and
+% sensitivity to different classes. These metrics provide quantitative insight
+% into the strengths and limitations of a classification algorithm, allowing
+% researchers and practitioners to make informed decisions when comparing models
+% or tuning parameters. Evaluating models using multiple metrics is especially
+% important in scenarios involving imbalanced datasets, where a single metric
+% (such as accuracy) may not provide a complete picture. The most commonly used
+% evaluation metrics in classification tasks, according to
+% \textcite{metrics_models_yaseen2021}, are:
 
-  \item \textbf{Precision} \\
-        Precision measures the proportion of correctly predicted positive observations to the total predicted positive observations. It reflects the model’s ability to return only relevant results.
-        \[
-          \text{Precision} = \frac{TP}{TP + FP}
-        \]
+% \begin{enumerate}
+%   \item \textbf{Accuracy} \\
+%         Accuracy is the ratio of correctly predicted instances to the total number of instances. It measures the overall effectiveness of a classification model.
+%         \[
+%           \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+%         \]
+%         where:
+%         \begin{itemize}
+%           \item TP = True Positives
+%           \item TN = True Negatives
+%           \item FP = False Positives
+%           \item FN = False Negatives
+%         \end{itemize}
 
-  \item \textbf{Recall (Sensitivity or True Positive Rate)} \\
-        Recall is the ratio of correctly predicted positive observations to all actual positives. It indicates the model’s ability to identify all relevant cases.
-        \[
-          \text{Recall} = \frac{TP}{TP + FN}
-        \]
+%   \item \textbf{Precision} \\
+%         Precision measures the proportion of correctly predicted positive observations to the total predicted positive observations. It reflects the model’s ability to return only relevant results.
+%         \[
+%           \text{Precision} = \frac{TP}{TP + FP}
+%         \]
 
-  \item \textbf{F1-Score} \\
-        The F1-Score is the harmonic mean of Precision and Recall, providing a balance between the two. It is particularly useful when the class distribution is imbalanced.
-        \[
-          \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
-        \]
+%   \item \textbf{Recall (Sensitivity or True Positive Rate)} \\
+%         Recall is the ratio of correctly predicted positive observations to all actual positives. It indicates the model’s ability to identify all relevant cases.
+%         \[
+%           \text{Recall} = \frac{TP}{TP + FN}
+%         \]
 
-  \item \textbf{Support} \\
-        Support refers to the number of actual occurrences of each class in the dataset. While not a performance metric per se, it helps in understanding how many examples a classifier is making predictions on for each class.
-\end{enumerate}
+%   \item \textbf{F1-Score} \\
+%         The F1-Score is the harmonic mean of Precision and Recall, providing a balance between the two. It is particularly useful when the class distribution is imbalanced.
+%         \[
+%           \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+%         \]
 
-Now that we are familiar with the main concepts of classification models and
-the metrics used to evaluate them, let us return to the study by Wu and Hicks
-(2021) in light of these indicators. The analysis of the results, presented in
-the following table, allows us to see more clearly how each algorithm performed
-in the task of distinguishing between TNBC and non-TNBC, highlighting the
-performance of SVM in virtually all scenarios evaluated.
+%   \item \textbf{Support} \\
+%         Support refers to the number of actual occurrences of each class in the dataset. While not a performance metric per se, it helps in understanding how many examples a classifier is making predictions on for each class.
+% \end{enumerate}
 
-In the complete gene set, SVM achieved 90\% accuracy, 87\% recall, and 90\%
-specificity - metrics that indicate, respectively, the proportion of correct
-classifications, the ability to correctly identify TNBC cases, and the ability
-to avoid false positives. The analysis of these metrics is essential to
-correctly interpret the results in a clinical context, where the consequences
-of classification errors can be significant.
+% Now that we are familiar with the main concepts of classification models and
+% the metrics used to evaluate them, let us return to the study by Wu and Hicks
+% (2021) in light of these indicators. The analysis of the results, presented in
+% the following table, allows us to see more clearly how each algorithm performed
+% in the task of distinguishing between TNBC and non-TNBC, highlighting the
+% performance of SVM in virtually all scenarios evaluated.
 
-To validate the robustness of the differentially expressed gene selection
-approach, the authors compared it with other classic feature selection methods,
-such as \textit{SVM-RFE} (an iterative technique that removes the least
-relevant features based on \textit{SVM} weights), \textit{Relief} (which
-weights features based on their correlation with the class), \textit{ARCO}, and
-\textit{mRMR} (which maximizes relevance and minimizes redundancy between
-variables). Even so, the model based on differential expression and
-\textit{SVM} demonstrated better performance in most cases, confirming the
-soundness of the strategy adopted.
+% In the complete gene set, SVM achieved 90\% accuracy, 87\% recall, and 90\%
+% specificity - metrics that indicate, respectively, the proportion of correct
+% classifications, the ability to correctly identify TNBC cases, and the ability
+% to avoid false positives. The analysis of these metrics is essential to
+% correctly interpret the results in a clinical context, where the consequences
+% of classification errors can be significant.
 
-The study further deepened the analysis of feature importance by evaluating the
-performance of models with different sizes of gene subsets, from the initial
-5,502 to only 16 genes. Interestingly, \textit{SVM} performance remained high
-even with reduced sets, achieving the best results with 256 genes. This
-stability suggests that discriminative information is concentrated in a small
-subset of features, which is relevant for scenarios with a low number of
-samples and a large number of features, as we have in this dissertation, and
-quite positive because:
+% To validate the robustness of the differentially expressed gene selection
+% approach, the authors compared it with other classic feature selection methods,
+% such as \textit{SVM-RFE} (an iterative technique that removes the least
+% relevant features based on \textit{SVM} weights), \textit{Relief} (which
+% weights features based on their correlation with the class), \textit{ARCO}, and
+% \textit{mRMR} (which maximizes relevance and minimizes redundancy between
+% variables). Even so, the model based on differential expression and
+% \textit{SVM} demonstrated better performance in most cases, confirming the
+% soundness of the strategy adopted.
 
-\begin{itemize}
-  \item it allows molecular tests to be cheaper and faster since fewer genes are
-        needed;
-  \item it makes models easier to validate in a clinical setting since it is simpler to
-        obtain quality samples with few targets;
-  \item greater interpretability for physicians.
-\end{itemize}
+% The study further deepened the analysis of feature importance by evaluating the
+% performance of models with different sizes of gene subsets, from the initial
+% 5,502 to only 16 genes. Interestingly, \textit{SVM} performance remained high
+% even with reduced sets, achieving the best results with 256 genes. This
+% stability suggests that discriminative information is concentrated in a small
+% subset of features, which is relevant for scenarios with a low number of
+% samples and a large number of features, as we have in this dissertation, and
+% quite positive because:
 
-The analysis of the two studies presented here allows us to consolidate a
-fundamental idea for this dissertation: \gls{ml} and \gls{dl} algorithms
-demonstrate a remarkable ability to \textbf{classify different types of cancer
-  based on complex data}, whether imaging or molecular. From deep neural networks
-applied to dermatological imaging to discriminative algorithms used to analyze
-gene expression, these models have proven to be effective tools for supporting
-clinical decisions, sometimes proving superior to human experts. More than just
-efficient classifiers, these systems have also proven to be interpretable,
-robust, and applicable in real clinical scenarios. Both the image-based
-approach \cite{ai_in_dermacancer_esteva2017} and the gene expression-based
-approach \cite{bca_subtypes_with_ml_Wu_2021} have faced and overcome challenges
-typical of medical practice and biomedical research: sample scarcity, high
-dimensionality, and the need for models with good overall performance, but also
-\textbf{confidence in the prediction of clinically critical cases}.
+% \begin{itemize}
+%   \item it allows molecular tests to be cheaper and faster since fewer genes are
+%         needed;
+%   \item it makes models easier to validate in a clinical setting since it is simpler to
+%         obtain quality samples with few targets;
+%   \item greater interpretability for physicians.
+% \end{itemize}
 
-These findings provide the \textbf{conceptual support needed to explore a more
-  specific direction}: the use of \gls{ml} models to discover and validate
-\textbf{miRNA as biomarkers} in oncology. Like coding genes, miRNA
-carry rich and discriminative information about the biological state of cells
-and have shown promise in the stratification of tumor subtypes. The next
-section addresses precisely this line of research, focusing on how ML has been
-used to reveal miRNA signatures with diagnostic and prognostic value - a
-foundation point for the objectives of this dissertation.
+% The analysis of the two studies presented here allows us to consolidate a
+% fundamental idea for this dissertation: \gls{ml} and \gls{dl} algorithms
+% demonstrate a remarkable ability to \textbf{classify different types of cancer
+%   based on complex data}, whether imaging or molecular. From deep neural networks
+% applied to dermatological imaging to discriminative algorithms used to analyze
+% gene expression, these models have proven to be effective tools for supporting
+% clinical decisions, sometimes proving superior to human experts. More than just
+% efficient classifiers, these systems have also proven to be interpretable,
+% robust, and applicable in real clinical scenarios. Both the image-based
+% approach \cite{ai_in_dermacancer_esteva2017} and the gene expression-based
+% approach \cite{bca_subtypes_with_ml_Wu_2021} have faced and overcome challenges
+% typical of medical practice and biomedical research: sample scarcity, high
+% dimensionality, and the need for models with good overall performance, but also
+% \textbf{confidence in the prediction of clinically critical cases}.
+
+% These findings provide the \textbf{conceptual support needed to explore a more
+%   specific direction}: the use of \gls{ml} models to discover and validate
+% \textbf{miRNA as biomarkers} in oncology. Like coding genes, miRNA
+% carry rich and discriminative information about the biological state of cells
+% and have shown promise in the stratification of tumor subtypes. The next
+% section addresses precisely this line of research, focusing on how ML has been
+% used to reveal miRNA signatures with diagnostic and prognostic value - a
+% foundation point for the objectives of this dissertation.
 
 \subsection{\gls{ml} unravelling miRNA as biomarkers}
-% Papers a usar: 1, 2 e 3
 
 As previously discussed, artificial intelligence models have demonstrated
 proficiency in the task of classificating tumor type, or subtype, by either
@@ -901,9 +903,7 @@ only 220 of these molecular regulators (a much more acceptable and
 interpretable value than the 1882 previously). Following this extensive data
 preprocessing, the authors set up a classification pipeline consisting of five
 classic \gls{ml} algorithms: Support Vector Machine, Random Forest, Decision
-Tree, Logistic Regression, and K-Nearest Neighbors \ref{list:models} (all of
-which have been discussed previously except for Random Forest, which consists
-of a set of several DTs), all of which were evaluated using metrics such as
+Tree, Logistic Regression, and K-Nearest Neighbors, all of which were evaluated using metrics such as
 F1-score, \textit{AUC}, and confusion matrices.
 
 \begin{table}[H]
@@ -939,8 +939,7 @@ showed a more modest performance compared to the others, probably due to its
 vulnerability to variance in data sets with more noise. Finally, logistic
 regression also showed robust performance, with an \textit{AUC} of 88\%, very
 close to that obtained by SVM. However, SVM offered better generalization or
-sensitivity, justifying its selection as the final model (as already discussed
-in the work by \textcite{bca_subtypes_with_ml_Wu_2021}). This analysis
+sensitivity, justifying its selection as the final model. This analysis
 highlights the importance of considering multiple metrics in model evaluation,
 especially in clinical contexts, where the reliability of the assigned
 probabilities - and not just the hit rate - can be decisive for a safe medical
@@ -1212,151 +1211,196 @@ expression profiles, not only to detect cancer, but also to support more
 specific tasks such as tumor subtype stratification, with real potential for
 clinical translation.
 
+% \subsection{Unsupervised Learning in Breast Cancer Subtype Discovery}
+% \label{sec:background:unsupervised}
+% The studies discussed in the preceding sections establish that machine learning can
+% extract meaningful signal from high-dimensional biological data, both for the general
+% task of cancer classification and for the more specific problem of identifying miRNA
+% expression patterns associated with disease subtypes. However, the approaches examined
+% so far share a common assumption: the availability of reliable class labels that supervise
+% the learning process. This raises a natural question: \textbf{to what extent does the structure
+% implied by those labels reflect genuine, data-intrinsic organisation, rather than the
+% boundaries imposed by the labelling scheme itself?} Unsupervised learning offers a
+% complementary perspective by letting the data speak without prior annotation, potentially
+% revealing subgroup structure that supervised methods, constrained to reproduce known
+% categories, may overlook. In the context of mapping miRNA expression profiles to breast
+% cancer subtypes, this distinction is particularly relevant: if miRNA signatures carry
+% sufficient biological information to drive meaningful clustering, unsupervised methods
+% should recover groupings that are at once statistically coherent and clinically
+% interpretable. The following subsection reviews the foundations of this approach and
+% examines how it has been applied to breast cancer subtype discovery.
+
+% This branch of Machine Learning refers to a family of methods that operate on unlabelled data,
+% seeking to discover latent structure without explicit supervision
+% \cite{hastie2009elements}. The prototypical task is \textit{clustering}: partitioning a
+% dataset into groups such that samples within a group are more similar to each other than
+% to samples in other groups. Unlike supervised classification, there is no ground truth to
+% optimise against during training; evaluation relies either on internal geometric measures
+% or on post-hoc comparison with external labels when available. Unsupervised learning
+% has been applied to cancer genomics since the early studies of molecular classification
+% \cite{bc_molecular_Perou2000}, where hierarchical clustering on gene
+% expression microarray data demonstrated that transcriptomic profiles alone, without
+% clinical labels, can recover biologically meaningful tumour classes. More broadly, with
+% the increasing availability of clinical and molecular patient data, unsupervised methods
+% have gained prominence as tools for \textit{phenomapping}: the delineation of
+% therapeutically homogeneous patient subclasses within heterogeneous diseases
+% \cite{shah2015phenomapping}.
+
+% A representative example of this paradigm is the work of \citeauthor{ferro2021phenomapping}
+% \cite{ferro2021phenomapping}, who applied unsupervised clustering to a cohort of 712
+% women with primary breast cancer to identify clinically meaningful patient
+% subgroups from biological prognostic parameters. The study is motivated by the high
+% heterogeneity of PBC at the clinical, histopathological, and molecular levels, which
+% complicates patient management when similar clinical presentations may conceal
+% distinct underlying disease profiles. The authors frame this as a patient similarity
+% problem and argue that unsupervised learning offers a principled approach to uncovering
+% hidden structures in such complex, high-dimensional data.
+
+% The input feature set comprised five continuous quantitative variables: patient age,
+% oestrogen receptor (ER) levels, progesterone receptor levels, pS2 protein levels,
+% and cathepsin D levels. The restriction to continuous variables was imposed by the
+% requirements of the algorithms under consideration; tumour size was excluded due to an
+% elevated proportion of missing values (49\%). Rather than committing to a single method,
+% the authors compared four clustering algorithms: K-Means,
+% self-organising maps (SOM), hierarchical agglomerative clustering
+% (HAC), and Gaussian mixture models (GMM); so as to assess whether the identified structure was robust
+% across methodological choices.
+
+% Since no external reference partition was available in this historical dataset, model
+% selection and evaluation were conducted entirely through internal validation. Evaluating
+% clustering solutions is inherently challenging due to the absence of ground-truth labels,
+% and the literature distinguishes between \textit{internal} metrics, which assess the
+% geometric quality of the clusters without any reference labels, and \textit{external}
+% metrics, which compare cluster assignments against a known partition post-hoc. The
+% internal metric used throughout this line of work is the \textbf{silhouette score}
+% \cite{rousseeuw1987silhouettes}, defined for each sample $i$ as:
+
+% \begin{equation}
+%     s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
+%     \label{eq:silhouette}
+% \end{equation}
+
+% \noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other
+% samples in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest
+% neighbouring cluster. Values close to $+1$ indicate that the sample is well matched to
+% its own cluster and poorly matched to neighbouring clusters; values near $0$ indicate
+% overlap; and negative values suggest potential misassignment. The overall silhouette
+% score is the mean over all samples. In \citeauthor{ferro2021phenomapping}'s study,
+% the authors combined the silhouette width with two additional internal indices, 
+% over a range of $k = 2$ to $18$ clusters,
+% selecting the optimal partition via a rank aggregation procedure. All methods converged
+% on $k = 2$; HAC achieved the highest scores across all three measures, whereas the GMM
+% performed the poorest. Inter-algorithm agreement was further quantified using Meil{\u a}'s
+% Variation of Information \cite{meila2007comparing}, which revealed strong pairwise
+% similarity among K-Means, SOM, and HAC, while the GMM diverged from the remaining
+% methods.
+
+% When ground-truth labels are available for post-hoc validation, a richer set of
+% external metrics can be brought to bear. \textbf{Cluster purity} measures, for each
+% cluster, the proportion of samples belonging to the most frequent true class within that
+% cluster, aggregated as a weighted average across all clusters:
+
+% \begin{equation}
+%     \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
+%     \label{eq:purity}
+% \end{equation}
+
+% \noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total
+% number of samples. Purity ranges from 0 to 1, with higher values indicating better
+% alignment between clusters and true classes. However, purity alone does not penalise
+% trivial solutions in which every sample is placed in its own cluster; it is therefore
+% complemented by agreement-based measures. The \textbf{Adjusted Rand Index} (ARI)
+% \cite{hubert1985comparing} counts the fraction of sample pairs for which the clustering
+% and the ground-truth labelling agree, correcting for the agreement expected by chance:
+
+% \begin{equation}
+%     \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) -
+%     \mathbb{E}[\text{RI}]}
+%     \label{eq:ari}
+% \end{equation}
+
+% \noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better
+% than random; negative values indicate systematic disagreement. Similarly, the
+% \textbf{Adjusted Mutual Information} (AMI) \cite{vinh2010information} quantifies the
+% information shared between the cluster assignments and the true labels, normalised and
+% adjusted for chance:
+
+% \begin{equation}
+%     \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) -
+%     \mathbb{E}[I(U;V)]}
+%     \label{eq:ami}
+% \end{equation}
+
+% \noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the
+% true labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
+% AMI $= 0$ is random. Together, purity, ARI, and AMI provide a complementary view of
+% how well an unsupervised partition recovers a known reference labelling.
+
+% The two clusters identified by HAC exhibited a clear clinical differentiation. The
+% first cluster comprised younger patients with lower levels of ER, PgR, and cathepsin D;
+% the second cluster consisted of older, predominantly postmenopausal women with elevated
+% hormone receptor levels and higher cathepsin D values. Variable importance analysis,
+% carried out separately for each algorithm using method-specific procedures, consistently
+% ranked age, ER, and PgR as the three most influential features in defining the partition.
+% These findings are consistent with established biological evidence linking ER and PgR
+% positivity with age and menopausal status in breast tumours, reinforcing the validity of
+% the identified subgroups beyond the statistical criteria used for selection.
+
+% This study highlights several methodological considerations relevant to the
+% application of unsupervised learning in a clinical oncology setting. First, the choice of
+% clustering algorithm substantially affects both the quality and the interpretability of the
+% resulting partition, underscoring the importance of systematic comparison rather than
+% reliance on a single method. Second, the cluster validity problem - the principled
+% selection of both the algorithm and the number of clusters - requires explicit attention
+% through internal validation indices, which are often overlooked in practice. Third,
+% post-hoc variable importance assessment provides an interpretable link between the
+% statistical partition and the underlying biology, bridging the gap between data-driven
+% discovery and domain knowledge.
+
 \subsection{Unsupervised Learning in Breast Cancer Subtype Discovery}
 \label{sec:background:unsupervised}
-The studies discussed in the preceding sections establish that machine learning can
-extract meaningful signal from high-dimensional biological data, both for the general
-task of cancer classification and for the more specific problem of identifying miRNA
-expression patterns associated with disease subtypes. However, the approaches examined
-so far share a common assumption: the availability of reliable class labels that supervise
-the learning process. This raises a natural question: \textbf{to what extent does the structure
-implied by those labels reflect genuine, data-intrinsic organisation, rather than the
-boundaries imposed by the labelling scheme itself?} Unsupervised learning offers a
-complementary perspective by letting the data speak without prior annotation, potentially
-revealing subgroup structure that supervised methods, constrained to reproduce known
-categories, may overlook. In the context of mapping miRNA expression profiles to breast
-cancer subtypes, this distinction is particularly relevant: if miRNA signatures carry
-sufficient biological information to drive meaningful clustering, unsupervised methods
-should recover groupings that are at once statistically coherent and clinically
-interpretable. The following subsection reviews the foundations of this approach and
-examines how it has been applied to breast cancer subtype discovery.
 
-This branch of Machine Learning refers to a family of methods that operate on unlabelled data,
-seeking to discover latent structure without explicit supervision
-\cite{hastie2009elements}. The prototypical task is \textit{clustering}: partitioning a
-dataset into groups such that samples within a group are more similar to each other than
-to samples in other groups. Unlike supervised classification, there is no ground truth to
-optimise against during training; evaluation relies either on internal geometric measures
-or on post-hoc comparison with external labels when available. Unsupervised learning
-has been applied to cancer genomics since the early studies of molecular classification
-\cite{bc_molecular_Perou2000}, where hierarchical clustering on gene
-expression microarray data demonstrated that transcriptomic profiles alone, without
-clinical labels, can recover biologically meaningful tumour classes. More broadly, with
-the increasing availability of clinical and molecular patient data, unsupervised methods
-have gained prominence as tools for \textit{phenomapping}: the delineation of
-therapeutically homogeneous patient subclasses within heterogeneous diseases
-\cite{shah2015phenomapping}.
+The studies discussed in the preceding sections establish that machine learning can extract meaningful signal from high-dimensional biological data, both for the general task of cancer classification and for the more specific problem of identifying miRNA expression patterns associated with disease subtypes. However, the approaches examined so far share a common assumption: the availability of reliable class labels that supervise the learning process. This raises a natural question: \textbf{to what extent does the structure implied by those labels reflect genuine, data-intrinsic organisation, rather than the boundaries imposed by the labelling scheme itself?} Unsupervised learning offers a complementary perspective by allowing the data to be analysed without prior annotation, potentially revealing subgroup structure that supervised methods, constrained to reproduce known categories, may overlook. In the context of mapping miRNA expression profiles to breast cancer subtypes, this distinction is particularly relevant. If miRNA signatures carry sufficient biological information, unsupervised methods should recover groupings that are both statistically coherent and clinically interpretable.
 
-A representative example of this paradigm is the work of \citeauthor{ferro2021phenomapping}
-\cite{ferro2021phenomapping}, who applied unsupervised clustering to a cohort of 712
-women with primary breast cancer to identify clinically meaningful patient
-subgroups from biological prognostic parameters. The study is motivated by the high
-heterogeneity of PBC at the clinical, histopathological, and molecular levels, which
-complicates patient management when similar clinical presentations may conceal
-distinct underlying disease profiles. The authors frame this as a patient similarity
-problem and argue that unsupervised learning offers a principled approach to uncovering
-hidden structures in such complex, high-dimensional data.
+This branch of Machine Learning refers to a family of methods that operate on unlabelled data, seeking to discover latent structure without explicit supervision \cite{hastie2009elements}. Rather than learning a mapping between input variables and predefined outcomes, these approaches aim to characterise the intrinsic organisation of the data itself. As noted by \citeauthor{https://doi.org/10.1007/s00167-022-07233-7} \cite{https://doi.org/10.1007/s00167-022-07233-7}, unsupervised methods are particularly useful for analysing and simplifying high-dimensional datasets, identifying hidden patterns that may not be immediately apparent through conventional analyses. Among the most widely used techniques are clustering algorithms such as K-Means and hierarchical clustering, which group observations according to similarity, and dimensionality reduction methods such as Principal Component Analysis (PCA) and factor analysis, which provide complementary views of the structure underlying complex datasets.
 
-The input feature set comprised five continuous quantitative variables: patient age,
-oestrogen receptor (ER) levels, progesterone receptor levels, pS2 protein levels,
-and cathepsin D levels. The restriction to continuous variables was imposed by the
-requirements of the algorithms under consideration; tumour size was excluded due to an
-elevated proportion of missing values (49\%). Rather than committing to a single method,
-the authors compared four clustering algorithms: K-Means,
-self-organising maps (SOM), hierarchical agglomerative clustering
-(HAC), and Gaussian mixture models (GMM); so as to assess whether the identified structure was robust
-across methodological choices.
+The application of these methods to cancer genomics is particularly compelling. High-throughput technologies routinely generate measurements involving hundreds or thousands of molecular features, often exhibiting complex relationships that are not immediately captured by clinical annotations. Unsupervised learning therefore provides a framework for investigating whether molecular data contain intrinsic organisation that reflects underlying biological processes. Early molecular classification studies demonstrated that transcriptomic profiles alone could recover biologically meaningful tumour classes without explicit supervision \cite{bc_molecular_Perou2000}, suggesting that at least part of the heterogeneity observed in cancer emerges naturally from the structure of the molecular data. In the present work, this motivates the investigation of whether miRNA expression profiles encode a geometry that aligns with established breast cancer subtype definitions.
 
-Since no external reference partition was available in this historical dataset, model
-selection and evaluation were conducted entirely through internal validation. Evaluating
-clustering solutions is inherently challenging due to the absence of ground-truth labels,
-and the literature distinguishes between \textit{internal} metrics, which assess the
-geometric quality of the clusters without any reference labels, and \textit{external}
-metrics, which compare cluster assignments against a known partition post-hoc. The
-internal metric used throughout this line of work is the \textbf{silhouette score}
-\cite{rousseeuw1987silhouettes}, defined for each sample $i$ as:
+Evaluating clustering solutions presents unique challenges because no ground-truth labels are available during training. Consequently, clustering performance is often assessed using internal validation measures that quantify the geometric quality of the resulting partition. One of the most widely used metrics is the \textbf{silhouette score} \cite{rousseeuw1987silhouettes}, defined for each sample $i$ as
 
 \begin{equation}
-    s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}}
-    \label{eq:silhouette}
+s(i) = \frac{b(i) - a(i)}{\max{a(i),, b(i)}}
+\label{eq:silhouette}
 \end{equation}
 
-\noindent where $a(i)$ is the mean intra-cluster distance from sample $i$ to all other
-samples in its cluster, and $b(i)$ is the mean distance from $i$ to the nearest
-neighbouring cluster. Values close to $+1$ indicate that the sample is well matched to
-its own cluster and poorly matched to neighbouring clusters; values near $0$ indicate
-overlap; and negative values suggest potential misassignment. The overall silhouette
-score is the mean over all samples. In \citeauthor{ferro2021phenomapping}'s study,
-the authors combined the silhouette width with two additional internal indices, 
-over a range of $k = 2$ to $18$ clusters,
-selecting the optimal partition via a rank aggregation procedure. All methods converged
-on $k = 2$; HAC achieved the highest scores across all three measures, whereas the GMM
-performed the poorest. Inter-algorithm agreement was further quantified using Meil{\u a}'s
-Variation of Information \cite{meila2007comparing}, which revealed strong pairwise
-similarity among K-Means, SOM, and HAC, while the GMM diverged from the remaining
-methods.
+\noindent where $a(i)$ denotes the mean intra-cluster distance between sample $i$ and all other samples assigned to the same cluster, and $b(i)$ corresponds to the mean distance between $i$ and the nearest neighbouring cluster. Values approaching $+1$ indicate that a sample is well matched to its assigned cluster and poorly matched to neighbouring clusters, whereas values close to $0$ suggest overlap between groups.
 
-When ground-truth labels are available for post-hoc validation, a richer set of
-external metrics can be brought to bear. \textbf{Cluster purity} measures, for each
-cluster, the proportion of samples belonging to the most frequent true class within that
-cluster, aggregated as a weighted average across all clusters:
+When reference labels are available, external measures can be used to assess the extent to which the identified clusters align with known categories. In the context of breast cancer, this enables the comparison of unsupervised partitions against established subtype annotations. \textbf{Cluster purity} measures the proportion of observations within each cluster belonging to the most frequent reference class:
 
 \begin{equation}
-    \text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
-    \label{eq:purity}
+\text{Purity} = \frac{1}{N} \sum_{k=1}^{K} \max_{j} \left| C_k \cap L_j \right|
+\label{eq:purity}
 \end{equation}
 
-\noindent where $L_j$ is the set of samples with true label $j$ and $N$ is the total
-number of samples. Purity ranges from 0 to 1, with higher values indicating better
-alignment between clusters and true classes. However, purity alone does not penalise
-trivial solutions in which every sample is placed in its own cluster; it is therefore
-complemented by agreement-based measures. The \textbf{Adjusted Rand Index} (ARI)
-\cite{hubert1985comparing} counts the fraction of sample pairs for which the clustering
-and the ground-truth labelling agree, correcting for the agreement expected by chance:
+\noindent where $L_j$ denotes the set of samples with true label $j$, $C_k$ represents the set of observations assigned to cluster $k$, and $N$ is the total number of samples.
+
+Agreement-based measures further account for chance correspondence between clustering assignments and reference labels. The \textbf{Adjusted Rand Index} (ARI) \cite{hubert1985comparing} is defined as
 
 \begin{equation}
-    \text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) -
-    \mathbb{E}[\text{RI}]}
-    \label{eq:ari}
+\text{ARI} = \frac{\text{RI} - \mathbb{E}[\text{RI}]}{\max(\text{RI}) - \mathbb{E}[\text{RI}]}
+\label{eq:ari}
 \end{equation}
 
-\noindent ARI $= 1$ indicates perfect agreement; ARI $= 0$ indicates agreement no better
-than random; negative values indicate systematic disagreement. Similarly, the
-\textbf{Adjusted Mutual Information} (AMI) \cite{vinh2010information} quantifies the
-information shared between the cluster assignments and the true labels, normalised and
-adjusted for chance:
+\noindent where values of $1$ indicate perfect agreement and values close to $0$ correspond to agreement expected by chance. Similarly, the \textbf{Adjusted Mutual Information} (AMI) \cite{vinh2010information} quantifies the information shared between clustering assignments and reference labels while correcting for chance:
 
 \begin{equation}
-    \text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\text{avg}(H(U), H(V)) -
-    \mathbb{E}[I(U;V)]}
-    \label{eq:ami}
+\text{AMI} = \frac{I(U;V) - \mathbb{E}[I(U;V)]}{\mathrm{avg}(H(U), H(V)) - \mathbb{E}[I(U;V)]}
+\label{eq:ami}
 \end{equation}
 
-\noindent where $I(U;V)$ is the mutual information between the clustering $U$ and the
-true labelling $V$, and $H(\cdot)$ denotes entropy. Like ARI, AMI $= 1$ is perfect and
-AMI $= 0$ is random. Together, purity, ARI, and AMI provide a complementary view of
-how well an unsupervised partition recovers a known reference labelling.
+\noindent where $I(U;V)$ represents the mutual information between the clustering solution $U$ and the reference partition $V$, and $H(\cdot)$ denotes entropy.
 
-The two clusters identified by HAC exhibited a clear clinical differentiation. The
-first cluster comprised younger patients with lower levels of ER, PgR, and cathepsin D;
-the second cluster consisted of older, predominantly postmenopausal women with elevated
-hormone receptor levels and higher cathepsin D values. Variable importance analysis,
-carried out separately for each algorithm using method-specific procedures, consistently
-ranked age, ER, and PgR as the three most influential features in defining the partition.
-These findings are consistent with established biological evidence linking ER and PgR
-positivity with age and menopausal status in breast tumours, reinforcing the validity of
-the identified subgroups beyond the statistical criteria used for selection.
-
-This study highlights several methodological considerations relevant to the
-application of unsupervised learning in a clinical oncology setting. First, the choice of
-clustering algorithm substantially affects both the quality and the interpretability of the
-resulting partition, underscoring the importance of systematic comparison rather than
-reliance on a single method. Second, the cluster validity problem - the principled
-selection of both the algorithm and the number of clusters - requires explicit attention
-through internal validation indices, which are often overlooked in practice. Third,
-post-hoc variable importance assessment provides an interpretable link between the
-statistical partition and the underlying biology, bridging the gap between data-driven
-discovery and domain knowledge.
+Together, these metrics provide complementary perspectives on cluster validity. Internal measures evaluate whether a clustering solution captures coherent geometric organisation within the data itself, whereas external measures assess the extent to which this organisation aligns with existing biological knowledge. This distinction is central to the present work. Rather than assuming that breast cancer subtype labels necessarily reflect the organisation of miRNA expression space, unsupervised learning provides a means of investigating whether these clinically defined categories emerge naturally from the underlying molecular geometry.
 
 \subsection{Comparison with thesis approach}
 
@@ -1367,11 +1411,9 @@ key elements in the classification of tumor biopsies, directly outlining some
 possible paths for this thesis.
 
 One of the first aspects to highlight is the \textbf{importance of differential
-  expression analysis as an initial step in feature selection}. This approach was
-common to several of the studies analyzed, namely
-\textcite{bca_subtypes_with_ml_Wu_2021} and \textcite{ml_gastric_Azari2023},
-and proved effective in reducing dimensionality in scenarios with high feature
-density, such as miRNA expression data. This strategy allows the analysis to
+  expression analysis as an initial step in feature selection}. This approach is 
+very common and proved effective in reducing dimensionality in scenarios with high feature
+density, such as miRNA expression data \cite{Azari2023}. This strategy allows the analysis to
 focus on more informative subsets, reducing the risk of overfitting and making
 the models more robust. In addition, the studies mentioned demonstrate that
 this initial selection can (and should) be complemented with additional
@@ -1454,9 +1496,3 @@ to the specific context of this dissertation, which seeks to identify miRNA
 signatures with discriminatory power for the classification of breast cancer
 subtypes. The next chapter describes in detail how this approach will be
 implemented.
-
-% \subsection{Other relevant work}
-% HERE: applying ml in diagnosis and prognosis + ai in oncological nanomedicine
-% Papers a usar: 6,8,5,7
-
-% \subsection{Conclusion}
